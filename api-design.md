@@ -10,3 +10,9 @@ gavin-admin
 ├── api-business      # 业务模块聚合目录
 ├── api-thirdparty    # 第三方服务
 └── pom.xml             # 父级依赖管理
+
+依赖问题
+
+1 由父模块统一管理版本，子模块只声明依赖，不写版本号
+
+2 
