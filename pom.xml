@@ -23,6 +23,7 @@
         <module>api-framework</module>
         <module>api-system</module>
         <module>api-common</module>
+        <module>api-quartz</module>
     </modules>
 
     <properties>
