@@ -1,4 +1,4 @@
-package com.boot.controller;
+package com.boot.controller.system;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.GetMapping;
