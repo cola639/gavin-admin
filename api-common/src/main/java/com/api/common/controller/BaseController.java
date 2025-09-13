@@ -11,13 +11,11 @@ import com.api.common.utils.*;
 import com.api.common.utils.pagination.PageDomain;
 import com.api.common.utils.pagination.TableDataInfo;
 import com.api.common.utils.pagination.TableSupport;
+import org.hibernate.query.Page;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-
-
-
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -90,6 +88,21 @@ public class BaseController {
         rspData.setTotal(new PageInfo(list).getTotal());
         return rspData;
     }
+
+    /**
+     * Build a paginated response from Spring Data JPA Page object.
+     *
+     * @param page Page object
+     * @return table response
+     */
+//    protected <T> TableDataInfo getDataTable(Page<T> page) {
+//        TableDataInfo rspData = new TableDataInfo();
+//        rspData.setCode(HttpStatus.SUCCESS);
+//        rspData.setMsg("Query successful");
+//        rspData.setRows(page.getContent());
+//        rspData.setTotal(page.getTotalElements());
+//        return rspData;
+//    }
 
     /** ----------- Response Wrappers ----------- */
 

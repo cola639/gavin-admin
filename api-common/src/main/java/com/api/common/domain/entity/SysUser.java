@@ -1,20 +1,13 @@
 package com.api.common.domain.entity;
 
-import java.util.Date;
-import java.util.List;
-
-//import javax.validation.constraints.*;
-
-import com.api.common.domain.entity.BaseEntity;
-import com.api.common.domain.entity.SysDept;
-import com.api.common.domain.entity.SysRole;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * User entity mapped to sys_user table.
@@ -25,92 +18,112 @@ import lombok.EqualsAndHashCode;
  * <p>
  * Features:
  * - Validation annotations for user input
- * - Excel annotations for batch import/export
+ * - JPA annotations for persistence mapping
  * - Department and role relationships
  * - Utility method for admin detection
  * <p>
  * Lombok annotations reduce boilerplate by auto-generating getters, setters, constructors, etc.
- * <p>
- * Author: ruoyi
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@Table(name = "sys_user")
 public class SysUser extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
     /** Unique User ID */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long userId;
 
     /** Department ID */
+    @Column(name = "dept_id")
     private Long deptId;
 
     /** Login username */
-    // @Xss(message = "Username cannot contain script characters")
     @NotBlank(message = "Username cannot be empty")
     @Size(max = 30, message = "Username length cannot exceed 30 characters")
+    @Column(name = "user_name")
     private String userName;
 
     /** Display nickname */
-    //  @Xss(message = "Nickname cannot contain script characters")
     @Size(max = 30, message = "Nickname length cannot exceed 30 characters")
+    @Column(name = "nick_name")
     private String nickName;
 
     /** Email address */
-    // @Email(message = "Invalid email format")
     @Size(max = 50, message = "Email length cannot exceed 50 characters")
-    //  @Excel(name = "Email")
+    @Column(name = "email")
     private String email;
 
     /** Phone number */
     @Size(max = 11, message = "Phone number cannot exceed 11 digits")
-    // @Excel(name = "Phone Number", cellType = ColumnType.TEXT)
+    @Column(name = "phonenumber")
     private String phonenumber;
 
     /** Gender (0=Male, 1=Female, 2=Unknown) */
-    // @Excel(name = "Gender", readConverterExp = "0=Male,1=Female,2=Unknown")
+    @Column(name = "sex")
     private String sex;
 
     /** Avatar URL */
+    @Column(name = "avatar")
     private String avatar;
 
     /** Encrypted password */
+    @Column(name = "password")
     private String password;
 
     /** Account status (0=Active, 1=Disabled) */
-    // @Excel(name = "Account Status", readConverterExp = "0=Active,1=Disabled")
+    @Column(name = "status")
     private String status;
 
     /** Deletion flag (0=Exists, 2=Deleted) */
+    @Column(name = "del_flag")
     private String delFlag;
 
     /** Last login IP */
-    // @Excel(name = "Last Login IP", type = Type.EXPORT)
+    @Column(name = "login_ip")
     private String loginIp;
 
     /** Last login time */
-    // @Excel(name = "Last Login Time", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss", type = Type.EXPORT)
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "login_date")
     private Date loginDate;
 
     /** Last password update timestamp */
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "pwd_update_date")
     private Date pwdUpdateDate;
 
     /** Associated department */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dept_id", insertable = false, updatable = false)
     private SysDept dept;
 
     /** Associated roles */
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "sys_user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
     private List<SysRole> roles;
 
-    /** Array of role IDs */
+    /** Array of role IDs (not persisted, helper field) */
+    @Transient
     private Long[] roleIds;
 
-    /** Array of post IDs */
+    /** Array of post IDs (not persisted, helper field) */
+    @Transient
     private Long[] postIds;
 
-    /** Single role ID (legacy use) */
+    /** Single role ID (legacy use, not persisted) */
+    @Transient
     private Long roleId;
 
     /**
