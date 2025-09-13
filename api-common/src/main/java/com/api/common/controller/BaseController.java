@@ -109,19 +109,19 @@ public class BaseController {
 
     /** ----------- User Information Helpers ----------- */
 
-//    public LoginUser getLoginUser() {
-//        return SecurityUtils.getLoginUser();
-//    }
+    public LoginUser getLoginUser() {
+        return SecurityUtils.getLoginUser();
+    }
 
-//    public Long getUserId() {
-//        return getLoginUser().getUserId();
-//    }
-//
-//    public Long getDeptId() {
-//        return getLoginUser().getDeptId();
-//    }
-//
-//    public String getUsername() {
-//        return getLoginUser().getUsername();
-//    }
+    public Long getUserId() {
+        return getLoginUser().getUserId();
+    }
+
+    public Long getDeptId() {
+        return getLoginUser().getDeptId();
+    }
+
+    public String getUsername() {
+        return getLoginUser().getUsername();
+    }
 }
