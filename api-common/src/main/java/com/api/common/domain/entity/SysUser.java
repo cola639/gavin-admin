@@ -101,7 +101,7 @@ public class SysUser extends BaseEntity {
     private Date pwdUpdateDate;
 
     /** Associated department */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "dept_id", insertable = false, updatable = false)
     private SysDept dept;
 

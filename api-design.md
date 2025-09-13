@@ -68,7 +68,7 @@ test → 单元测试依赖
 
 7 项目是 java17 springboot3.5 考虑版本兼容性 帮我补充版本号 + Maven 坐标链接
 
-8 项目是 java17 springboot3.5 在迁移JDK8的项目 怎么修复 给出原因
+8 项目是 java17 springboot3.5 在迁移项目 怎么修复 给出原因
 
 9 .mvn 文件夹目录是干嘛 有没有区别在哪里
 

@@ -68,16 +68,6 @@
                 <artifactId>poi-ooxml</artifactId>
                 <version>${poi.version}</version>
             </dependency>
-<!--            <dependency>-->
-<!--                <groupId>com.querydsl</groupId>-->
-<!--                <artifactId>querydsl-jpa</artifactId>-->
-<!--                <version>${dsl.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>com.querydsl</groupId>-->
-<!--                <artifactId>querydsl-apt</artifactId>-->
-<!--                <version>${dsl.version}</version>-->
-<!--            </dependency>-->
 
 
             <dependency>
