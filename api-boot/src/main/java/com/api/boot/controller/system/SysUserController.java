@@ -3,9 +3,11 @@ package com.api.boot.controller.system;
 import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
 import com.api.common.domain.entity.SysUser;
+import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.pagination.TableDataInfo;
 
+import com.api.system.service.SysDeptService;
 import com.api.system.service.SysUserService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,8 @@ import java.util.stream.Collectors;
 public class SysUserController extends BaseController {
 
     private final SysUserService userService;
+
+    private final SysDeptService sysDeptService;
 
     /**
      * Get paginated list of users (with fixed params for now).
@@ -84,35 +88,29 @@ public class SysUserController extends BaseController {
 //
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysUser user) {
-        deptService.checkDeptDataScope(user.getDeptId());
-        roleService.checkRoleDataScope(user.getRoleIds());
-        if (!userService.checkUserNameUnique(user)) {
-            return error("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
-        } else if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user)) {
-            return error("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
-        } else if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user)) {
-            return error("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
-        }
-        user.setCreateBy(getUsername());
+//        user.setCreateBy(getUsername());
         user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
-        return toAjax(userService.insertUser(user));
+
+        userService.createUser(user); // 把校验和保存逻辑交给 Service
+
+        return success();
     }
 
-    public AjaxResult edit(@Validated @RequestBody SysUser user) {
-        userService.checkUserAllowed(user);
-        userService.checkUserDataScope(user.getUserId());
-        deptService.checkDeptDataScope(user.getDeptId());
-        roleService.checkRoleDataScope(user.getRoleIds());
-        if (!userService.checkUserNameUnique(user)) {
-            return error("修改用户'" + user.getUserName() + "'失败，登录账号已存在");
-        } else if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user)) {
-            return error("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
-        } else if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user)) {
-            return error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
-        }
-        user.setUpdateBy(getUsername());
-        return toAjax(userService.updateUser(user));
-    }
+//    public AjaxResult edit(@Validated @RequestBody SysUser user) {
+//        userService.checkUserAllowed(user);
+//        userService.checkUserDataScope(user.getUserId());
+//        deptService.checkDeptDataScope(user.getDeptId());
+//        roleService.checkRoleDataScope(user.getRoleIds());
+//        if (!userService.checkUserNameUnique(user)) {
+//            return error("修改用户'" + user.getUserName() + "'失败，登录账号已存在");
+//        } else if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user)) {
+//            return error("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
+//        } else if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user)) {
+//            return error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+//        }
+//        user.setUpdateBy(getUsername());
+//        return toAjax(userService.updateUser(user));
+//    }
 
 //    @DeleteMapping("/{userIds}")
 //    public AjaxResult remove(@PathVariable Long[] userIds) {

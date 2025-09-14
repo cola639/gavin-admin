@@ -6,10 +6,13 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.Optional;
 
-public interface SysUserRepository
-        extends JpaRepository<SysUser, Long>, JpaSpecificationExecutor<SysUser> {
+public interface SysUserRepository extends JpaRepository<SysUser, Long>, JpaSpecificationExecutor<SysUser> {
 
     Optional<SysUser> findByUserNameAndDelFlag(String userName, String delFlag);
+
+    Optional<SysUser> findByPhonenumberAndDelFlag(String phonenumber, String delFlag);
+
+    Optional<SysUser> findByEmailAndDelFlag(String email, String delFlag);
 
     boolean existsByUserNameAndDelFlag(String userName, String delFlag);
 

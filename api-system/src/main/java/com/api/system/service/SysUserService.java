@@ -1,9 +1,12 @@
 package com.api.system.service;
 
 import com.api.common.domain.entity.SysUser;
+import com.api.common.utils.StringUtils;
 import com.api.common.utils.jpa.SpecificationBuilder;
 import com.api.system.repository.SysUserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.service.spi.ServiceException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -49,5 +52,22 @@ public class SysUserService {
 
     public void deleteUserById(Long userId) {
         userRepository.deleteById(userId);
+    }
+
+    @Transactional
+    public void createUser(SysUser user) {
+        if (userRepository.existsByUserNameAndDelFlag(user.getUserName(), "0")) {
+            throw new ServiceException("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
+        }
+        if (StringUtils.isNotEmpty(user.getPhonenumber())
+                && userRepository.existsByPhonenumberAndDelFlag(user.getPhonenumber(), "0")) {
+            throw new ServiceException("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
+        }
+        if (StringUtils.isNotEmpty(user.getEmail())
+                && userRepository.existsByEmailAndDelFlag(user.getEmail(), "0")) {
+            throw new ServiceException("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+        }
+
+        userRepository.save(user);
     }
 }

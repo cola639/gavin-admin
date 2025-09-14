@@ -84,3 +84,7 @@ test → 单元测试依赖
 可以用 querydsl-jpa 和 querydsl-apt 5.1.0 来加强jpa查询 英文注释 
 
 12 基于JAVA17 + spring3.5 改用JPA实现 要求优雅 模块化 可插拔 英文注释
+
+13 debug workflow 圈出关键点 自己实现 借鉴不是照搬
+
+14 父级包含子级部门 修改权限
