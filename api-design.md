@@ -61,7 +61,8 @@ test → 单元测试依赖
 4 jackjson lombook rewrite
 
 5 （项目使用lombook jackjson 可以看情况能不能用）
-帮我改写成基于java17 springboot3.5 用更优雅的代码 改成英文注释 去掉作者信息 并给出全部改动前后对比
+帮我改写成 jpa entity
+基于java17 springboot3.5 用更优雅的代码 改成英文注释 去掉作者信息 并给出全部改动前后对比
 解释下这段代码作用
 
 6 querydsl-jpa 和 querydsl-apt 5.1.0 来加强jpa查询
@@ -78,6 +79,8 @@ test → 单元测试依赖
 
 @EqualsAndHashCode(callSuper = true) 让子类包含父类的 equals、hashCode。
 
-11  根据原来的 entity mapper.xml, ddl, 和用JPA buddy生成的数据库entity
-希望改成完整迁移的的JPA entity, service，repository 
+11 根据原来的 entity mapper.xml, ddl, 和用JPA buddy生成的数据库entity
+希望改成完整迁移的的JPA entity, service，repository
 可以用 querydsl-jpa 和 querydsl-apt 5.1.0 来加强jpa查询 英文注释 
+
+12 基于JAVA17 + spring3.5 改用JPA实现 要求优雅 模块化 可插拔 英文注释
