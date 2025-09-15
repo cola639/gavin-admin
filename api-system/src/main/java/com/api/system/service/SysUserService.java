@@ -26,14 +26,7 @@ public class SysUserService {
     private final SysUserRepository userRepository;
 
     public Page<SysUser> selectUserList(SysUser user, Map<String, Object> params, Pageable pageable) {
-        Specification<SysUser> spec = SpecificationBuilder.<SysUser>builder()
-                .eq("delFlag", "0")
-                .eq("userId", user.getUserId())
-                .like("userName", user.getUserName())
-                .eq("status", user.getStatus())
-                .like("phonenumber", user.getPhonenumber())
-                .between("createTime", (Date) params.get("beginTime"), (Date) params.get("endTime"))
-                .build();
+        Specification<SysUser> spec = SpecificationBuilder.<SysUser>builder().eq("delFlag", "0").eq("userId", user.getUserId()).like("userName", user.getUserName()).eq("status", user.getStatus()).like("phonenumber", user.getPhonenumber()).between("createTime", (Date) params.get("beginTime"), (Date) params.get("endTime")).build();
 
         return userRepository.findAll(spec, pageable);
     }
@@ -60,13 +53,13 @@ public class SysUserService {
 
     @Transactional
     public void createUser(SysUser user) {
-        if (userRepository.existsByUserNameAndDelFlag(user.getUserName(), "0")) {
+        if (userRepository.existsByUserName(user.getUserName())) {
             throw new ServiceException("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
         }
-        if (StringUtils.isNotEmpty(user.getPhonenumber()) && userRepository.existsByPhonenumberAndDelFlag(user.getPhonenumber(), "0")) {
+        if (StringUtils.isNotEmpty(user.getPhonenumber()) && userRepository.existsByPhonenumber(user.getPhonenumber())) {
             throw new ServiceException("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
         }
-        if (StringUtils.isNotEmpty(user.getEmail()) && userRepository.existsByEmailAndDelFlag(user.getEmail(), "0")) {
+        if (StringUtils.isNotEmpty(user.getEmail()) && userRepository.existsByEmail(user.getEmail())) {
             throw new ServiceException("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
 

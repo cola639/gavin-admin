@@ -14,9 +14,9 @@ public interface SysUserRepository extends JpaRepository<SysUser, Long>, JpaSpec
 
     Optional<SysUser> findByEmailAndDelFlag(String email, String delFlag);
 
-    boolean existsByUserNameAndDelFlag(String userName, String delFlag);
+    boolean existsByUserName(String userName);
 
-    boolean existsByPhonenumberAndDelFlag(String phonenumber, String delFlag);
+    boolean existsByPhonenumber(String phonenumber);
 
-    boolean existsByEmailAndDelFlag(String email, String delFlag);
+    boolean existsByEmail(String email);
 }
