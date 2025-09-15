@@ -112,6 +112,7 @@ public class SysUser extends BaseEntity {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+    @org.hibernate.annotations.Immutable // 标记不可修改（Hibernate 提供的）
     private List<SysRole> roles;
 
     /** Array of role IDs (not persisted, helper field) */

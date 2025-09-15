@@ -88,9 +88,8 @@ public class SysUserController extends BaseController {
 //
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysUser user) {
-//        user.setCreateBy(getUsername());
+        //  user.setCreateBy(getUsername());
         user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
-
         userService.createUser(user); // 把校验和保存逻辑交给 Service
 
         return success();

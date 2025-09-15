@@ -6,6 +6,7 @@ import com.api.common.utils.jpa.SpecificationBuilder;
 import com.api.system.repository.SysUserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +16,13 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SysUserService {
 
+    private final SysUserPostService userPostService;
+    private final SysUserRoleService userRoleService;
     private final SysUserRepository userRepository;
 
     public Page<SysUser> selectUserList(SysUser user, Map<String, Object> params, Pageable pageable) {
@@ -59,15 +63,21 @@ public class SysUserService {
         if (userRepository.existsByUserNameAndDelFlag(user.getUserName(), "0")) {
             throw new ServiceException("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
         }
-        if (StringUtils.isNotEmpty(user.getPhonenumber())
-                && userRepository.existsByPhonenumberAndDelFlag(user.getPhonenumber(), "0")) {
+        if (StringUtils.isNotEmpty(user.getPhonenumber()) && userRepository.existsByPhonenumberAndDelFlag(user.getPhonenumber(), "0")) {
             throw new ServiceException("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
         }
-        if (StringUtils.isNotEmpty(user.getEmail())
-                && userRepository.existsByEmailAndDelFlag(user.getEmail(), "0")) {
+        if (StringUtils.isNotEmpty(user.getEmail()) && userRepository.existsByEmailAndDelFlag(user.getEmail(), "0")) {
             throw new ServiceException("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
 
-        userRepository.save(user);
+        // Save user info
+        SysUser savedUser = userRepository.save(user);
+        log.info("Inserted user with id={}", savedUser.getUserId());
+
+        // Save user-post associations
+        userPostService.insertUserPost(savedUser);
+
+        // Save user-role associations
+        userRoleService.insertUserRole(savedUser.getUserId(), savedUser.getRoleIds());
     }
 }

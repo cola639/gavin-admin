@@ -81,10 +81,22 @@ test → 单元测试依赖
 
 11 根据原来的 entity mapper.xml, ddl, 和用JPA buddy生成的数据库entity
 希望改成完整迁移的的JPA entity, service，repository
-可以用 querydsl-jpa 和 querydsl-apt 5.1.0 来加强jpa查询 英文注释 
+可以用 specification 来加强jpa查询 英文注释
 
 12 基于JAVA17 + spring3.5 改用JPA实现 要求优雅 模块化 可插拔 英文注释
 
 13 debug workflow 圈出关键点 自己实现 借鉴不是照搬
 
 14 父级包含子级部门 修改权限
+
+15 关注表数据的变化 借鉴ruoyi 封装模式 DDL
+
+16 改用JPA实现 关联表只用@OneToMany / @ManyToOne + 中间表实体，保存更新自己维护，关联仅用于查询。
+
+17 根据 mapper.xml
+希望改成JPA repository service 不需要service interface
+看情况用 specification 来加强jpa查询 英文注释
+
+18 复合组件 static 声明主键
+
+19 console 转成执行sql 总数 单独解释每条sql
