@@ -100,3 +100,30 @@ test → 单元测试依赖
 18 复合组件 static 声明主键
 
 19 console 转成执行sql 总数 单独解释每条sql
+
+20  
+yyyy-MM-dd HH:mm:ss
+
+yyyy-MM-dd
+
+ISO-8601 格式：2025-09-06T15:25:49.000+08:00
+
+{
+"time1": "2025-09-06T15:25:49.000+08:00",
+"time2": "2025-09-06 15:25:49",
+"time3": "2025-09-06"
+}
+
+在 Java 8+ / Spring Boot 3.x 里，最佳实践是：
+
+不要再用 java.util.Date + @Temporal，而是用 java.time.LocalDateTime / LocalDate / LocalTime。
+
+原因：
+
+Date / Calendar 已经过时，不推荐。
+
+LocalDateTime、LocalDate、LocalTime 不需要 @Temporal，JPA 可以直接映射到 TIMESTAMP、DATE、TIME。
+
+你已经有全局 JacksonConfig 配置了，可以无缝支持 LocalDateTime 的序列化/反序列化。
+
+21  存储 (TIMESTAMP) → 读取 (JDBC/应用)

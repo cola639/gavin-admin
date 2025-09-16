@@ -20,15 +20,15 @@ import java.util.Map;
  * Provides common audit fields and request-related metadata
  * that are automatically inherited by all entities in the system.
  * </p>
- *
+ * <p>
  * Features:
  * - Audit tracking (createdBy, createdTime, updatedBy, updatedTime)
  * - Search support
  * - Additional request parameters
  * - JSON serialization formatting and control
- *
+ * <p>
  * Lombok annotations are used to reduce boilerplate code.
- *
+ * <p>
  * Author: ruoyi
  */
 @Data

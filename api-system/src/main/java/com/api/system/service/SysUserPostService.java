@@ -43,4 +43,9 @@ public class SysUserPostService {
             log.info("No posts to insert for userId={}", user.getUserId());
         }
     }
+
+    public void deleteByUserId(Long userId) {
+        log.info("Deleting user-post associations by userId: {}", userId);
+        repository.deleteByUser_UserId(userId);
+    }
 }

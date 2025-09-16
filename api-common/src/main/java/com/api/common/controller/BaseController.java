@@ -31,15 +31,15 @@ public class BaseController {
     /**
      * Register a binder to convert request strings into {@link Date}.
      */
-    @InitBinder
-    public void initBinder(WebDataBinder binder) {
-        binder.registerCustomEditor(Date.class, new PropertyEditorSupport() {
-            @Override
-            public void setAsText(String text) {
-                setValue(DateUtils.parseDate(text));
-            }
-        });
-    }
+//    @InitBinder
+//    public void initBinder(WebDataBinder binder) {
+//        binder.registerCustomEditor(Date.class, new PropertyEditorSupport() {
+//            @Override
+//            public void setAsText(String text) {
+//                setValue(DateUtils.parseDate(text));
+//            }
+//        });
+//    }
 
     /**
      * Build a paginated response from Spring Data JPA Page object.

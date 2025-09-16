@@ -95,21 +95,12 @@ public class SysUserController extends BaseController {
         return success();
     }
 
-//    public AjaxResult edit(@Validated @RequestBody SysUser user) {
-//        userService.checkUserAllowed(user);
-//        userService.checkUserDataScope(user.getUserId());
-//        deptService.checkDeptDataScope(user.getDeptId());
-//        roleService.checkRoleDataScope(user.getRoleIds());
-//        if (!userService.checkUserNameUnique(user)) {
-//            return error("修改用户'" + user.getUserName() + "'失败，登录账号已存在");
-//        } else if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user)) {
-//            return error("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
-//        } else if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user)) {
-//            return error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
-//        }
-//        user.setUpdateBy(getUsername());
-//        return toAjax(userService.updateUser(user));
-//    }
+    @PutMapping
+    public AjaxResult update(@Validated @RequestBody SysUser user) {
+
+        SysUser updatedUser = userService.updateUser(user);
+        return AjaxResult.success(updatedUser);
+    }
 
 //    @DeleteMapping("/{userIds}")
 //    public AjaxResult remove(@PathVariable Long[] userIds) {

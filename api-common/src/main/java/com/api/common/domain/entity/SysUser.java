@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -91,12 +92,10 @@ public class SysUser extends BaseEntity {
     private String loginIp;
 
     /** Last login time */
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "login_date")
     private Date loginDate;
 
     /** Last password update timestamp */
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "pwd_update_date")
     private Date pwdUpdateDate;
 
@@ -107,12 +106,8 @@ public class SysUser extends BaseEntity {
 
     /** Associated roles */
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "sys_user_role",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    @org.hibernate.annotations.Immutable // 标记不可修改（Hibernate 提供的）
+    @JoinTable(name = "sys_user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @org.hibernate.annotations.Immutable  // Hibernate won't allow modifications
     private List<SysRole> roles;
 
     /** Array of role IDs (not persisted, helper field) */

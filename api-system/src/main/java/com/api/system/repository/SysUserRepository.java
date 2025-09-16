@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.Optional;
 
 public interface SysUserRepository extends JpaRepository<SysUser, Long>, JpaSpecificationExecutor<SysUser> {
+    Optional<SysUser> findByUserId(Long userId);
 
     Optional<SysUser> findByUserNameAndDelFlag(String userName, String delFlag);
 

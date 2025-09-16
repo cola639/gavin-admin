@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -43,10 +44,6 @@ public class SysUserService {
         return userRepository.save(user);
     }
 
-    public SysUser updateUser(SysUser user) {
-        return userRepository.save(user);
-    }
-
     public void deleteUserById(Long userId) {
         userRepository.deleteById(userId);
     }
@@ -72,5 +69,33 @@ public class SysUserService {
 
         // Save user-role associations
         userRoleService.insertUserRole(savedUser.getUserId(), savedUser.getRoleIds());
+    }
+
+    @Transactional
+    public SysUser updateUser(SysUser user) {
+        Optional<SysUser> info = userRepository.findById(user.getUserId());
+
+        if (info.isPresent()) {
+            SysUser existingUser = info.get();  // unwrap to real SysUser
+            if (!user.getUserId().equals(existingUser.getUserId()) && userRepository.existsByUserName(user.getUserName())) {
+                throw new ServiceException("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
+            }
+            if (!user.getUserId().equals(existingUser.getUserId()) && StringUtils.isNotEmpty(existingUser.getPhonenumber()) && userRepository.existsByPhonenumber(user.getPhonenumber())) {
+                throw new ServiceException("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
+            }
+            if (!user.getUserId().equals(existingUser.getUserId()) && StringUtils.isNotEmpty(user.getEmail()) && userRepository.existsByEmail(user.getEmail())) {
+                throw new ServiceException("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+            }
+        }
+
+        Long userId = user.getUserId();
+        userRoleService.deleteByUserId(userId);
+        userPostService.deleteByUserId(userId);
+        userPostService.insertUserPost(user);
+        userRoleService.insertUserRole(user.getUserId(), user.getRoleIds());
+
+        // ensure JPA does not touch immutable roles
+        user.setRoles(null);
+        return userRepository.save(user);
     }
 }
