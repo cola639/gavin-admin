@@ -48,4 +48,9 @@ public class SysUserPostService {
         log.info("Deleting user-post associations by userId: {}", userId);
         repository.deleteByUser_UserId(userId);
     }
+
+    public void deleteByUser_UserIdIn(List<Long> ids) {
+        log.info("Deleting user-post associations by userIds: {}", ids);
+        repository.deleteByUser_UserIdIn(ids);
+    }
 }

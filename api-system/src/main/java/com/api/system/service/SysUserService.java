@@ -13,9 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -97,5 +95,23 @@ public class SysUserService {
         // ensure JPA does not touch immutable roles
         user.setRoles(null);
         return userRepository.save(user);
+    }
+
+    @Transactional
+    public int deleteUserByIds(Long[] userIds) {
+        List<Long> ids = Arrays.asList(userIds);
+
+        // Pre-checks
+//        for (Long userId : ids) {
+//            checkUserAllowed(new SysUser(userId));
+//            checkUserDataScope(userId);
+//        }
+
+        // Delete associations
+        userRoleService.deleteByUserIds(ids);
+        userPostService.deleteByUser_UserIdIn(ids);
+
+        // Soft delete users
+        return userRepository.softDeleteUsers(ids);
     }
 }

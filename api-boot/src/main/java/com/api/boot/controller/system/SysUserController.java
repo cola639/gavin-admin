@@ -102,14 +102,15 @@ public class SysUserController extends BaseController {
         return AjaxResult.success(updatedUser);
     }
 
-//    @DeleteMapping("/{userIds}")
-//    public AjaxResult remove(@PathVariable Long[] userIds) {
+    @DeleteMapping("/{userIds}")
+    public AjaxResult remove(@PathVariable Long[] userIds) {
 //        if (ArrayUtils.contains(userIds, getUserId())) {
-//            return error("当前用户不能删除");
+//            return AjaxResult.error("Not allow delete current user");
 //        }
-//        return toAjax(userService.deleteUserByIds(userIds));
-//    }
-//
+        userService.deleteUserByIds(userIds);
+        return AjaxResult.success();
+    }
+
 //    @PutMapping("/resetPwd")
 //    public AjaxResult resetPwd(@RequestBody SysUser user) {
 //        userService.checkUserAllowed(user);

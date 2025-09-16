@@ -54,4 +54,5 @@ public interface SysUserPostRepository extends JpaRepository<SysUserPost, Long>,
      */
     @SuppressWarnings("unchecked")
     <S extends SysUserPost> List<S> saveAll(Iterable<S> userPosts);
+
 }

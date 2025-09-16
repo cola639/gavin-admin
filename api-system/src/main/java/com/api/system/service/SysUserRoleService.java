@@ -76,4 +76,6 @@ public class SysUserRoleService {
         log.info("Finding user-role associations with specification");
         return sysUserRoleRepository.findAll(spec);
     }
+
+
 }
