@@ -92,7 +92,7 @@ public class SysUserController extends BaseController {
         user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
         userService.createUser(user); // 把校验和保存逻辑交给 Service
 
-        return success();
+        return AjaxResult.success();
     }
 
     @PutMapping
