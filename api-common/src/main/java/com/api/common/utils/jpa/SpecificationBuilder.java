@@ -40,7 +40,7 @@ public class SpecificationBuilder<T> {
         return this;
     }
 
-    /** Like (模糊匹配) */
+    /** Like  */
     public SpecificationBuilder<T> like(String field, String value) {
         if (StringUtils.hasText(value)) {
             specs.add((root, query, cb) -> cb.like(root.get(field), "%" + value + "%"));

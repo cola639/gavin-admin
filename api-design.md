@@ -83,6 +83,8 @@ test → 单元测试依赖
 希望改成完整迁移的的JPA entity, service，repository
 可以用 specification 来加强jpa查询 英文注释
 
+11 Implemented JPA CRUD methods using the existing mapper.xml as a reference.
+
 12 基于JAVA17 + spring3.5 改用JPA实现 要求优雅 模块化 可插拔 英文注释
 
 13 debug workflow 圈出关键点 自己实现 借鉴不是照搬
