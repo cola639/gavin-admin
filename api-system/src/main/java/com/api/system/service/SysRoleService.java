@@ -80,4 +80,8 @@ public class SysRoleService {
 
     return roleRepository.findAll(spec, pageable);
   }
+
+  public SysRole selectRoleById(Long roleId) {
+    return roleRepository.findById(roleId).orElse(null);
+  }
 }

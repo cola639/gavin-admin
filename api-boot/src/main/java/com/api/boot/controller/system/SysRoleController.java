@@ -1,6 +1,7 @@
 package com.api.boot.controller.system;
 
 import com.api.common.controller.BaseController;
+import com.api.common.domain.AjaxResult;
 import com.api.common.domain.entity.SysRole;
 import com.api.common.domain.entity.SysUser;
 import com.api.common.utils.pagination.TableDataInfo;
@@ -61,13 +62,11 @@ public class SysRoleController extends BaseController {
   //    util.exportExcel(response, list, "Role Data");
   //  }
   //
-  //  /** Get role details by ID */
-  //  @PreAuthorize("@ss.hasPermi('system:role:query')")
-  //  @GetMapping("/{roleId}")
-  //  public AjaxResult getInfo(@PathVariable Long roleId) {
-  //    roleService.checkRoleDataScope(roleId);
-  //    return success(roleService.selectRoleById(roleId));
-  //  }
+  /** Get role details by ID */
+  @GetMapping("/{roleId}")
+  public AjaxResult getInfo(@PathVariable Long roleId) {
+    return AjaxResult.success(roleService.selectRoleById(roleId));
+  }
   //
   //  /** Create a new role */
   //  @PreAuthorize("@ss.hasPermi('system:role:add')")
