@@ -1,41 +1,50 @@
 package com.api.system.domain;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
+import com.api.common.domain.entity.BaseEntity;
+import com.api.common.domain.entity.SysRole;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
-/**
- * 角色和菜单关联 sys_role_menu
- *
- * @author ruoyi
- */
-public class SysRoleMenu {
-    /** 角色ID */
+import java.io.Serializable;
+import java.util.Objects;
+
+/** Role-Menu association entity using composite key (roleId + menuId). */
+@Entity
+@Table(name = "sys_role_menu")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
+@IdClass(SysRoleMenu.CompositeKey.class) // define composite key inside this class
+public class SysRoleMenu extends BaseEntity {
+  /** Custom constructor for convenience */
+  @Id
+  @Column(name = "role_id")
+  private Long roleId;
+
+  @Id
+  @Column(name = "menu_id")
+  private Long menuId;
+
+  /** Inner static class representing composite primary key. */
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class CompositeKey implements Serializable {
     private Long roleId;
-
-    /** 菜单ID */
     private Long menuId;
 
-    public Long getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(Long roleId) {
-        this.roleId = roleId;
-    }
-
-    public Long getMenuId() {
-        return menuId;
-    }
-
-    public void setMenuId(Long menuId) {
-        this.menuId = menuId;
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (!(o instanceof CompositeKey that)) return false;
+      return Objects.equals(roleId, that.roleId) && Objects.equals(menuId, that.menuId);
     }
 
     @Override
-    public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
-                .append("roleId", getRoleId())
-                .append("menuId", getMenuId())
-                .toString();
+    public int hashCode() {
+      return Objects.hash(roleId, menuId);
     }
+  }
 }

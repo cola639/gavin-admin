@@ -2,6 +2,7 @@ package com.api.boot.controller.system;
 
 import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
+import com.api.common.domain.entity.LoginUser;
 import com.api.common.domain.entity.SysRole;
 import com.api.common.domain.entity.SysUser;
 import com.api.common.utils.pagination.TableDataInfo;
@@ -18,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +41,6 @@ public class SysRoleController extends BaseController {
   private final SysDeptService deptService;
 
   /** Get role list */
-  @PreAuthorize("@ss.hasPermi('system:role:list')")
   @GetMapping("/list")
   public TableDataInfo list(SysRole role) {
     Map<String, Object> params = new HashMap<>();
@@ -67,47 +68,48 @@ public class SysRoleController extends BaseController {
   public AjaxResult getInfo(@PathVariable Long roleId) {
     return AjaxResult.success(roleService.selectRoleById(roleId));
   }
+
   //
   //  /** Create a new role */
   //  @PreAuthorize("@ss.hasPermi('system:role:add')")
   //  @Log(title = "Role Management", businessType = BusinessType.INSERT)
-  //  @PostMapping
-  //  public AjaxResult add(@Validated @RequestBody SysRole role) {
-  //    if (!roleService.checkRoleNameUnique(role)) {
-  //      return error("Failed to add role '" + role.getRoleName() + "': Role name already exists");
-  //    }
-  //    if (!roleService.checkRoleKeyUnique(role)) {
-  //      return error("Failed to add role '" + role.getRoleName() + "': Role key already exists");
-  //    }
-  //    role.setCreateBy(getUsername());
-  //    return toAjax(roleService.insertRole(role));
-  //  }
+  @PostMapping
+  public AjaxResult add(@Validated @RequestBody SysRole role) {
+
+    // role.setCreateBy(getUsername());
+    return AjaxResult.success(roleService.createRole(role));
+  }
+
   //
   //  /** Update an existing role */
   //  @PreAuthorize("@ss.hasPermi('system:role:edit')")
   //  @Log(title = "Role Management", businessType = BusinessType.UPDATE)
-  //  @PutMapping
-  //  public AjaxResult edit(@Validated @RequestBody SysRole role) {
-  //    roleService.checkRoleAllowed(role);
-  //    roleService.checkRoleDataScope(role.getRoleId());
-  //
-  //    if (!roleService.checkRoleNameUnique(role)) {
-  //      return error("Failed to update role '" + role.getRoleName() + "': Role name already
-  // exists");
-  //    }
-  //    if (!roleService.checkRoleKeyUnique(role)) {
-  //      return error("Failed to update role '" + role.getRoleName() + "': Role key already
-  // exists");
-  //    }
-  //
-  //    role.setUpdateBy(getUsername());
-  //
-  //    if (roleService.updateRole(role) > 0) {
-  //      refreshLoginUserPermissions();
-  //      return success();
-  //    }
-  //    return error("Failed to update role '" + role.getRoleName() + "', please contact admin");
-  //  }
+  @PutMapping
+  public AjaxResult edit(@Validated @RequestBody SysRole role) {
+    //      roleService.checkRoleAllowed(role);
+    //      roleService.checkRoleDataScope(role.getRoleId());
+
+    //      if (!roleService.checkRoleNameUnique(role)) {
+    //        return error("Failed to update role '" + role.getRoleName() + "': Role name already
+    //   exists");
+    //      }
+    //      if (!roleService.checkRoleKeyUnique(role)) {
+    //        return error("Failed to update role '" + role.getRoleName() + "': Role key already
+    //   exists");
+    //      }
+
+    role.setUpdateBy(getUsername());
+    roleService.updateRole(role);
+
+    return AjaxResult.error(
+        "Failed to update role '" + role.getRoleName() + "', please contact admin");
+  }
+
+  @DeleteMapping("/{roleIds}")
+  public AjaxResult remove(@PathVariable Long[] roleIds) {
+    return AjaxResult.success(roleService.deleteRoleByIds(Arrays.asList(roleIds)));
+  }
+
   //
   //  /** Update role data scope */
   //  @PreAuthorize("@ss.hasPermi('system:role:edit')")
@@ -133,10 +135,7 @@ public class SysRoleController extends BaseController {
   //  /** Delete roles */
   //  @PreAuthorize("@ss.hasPermi('system:role:remove')")
   //  @Log(title = "Role Management", businessType = BusinessType.DELETE)
-  //  @DeleteMapping("/{roleIds}")
-  //  public AjaxResult remove(@PathVariable Long[] roleIds) {
-  //    return toAjax(roleService.deleteRoleByIds(roleIds));
-  //  }
+
   //
   //  /** Get all roles for dropdown selection */
   //  @PreAuthorize("@ss.hasPermi('system:role:query')")

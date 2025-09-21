@@ -3,6 +3,9 @@ package com.api.system.service;
 import com.api.common.domain.entity.SysRole;
 import com.api.common.domain.entity.SysUser;
 import com.api.common.utils.jpa.SpecificationBuilder;
+import com.api.framework.exception.ServiceException;
+import com.api.system.domain.SysRoleMenu;
+import com.api.system.repository.SysRoleMenuRepository;
 import com.api.system.repository.SysRoleRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -22,14 +26,9 @@ public class SysRoleService {
 
   private final SysRoleRepository roleRepository;
 
+  private final SysRoleMenuRepository sysRoleMenuRepository;
+
   /** List roles with optional filters (using Specification for dynamic queries) */
-
-  /** Insert role */
-  @Transactional
-  public SysRole insertRole(SysRole role) {
-
-    return roleRepository.save(role);
-  }
 
   /** Update role */
   @Transactional
@@ -83,5 +82,68 @@ public class SysRoleService {
 
   public SysRole selectRoleById(Long roleId) {
     return roleRepository.findById(roleId).orElse(null);
+  }
+
+  @Transactional
+  public SysRole createRole(SysRole role) {
+    role.setDelFlag("0");
+
+    // Uniqueness checks
+    if (!checkRoleNameUnique(role)) {
+      throw new ServiceException("Role name '" + role.getRoleName() + "' already exists");
+    }
+    if (!checkRoleKeyUnique(role)) {
+      throw new ServiceException("Role key '" + role.getRoleName() + "' already exists");
+    }
+
+    // Save role (generate ID)
+    SysRole savedRole = roleRepository.save(role);
+
+    // Save role-menu associations
+    saveRoleMenus(savedRole);
+
+    return savedRole;
+  }
+
+  private void saveRoleMenus(SysRole role) {
+    Long[] menuIds = role.getMenuIds();
+    if (menuIds == null || menuIds.length == 0) {
+      return;
+    }
+
+    List<SysRoleMenu> roleMenus =
+        Arrays.stream(menuIds).map(menuId -> new SysRoleMenu(role.getRoleId(), menuId)).toList();
+
+    sysRoleMenuRepository.saveAll(roleMenus);
+  }
+
+  /**
+   * Check if role name is unique.
+   *
+   * @param role the role entity to check
+   * @return true if unique, false otherwise
+   */
+  public boolean checkRoleNameUnique(SysRole role) {
+    return roleRepository
+        .findFirstByRoleNameAndDelFlag(role.getRoleName(), "0")
+        .map(
+            existingRole ->
+                existingRole
+                    .getRoleId()
+                    .equals(role.getRoleId())) // allow same role updating itself
+        .orElse(true); // if no record found, it's unique
+  }
+
+  /**
+   * Check if role key is unique.
+   *
+   * @param role the role entity to check
+   * @return true if unique, false otherwise
+   */
+  public boolean checkRoleKeyUnique(SysRole role) {
+    return roleRepository
+        .findFirstByRoleKeyAndDelFlag(role.getRoleKey(), "0")
+        .map(existingRole -> existingRole.getRoleId().equals(role.getRoleId()))
+        .orElse(true);
   }
 }
