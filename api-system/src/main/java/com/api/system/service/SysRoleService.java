@@ -33,8 +33,30 @@ public class SysRoleService {
   /** Update role */
   @Transactional
   public SysRole updateRole(SysRole role) {
+    // 1. Uniqueness checks
+    if (!checkRoleNameUnique(role)) {
+      throw new ServiceException("Role name '" + role.getRoleName() + "' already exists");
+    }
+    if (!checkRoleKeyUnique(role)) {
+      throw new ServiceException("Role key '" + role.getRoleKey() + "' already exists");
+    }
 
-    return roleRepository.save(role);
+    // 2. Update role info
+    SysRole updatedRole = roleRepository.save(role);
+
+    // 3. Delete old role-menu associations
+    sysRoleMenuRepository.deleteByRoleId(role.getRoleId());
+
+    // 4. Re-insert role-menu associations
+    if (role.getMenuIds() != null && role.getMenuIds().length > 0) {
+      List<SysRoleMenu> roleMenus =
+          Arrays.stream(role.getMenuIds())
+              .map(menuId -> new SysRoleMenu(role.getRoleId(), menuId))
+              .toList();
+      sysRoleMenuRepository.saveAll(roleMenus);
+    }
+
+    return updatedRole;
   }
 
   /** Soft delete role */

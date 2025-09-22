@@ -98,11 +98,10 @@ public class SysRoleController extends BaseController {
     //   exists");
     //      }
 
-    role.setUpdateBy(getUsername());
+    //    role.setUpdateBy(getUsername());
     roleService.updateRole(role);
 
-    return AjaxResult.error(
-        "Failed to update role '" + role.getRoleName() + "', please contact admin");
+    return AjaxResult.success("Operation successful");
   }
 
   @DeleteMapping("/{roleIds}")
