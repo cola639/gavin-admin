@@ -106,7 +106,7 @@ public class SysRoleController extends BaseController {
 
   @DeleteMapping("/{roleIds}")
   public AjaxResult remove(@PathVariable Long[] roleIds) {
-    return AjaxResult.success(roleService.deleteRoleByIds(Arrays.asList(roleIds)));
+    return AjaxResult.success(roleService.deleteRoleByIds(roleIds));
   }
 
   //

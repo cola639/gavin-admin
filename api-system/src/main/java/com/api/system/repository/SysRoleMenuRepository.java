@@ -15,19 +15,16 @@ public interface SysRoleMenuRepository
   long countByMenuId(Long menuId);
 
   /** Delete by roleId */
-  @Transactional
   @Modifying
   @Query("delete from SysRoleMenu rm where rm.roleId = :roleId")
   int deleteByRoleId(Long roleId);
 
   /** Delete by roleIds */
-  @Transactional
   @Modifying
   @Query("delete from SysRoleMenu rm where rm.roleId in :roleIds")
-  int deleteByRoleIds(List<Long> roleIds);
+  int deleteByRoleIds(Long[] roleIds);
 
   /** Delete by roleId and menuId */
-  @Transactional
   int deleteByRoleIdAndMenuId(Long roleId, Long menuId);
 
   /** Find menus by roleId */
