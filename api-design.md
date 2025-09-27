@@ -1,5 +1,30 @@
-1. 项目结构 设计
+项目结构 设计
+1 user management
+2 role management
+3 menu management
+4 dept management
 
+monitor
+1 online user
+2 machine status
+3 sql/uri vistior
+4 operation logs management
+
+quartz
+1 schedule task
+2 delete task
+3 generate task
+
+doc
+1 api
+
+non functional
+1 notification
+2 optimical lock
+3 generate
+4 dict management
+5 chche management
+6 rate limit
 gavin-admin
 ├── api-boot # 启动模块（SpringBootApplication 入口）
 ├── api-framework # 框架配置（安全/数据源/异常/日志等）
@@ -128,4 +153,4 @@ LocalDateTime、LocalDate、LocalTime 不需要 @Temporal，JPA 可以直接映�
 
 你已经有全局 JacksonConfig 配置了，可以无缝支持 LocalDateTime 的序列化/反序列化。
 
-21  存储 (TIMESTAMP) → 读取 (JDBC/应用)
+21 存储 (TIMESTAMP) → 读取 (JDBC/应用)

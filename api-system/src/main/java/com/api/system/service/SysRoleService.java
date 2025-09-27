@@ -107,8 +107,7 @@ public class SysRoleService {
             .between(
                 "createTime",
                 (LocalDateTime) params.get("beginTime"),
-                (LocalDateTime) params.get("endTime"))
-            .build();
+                (LocalDateTime) params.get("endTime"));
 
     return roleRepository.findAll(spec, pageable);
   }

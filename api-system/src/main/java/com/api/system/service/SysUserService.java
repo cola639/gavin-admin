@@ -32,8 +32,7 @@ public class SysUserService {
             .like("userName", user.getUserName())
             .eq("status", user.getStatus())
             .like("phonenumber", user.getPhonenumber())
-            .between("createTime", (Date) params.get("beginTime"), (Date) params.get("endTime"))
-            .build();
+            .between("createTime", (Date) params.get("beginTime"), (Date) params.get("endTime"));
 
     return userRepository.findAll(spec, pageable);
   }
