@@ -1,14 +1,13 @@
 package com.api.system.service;
 
 import com.api.common.constant.Constants;
-import com.api.common.constant.UserConstants;
-import com.api.common.domain.entity.SysRole;
 import com.api.system.domain.SysMenu;
 import com.api.system.repository.SysMenuRepository;
 import com.api.system.repository.SysRoleRepository;
 import com.api.system.repository.SysRoleMenuRepository;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.jpa.SpecificationBuilder;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -28,7 +27,7 @@ public class SysMenuService {
   /** 查询所有菜单（支持动态条件） */
   public List<SysMenu> getMenuList(SysMenu menu) {
     Specification<SysMenu> spec =
-        SpecificationBuilder.<SysMenu> builder()
+        SpecificationBuilder.<SysMenu>builder()
             .like("menuName", menu.getMenuName())
             .eq("visible", menu.getVisible())
             .eq("status", menu.getStatus())
@@ -68,12 +67,6 @@ public class SysMenuService {
     return sysMenuRepository.save(menu);
   }
 
-  /** 删除菜单 */
-  @Transactional
-  public void deleteMenu(Long menuId) {
-    sysMenuRepository.deleteById(menuId);
-  }
-
   // ====== 工具方法 ======
   private List<SysMenu> buildMenuHierarchy(List<SysMenu> list, Long parentId) {
     List<SysMenu> result = new ArrayList<>();
@@ -100,5 +93,18 @@ public class SysMenuService {
         path,
         new String[] {Constants.HTTP, Constants.HTTPS, Constants.WWW, ".", ":"},
         new String[] {"", "", "", "/", "/"});
+  }
+
+  public SysMenu insertMenu(SysMenu menu) {
+    return sysMenuRepository.save(menu);
+  }
+
+  /** Delete Menu */
+  @Transactional
+  public void deleteMenuById(Long menuId) {
+    if (!sysMenuRepository.existsById(menuId)) {
+      throw new EntityNotFoundException("Menu is not existed" + menuId);
+    }
+    sysMenuRepository.deleteById(menuId);
   }
 }

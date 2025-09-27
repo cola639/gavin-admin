@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,5 +31,45 @@ public class SysMenuController extends BaseController {
   public AjaxResult list(SysMenu menu) {
     List<SysMenu> menus = sysMenuService.getMenuList(menu);
     return AjaxResult.success(menus);
+  }
+
+  /** Add a new menu item. */
+  @PostMapping
+  public AjaxResult add(@Validated @RequestBody SysMenu menu) {
+    //    if (!menuService.checkMenuNameUnique(menu)) {
+    //      return error("新增菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");
+    //    } else if (UserConstants.YES_FRAME.equals(menu.getIsFrame())
+    //        && !StringUtils.ishttp(menu.getPath())) {
+    //      return error("新增菜单'" + menu.getMenuName() + "'失败，地址必须以http(s)://开头");
+    //    }
+    //    menu.setCreateBy(getUsername());
+    return AjaxResult.success(sysMenuService.insertMenu(menu));
+  }
+
+  /** Add a new menu item. */
+  @PostMapping
+  public AjaxResult update(@Validated @RequestBody SysMenu menu) {
+    //    if (!menuService.checkMenuNameUnique(menu)) {
+    //      return error("新增菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");
+    //    } else if (UserConstants.YES_FRAME.equals(menu.getIsFrame())
+    //        && !StringUtils.ishttp(menu.getPath())) {
+    //      return error("新增菜单'" + menu.getMenuName() + "'失败，地址必须以http(s)://开头");
+    //    }
+    //    menu.setCreateBy(getUsername());
+    return AjaxResult.success(sysMenuService.insertMenu(menu));
+  }
+
+  @DeleteMapping("/{menuId}")
+  public AjaxResult remove(@PathVariable("menuId") Long menuId) {
+    //    if (menuService.hasChildByMenuId(menuId))
+    //    {
+    //      return warn("存在子菜单,不允许删除");
+    //    }
+    //    if (menuService.checkMenuExistRole(menuId))
+    //    {
+    //      return warn("菜单已分配,不允许删除");
+    //    }
+    sysMenuService.deleteMenuById(menuId);
+    return AjaxResult.success();
   }
 }
