@@ -10,22 +10,23 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface SysUserRepository extends JpaRepository<SysUser, Long>, JpaSpecificationExecutor<SysUser> {
-    Optional<SysUser> findByUserId(Long userId);
+public interface SysUserRepository
+    extends JpaRepository<SysUser, Long>, JpaSpecificationExecutor<SysUser> {
+  Optional<SysUser> findByUserId(Long userId);
 
-    Optional<SysUser> findByUserNameAndDelFlag(String userName, String delFlag);
+  Optional<SysUser> findByUserNameAndDelFlag(String userName, String delFlag);
 
-    Optional<SysUser> findByPhonenumberAndDelFlag(String phonenumber, String delFlag);
+  Optional<SysUser> findByPhonenumberAndDelFlag(String phonenumber, String delFlag);
 
-    Optional<SysUser> findByEmailAndDelFlag(String email, String delFlag);
+  Optional<SysUser> findByEmailAndDelFlag(String email, String delFlag);
 
-    @Modifying
-    @Query("update SysUser u set u.delFlag = '2' where u.userId in :userIds")
-    int softDeleteUsers(@Param("userIds") List<Long> userIds);
+  @Modifying
+  @Query("update SysUser u set u.delFlag = '2' where u.userId in :userIds")
+  int softDeleteUsers(@Param("userIds") List<Long> userIds);
 
-    boolean existsByUserName(String userName);
+  boolean existsByUserName(String userName);
 
-    boolean existsByPhonenumber(String phonenumber);
+  boolean existsByPhonenumber(String phonenumber);
 
-    boolean existsByEmail(String email);
+  boolean existsByEmail(String email);
 }

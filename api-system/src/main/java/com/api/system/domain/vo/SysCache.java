@@ -1,14 +1,14 @@
-//package com.api.system.domain.vo;
+// package com.api.system.domain.vo;
 //
-//import com.ruoyi.common.utils.StringUtils;
+// import com.ruoyi.common.utils.StringUtils;
 //
-///**
+/// **
 // * 缓存信息
 // *
 // * @author ruoyi
 // */
-//public class SysCache
-//{
+// public class SysCache
+// {
 //    /** 缓存名称 */
 //    private String cacheName = "";
 //
@@ -78,4 +78,4 @@
 //    {
 //        this.remark = remark;
 //    }
-//}
+// }

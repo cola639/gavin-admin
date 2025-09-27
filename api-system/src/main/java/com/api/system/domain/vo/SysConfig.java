@@ -1,21 +1,21 @@
-//package com.api.system.domain.vo;
+// package com.api.system.domain.vo;
 //
-//import com.ruoyi.common.annotation.Excel;
-//import com.ruoyi.common.annotation.Excel.ColumnType;
-//import com.ruoyi.common.core.domain.BaseEntity;
-//import org.apache.commons.lang3.builder.ToStringBuilder;
-//import org.apache.commons.lang3.builder.ToStringStyle;
+// import com.ruoyi.common.annotation.Excel;
+// import com.ruoyi.common.annotation.Excel.ColumnType;
+// import com.ruoyi.common.core.domain.BaseEntity;
+// import org.apache.commons.lang3.builder.ToStringBuilder;
+// import org.apache.commons.lang3.builder.ToStringStyle;
 //
-//import javax.validation.constraints.NotBlank;
-//import javax.validation.constraints.Size;
+// import javax.validation.constraints.NotBlank;
+// import javax.validation.constraints.Size;
 //
-///**
+/// **
 // * 参数配置表 sys_config
 // *
 // * @author ruoyi
 // */
-//public class SysConfig extends BaseEntity
-//{
+// public class SysConfig extends BaseEntity
+// {
 //    private static final long serialVersionUID = 1L;
 //
 //    /** 参数主键 */
@@ -109,4 +109,4 @@
 //            .append("remark", getRemark())
 //            .toString();
 //    }
-//}
+// }

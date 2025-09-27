@@ -15,25 +15,22 @@ import lombok.experimental.SuperBuilder;
 @IdClass(SysUserPost.SysUserPostId.class)
 public class SysUserPost extends BaseEntity {
 
-    @Id
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private SysUser user;
+  @Id
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  private SysUser user;
 
-    @Id
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private SysPost post;
+  @Id
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "post_id", nullable = false)
+  private SysPost post;
 
-    /**
-     * Composite primary key for SysUserPost
-     */
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class SysUserPostId implements java.io.Serializable {
-        private Long user;
-        private Long post;
-    }
+  /** Composite primary key for SysUserPost */
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class SysUserPostId implements java.io.Serializable {
+    private Long user;
+    private Long post;
+  }
 }
-

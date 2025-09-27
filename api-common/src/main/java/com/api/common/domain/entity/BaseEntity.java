@@ -16,20 +16,16 @@ import java.util.Map;
 
 /**
  * Base entity class for all persistent objects.
- * <p>
- * Provides common audit fields and request-related metadata
- * that are automatically inherited by all entities in the system.
- * </p>
- * <p>
- * Features:
- * - Audit tracking (createdBy, createdTime, updatedBy, updatedTime)
- * - Search support
- * - Additional request parameters
- * - JSON serialization formatting and control
- * <p>
- * Lombok annotations are used to reduce boilerplate code.
- * <p>
- * Author: ruoyi
+ *
+ * <p>Provides common audit fields and request-related metadata that are automatically inherited by
+ * all entities in the system.
+ *
+ * <p>Features: - Audit tracking (createdBy, createdTime, updatedBy, updatedTime) - Search support -
+ * Additional request parameters - JSON serialization formatting and control
+ *
+ * <p>Lombok annotations are used to reduce boilerplate code.
+ *
+ * <p>Author: ruoyi
  */
 @Data
 @NoArgsConstructor
@@ -37,32 +33,30 @@ import java.util.Map;
 @SuperBuilder
 public class BaseEntity implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    /** Search value (used in filtering/query conditions, not persisted) */
-    @JsonIgnore
-    private String searchValue;
+  /** Search value (used in filtering/query conditions, not persisted) */
+  @JsonIgnore private String searchValue;
 
-    /** User who created the record */
-    private String createBy;
+  /** User who created the record */
+  private String createBy;
 
-    /** Creation timestamp */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
+  /** Creation timestamp */
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  private Date createTime;
 
-    /** User who last updated the record */
-    private String updateBy;
+  /** User who last updated the record */
+  private String updateBy;
 
-    /** Last updated timestamp */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date updateTime;
+  /** Last updated timestamp */
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  private Date updateTime;
 
-    /** Remarks or additional notes */
-    private String remark;
+  /** Remarks or additional notes */
+  private String remark;
 
-    /** Extra request parameters (useful for dynamic queries) */
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    @Builder.Default
-    private Map<String, Object> params = new HashMap<>();
-
+  /** Extra request parameters (useful for dynamic queries) */
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  @Builder.Default
+  private Map<String, Object> params = new HashMap<>();
 }

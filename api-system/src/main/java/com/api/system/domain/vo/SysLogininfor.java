@@ -1,19 +1,19 @@
-//package com.api.system.domain.vo;
+// package com.api.system.domain.vo;
 //
-//import com.fasterxml.jackson.annotation.JsonFormat;
-//import com.ruoyi.common.annotation.Excel;
-//import com.ruoyi.common.annotation.Excel.ColumnType;
-//import com.ruoyi.common.core.domain.BaseEntity;
+// import com.fasterxml.jackson.annotation.JsonFormat;
+// import com.ruoyi.common.annotation.Excel;
+// import com.ruoyi.common.annotation.Excel.ColumnType;
+// import com.ruoyi.common.core.domain.BaseEntity;
 //
-//import java.util.Date;
+// import java.util.Date;
 //
-///**
+/// **
 // * 系统访问记录表 sys_logininfor
 // *
 // * @author ruoyi
 // */
-//public class SysLogininfor extends BaseEntity
-//{
+// public class SysLogininfor extends BaseEntity
+// {
 //    private static final long serialVersionUID = 1L;
 //
 //    /** ID */
@@ -142,4 +142,4 @@
 //    {
 //        this.loginTime = loginTime;
 //    }
-//}
+// }

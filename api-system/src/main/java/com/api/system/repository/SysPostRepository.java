@@ -7,8 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface SysPostRepository extends JpaRepository<SysPost, Long> {
-    boolean existsByPostName(String postName);
+  boolean existsByPostName(String postName);
 
-    boolean existsByPostCode(String postCode);
+  boolean existsByPostCode(String postCode);
 }
-

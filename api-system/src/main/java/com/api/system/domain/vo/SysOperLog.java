@@ -1,19 +1,19 @@
-//package com.api.system.domain.vo;
+// package com.api.system.domain.vo;
 //
-//import com.fasterxml.jackson.annotation.JsonFormat;
-//import com.ruoyi.common.annotation.Excel;
-//import com.ruoyi.common.annotation.Excel.ColumnType;
-//import com.ruoyi.common.core.domain.BaseEntity;
+// import com.fasterxml.jackson.annotation.JsonFormat;
+// import com.ruoyi.common.annotation.Excel;
+// import com.ruoyi.common.annotation.Excel.ColumnType;
+// import com.ruoyi.common.core.domain.BaseEntity;
 //
-//import java.util.Date;
+// import java.util.Date;
 //
-///**
+/// **
 // * 操作日志记录表 oper_log
 // *
 // * @author ruoyi
 // */
-//public class SysOperLog extends BaseEntity
-//{
+// public class SysOperLog extends BaseEntity
+// {
 //    private static final long serialVersionUID = 1L;
 //
 //    /** 日志主键 */
@@ -25,7 +25,8 @@
 //    private String title;
 //
 //    /** 业务类型（0其它 1新增 2修改 3删除） */
-//    @Excel(name = "业务类型", readConverterExp = "0=其它,1=新增,2=修改,3=删除,4=授权,5=导出,6=导入,7=强退,8=生成代码,9=清空数据")
+//    @Excel(name = "业务类型", readConverterExp =
+// "0=其它,1=新增,2=修改,3=删除,4=授权,5=导出,6=导入,7=强退,8=生成代码,9=清空数据")
 //    private Integer businessType;
 //
 //    /** 业务类型数组 */
@@ -267,4 +268,4 @@
 //    {
 //        this.costTime = costTime;
 //    }
-//}
+// }

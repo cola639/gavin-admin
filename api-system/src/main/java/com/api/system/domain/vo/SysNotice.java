@@ -1,20 +1,20 @@
-//package com.api.system.domain.vo;
+// package com.api.system.domain.vo;
 //
-//import com.ruoyi.common.core.domain.BaseEntity;
-//import com.ruoyi.common.xss.Xss;
-//import org.apache.commons.lang3.builder.ToStringBuilder;
-//import org.apache.commons.lang3.builder.ToStringStyle;
+// import com.ruoyi.common.core.domain.BaseEntity;
+// import com.ruoyi.common.xss.Xss;
+// import org.apache.commons.lang3.builder.ToStringBuilder;
+// import org.apache.commons.lang3.builder.ToStringStyle;
 //
-//import javax.validation.constraints.NotBlank;
-//import javax.validation.constraints.Size;
+// import javax.validation.constraints.NotBlank;
+// import javax.validation.constraints.Size;
 //
-///**
+/// **
 // * 通知公告表 sys_notice
 // *
 // * @author ruoyi
 // */
-//public class SysNotice extends BaseEntity
-//{
+// public class SysNotice extends BaseEntity
+// {
 //    private static final long serialVersionUID = 1L;
 //
 //    /** 公告ID */
@@ -100,4 +100,4 @@
 //            .append("remark", getRemark())
 //            .toString();
 //    }
-//}
+// }

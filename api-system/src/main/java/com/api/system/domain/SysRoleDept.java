@@ -9,33 +9,33 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * @author ruoyi
  */
 public class SysRoleDept {
-    /** 角色ID */
-    private Long roleId;
+  /** 角色ID */
+  private Long roleId;
 
-    /** 部门ID */
-    private Long deptId;
+  /** 部门ID */
+  private Long deptId;
 
-    public Long getRoleId() {
-        return roleId;
-    }
+  public Long getRoleId() {
+    return roleId;
+  }
 
-    public void setRoleId(Long roleId) {
-        this.roleId = roleId;
-    }
+  public void setRoleId(Long roleId) {
+    this.roleId = roleId;
+  }
 
-    public Long getDeptId() {
-        return deptId;
-    }
+  public Long getDeptId() {
+    return deptId;
+  }
 
-    public void setDeptId(Long deptId) {
-        this.deptId = deptId;
-    }
+  public void setDeptId(Long deptId) {
+    this.deptId = deptId;
+  }
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
-                .append("roleId", getRoleId())
-                .append("deptId", getDeptId())
-                .toString();
-    }
+  @Override
+  public String toString() {
+    return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+        .append("roleId", getRoleId())
+        .append("deptId", getDeptId())
+        .toString();
+  }
 }
