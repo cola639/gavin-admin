@@ -1,12 +1,12 @@
 package com.api.system.service;
 
 import com.api.common.constant.Constants;
-import com.api.system.domain.SysMenu;
-import com.api.system.repository.SysMenuRepository;
-import com.api.system.repository.SysRoleRepository;
-import com.api.system.repository.SysRoleMenuRepository;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.jpa.SpecificationBuilder;
+import com.api.persistence.domain.SysMenu;
+import com.api.persistence.repository.SysMenuRepository;
+import com.api.persistence.repository.SysRoleMenuRepository;
+import com.api.persistence.repository.SysRoleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

@@ -154,3 +154,27 @@ LocalDateTime、LocalDate、LocalTime 不需要 @Temporal，JPA 可以直接映�
 你已经有全局 JacksonConfig 配置了，可以无缝支持 LocalDateTime 的序列化/反序列化。
 
 21 存储 (TIMESTAMP) → 读取 (JDBC/应用)
+
+22
+Improve code elegance and maintainability.
+Use Lombok annotations (e.g., @Data, @Getter, @Setter) to reduce boilerplate code.
+Ensure proper JPA annotations for entity mapping.
+Replace @RequiredArgsConstructor with @Autowired.
+Replace Fastjson with Jackson for JSON processing.
+Add clear English comments in the code.
+Use @Slf4j for logging
+Remove author name comments.
+
+23
+gavin/
+├── api-common
+│ └── utils, constants
+├── api-persistence
+│ └── entities, repositories
+├── api-system
+│ └── business services
+├── api-framework
+│ └── security, web, cross-cutting
+└── pom.xml (parent)
+
+24 This POM defines managed versions for hundreds of common libraries: Jackson, Commons Lang, Hibernate, JUnit, etc.

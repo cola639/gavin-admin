@@ -1,5 +1,7 @@
 package com.api.common.constant;
 
+import io.jsonwebtoken.Claims;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
@@ -84,7 +86,7 @@ public class Constants {
   public static final String JWT_USERID = "userid";
 
   /** JWT username claim */
-  //    public static final String JWT_USERNAME = Claims.SUBJECT;
+  public static final String JWT_USERNAME = Claims.SUBJECT;
 
   /** JWT avatar claim */
   public static final String JWT_AVATAR = "avatar";

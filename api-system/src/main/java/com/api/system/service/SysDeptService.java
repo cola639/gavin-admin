@@ -5,7 +5,6 @@ import com.api.common.domain.entity.SysUser;
 import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.springUtils.SpringUtils;
-import com.api.framework.annotation.DataScope;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.stereotype.Service;
 

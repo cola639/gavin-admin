@@ -4,10 +4,8 @@ import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
 import com.api.system.domain.SysMenu;
 import com.api.system.service.SysMenuService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

@@ -24,6 +24,7 @@
         <module>api-system</module>
         <module>api-common</module>
         <module>api-quartz</module>
+        <module>api-persistence</module>
     </modules>
 
     <properties>
@@ -35,6 +36,10 @@
         <oshi.version>6.6.5</oshi.version>
         <servlet.version>6.0.0</servlet.version>
         <lombok.version>1.18.38</lombok.version>
+        <jwt.version>0.11.5</jwt.version>
+        <bitwalker.version>1.21</bitwalker.version>
+        <redis.version>3.5.5</redis.version>
+        <mysql.version>8.3.0</mysql.version>
     </properties>
 
     <!-- Dependency management -->
@@ -97,6 +102,25 @@
                 <scope>provided</scope>
             </dependency>
 
+
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jwt.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>eu.bitwalker</groupId>
+                <artifactId>UserAgentUtils</artifactId>
+                <version>${bitwalker.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-redis</artifactId>
+                <version>${redis.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

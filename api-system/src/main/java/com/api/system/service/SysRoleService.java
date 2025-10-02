@@ -1,14 +1,13 @@
 package com.api.system.service;
 
 import com.api.common.domain.entity.SysRole;
-import com.api.common.domain.entity.SysUser;
 import com.api.common.utils.jpa.SpecificationBuilder;
-import com.api.framework.exception.ServiceException;
 import com.api.system.domain.SysRoleMenu;
 import com.api.system.repository.SysRoleMenuRepository;
 import com.api.system.repository.SysRoleRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.service.spi.ServiceException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 

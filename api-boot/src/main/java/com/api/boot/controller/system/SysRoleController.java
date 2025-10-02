@@ -2,26 +2,20 @@ package com.api.boot.controller.system;
 
 import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
-import com.api.common.domain.entity.LoginUser;
 import com.api.common.domain.entity.SysRole;
-import com.api.common.domain.entity.SysUser;
 import com.api.common.utils.pagination.TableDataInfo;
 import com.api.system.domain.SysUserRole;
 import com.api.system.service.*;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
