@@ -1,8 +1,8 @@
 package com.api.common.utils;
 
 import com.api.common.constant.Constants;
-import com.api.common.domain.entity.LoginUser;
-import com.api.common.domain.entity.SysRole;
+import com.api.persistence.domain.common.LoginUser;
+import com.api.persistence.domain.common.SysRole;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

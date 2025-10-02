@@ -1,7 +1,6 @@
 package com.api.system.service;
 
-import com.api.system.domain.SysRoleMenu;
-import com.api.system.repository.SysRoleMenuRepository;
+import com.api.persistence.repository.SysRoleMenuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

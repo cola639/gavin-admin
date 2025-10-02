@@ -1,7 +1,7 @@
 package com.api.system.service;
 
-import com.api.system.domain.SysUserRole;
-import com.api.system.repository.SysUserRoleRepository;
+import com.api.persistence.domain.SysUserRole;
+import com.api.persistence.repository.SysUserRoleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;

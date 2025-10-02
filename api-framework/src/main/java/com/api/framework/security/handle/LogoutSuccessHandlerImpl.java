@@ -2,11 +2,11 @@ package com.api.framework.security.handle;
 
 import com.api.common.constant.Constants;
 import com.api.common.domain.AjaxResult;
-import com.api.common.domain.entity.LoginUser;
 import com.api.common.utils.MessageUtils;
 import com.api.common.utils.ServletUtils;
 import com.api.common.utils.StringUtils;
 import com.api.framework.service.TokenService;
+import com.api.persistence.domain.common.LoginUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

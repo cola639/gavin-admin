@@ -2,10 +2,10 @@ package com.api.framework.security.filter;
 
 import java.io.IOException;
 
-import com.api.common.domain.entity.LoginUser;
 import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.framework.service.TokenService;
+import com.api.persistence.domain.common.LoginUser;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

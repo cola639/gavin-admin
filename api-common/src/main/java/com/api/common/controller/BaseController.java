@@ -4,10 +4,10 @@ import java.util.Date;
 
 import com.api.common.constant.HttpStatus;
 import com.api.common.domain.AjaxResult;
-import com.api.common.domain.entity.LoginUser;
 import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.pagination.TableDataInfo;
+import com.api.persistence.domain.common.LoginUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 

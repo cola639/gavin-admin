@@ -1,6 +1,5 @@
 package com.api.persistence.domain.common;
 
-import com.api.common.domain.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

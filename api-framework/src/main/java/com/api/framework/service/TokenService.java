@@ -2,13 +2,13 @@ package com.api.framework.service;
 
 import com.api.common.constant.CacheConstants;
 import com.api.common.constant.Constants;
-import com.api.common.domain.entity.LoginUser;
 import com.api.common.redis.RedisCache;
 import com.api.common.utils.ServletUtils;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.ip.AddressUtils;
 import com.api.common.utils.ip.IpUtils;
 import com.api.common.utils.uuid.IdUtils;
+import com.api.persistence.domain.common.LoginUser;
 import eu.bitwalker.useragentutils.UserAgent;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

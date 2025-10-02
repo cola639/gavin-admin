@@ -3,9 +3,12 @@ package com.api.framework.service;
 import java.util.concurrent.TimeUnit;
 
 import com.api.common.constant.CacheConstants;
-import com.api.common.domain.entity.SysUser;
 import com.api.common.redis.RedisCache;
+import com.api.common.utils.SecurityUtils;
+import com.api.framework.exception.user.UserPasswordNotMatchException;
+import com.api.framework.exception.user.UserPasswordRetryLimitExceedException;
 import com.api.framework.security.context.AuthenticationContextHolder;
+import com.api.persistence.domain.common.SysUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;

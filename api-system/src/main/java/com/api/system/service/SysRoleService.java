@@ -1,10 +1,11 @@
 package com.api.system.service;
 
-import com.api.common.domain.entity.SysRole;
 import com.api.common.utils.jpa.SpecificationBuilder;
-import com.api.system.domain.SysRoleMenu;
-import com.api.system.repository.SysRoleMenuRepository;
-import com.api.system.repository.SysRoleRepository;
+
+import com.api.persistence.domain.SysRoleMenu;
+import com.api.persistence.domain.common.SysRole;
+import com.api.persistence.repository.SysRoleMenuRepository;
+import com.api.persistence.repository.SysRoleRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.service.spi.ServiceException;

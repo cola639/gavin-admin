@@ -1,7 +1,5 @@
 package com.api.system.service;
 
-import com.api.common.domain.entity.SysDept;
-import com.api.common.domain.entity.SysUser;
 import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.springUtils.SpringUtils;

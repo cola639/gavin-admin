@@ -1,11 +1,11 @@
 package com.api.framework.aspectj;
 
 import com.api.common.constant.UserConstants;
-import com.api.common.domain.entity.SysRole;
-import com.api.common.domain.entity.SysUser;
 import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.framework.annotation.DataScope;
+import com.api.persistence.domain.common.SysRole;
+import com.api.persistence.domain.common.SysUser;
 import jakarta.persistence.criteria.JoinType;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;

@@ -2,15 +2,15 @@ package com.api.framework.service;
 
 import com.api.common.constant.CacheConstants;
 import com.api.common.constant.UserConstants;
-import com.api.common.domain.entity.RegisterBody;
-import com.api.common.domain.entity.SysUser;
 import com.api.common.redis.RedisCache;
 import com.api.common.utils.DateEnhancedUtil;
 import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.framework.exception.user.CaptchaException;
 import com.api.framework.exception.user.CaptchaExpireException;
-import com.api.system.repository.SysUserRepository;
+import com.api.persistence.domain.common.RegisterBody;
+import com.api.persistence.domain.common.SysUser;
+import com.api.persistence.repository.SysUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

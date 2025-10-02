@@ -1,6 +1,5 @@
 package com.api.persistence.domain.common;
 
-import com.api.common.domain.entity.SysUser;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Collection;
 import java.util.Set;
