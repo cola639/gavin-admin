@@ -2,6 +2,7 @@ package com.api.common.redis;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Utility class for common Redis operations.
@@ -23,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class RedisCache {
 
-  private final RedisTemplate<String, Object> redisTemplate;
+  private final RedisTemplate<Object, Object> redisTemplate;
 
   /** Cache a basic object (String, Integer, entity, etc.) */
   public <T> void setCacheObject(final String key, final T value) {
@@ -68,8 +70,9 @@ public class RedisCache {
   }
 
   /** Delete multiple keys. */
-  public boolean deleteObject(final Collection<String> collection) {
-    return redisTemplate.delete(collection) > 0;
+  public boolean deleteObject(final Collection<String> keys) {
+    Long deletedCount = redisTemplate.delete(Collections.singleton(keys));
+    return deletedCount != null && deletedCount > 0;
   }
 
   /** Cache a list of objects. */
@@ -135,7 +138,11 @@ public class RedisCache {
   }
 
   /** Get all keys matching a pattern. */
-  public Collection<String> keys(final String pattern) {
-    return redisTemplate.keys(pattern);
+  public Set<String> keys(final String pattern) {
+    Set<Object> rawKeys = redisTemplate.keys(pattern);
+    if (rawKeys == null) {
+      return Collections.emptySet();
+    }
+    return rawKeys.stream().map(Object::toString).collect(Collectors.toSet());
   }
 }

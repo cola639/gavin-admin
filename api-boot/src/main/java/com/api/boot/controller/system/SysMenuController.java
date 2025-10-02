@@ -45,7 +45,7 @@ public class SysMenuController extends BaseController {
   }
 
   /** Add a new menu item. */
-  @PostMapping
+  @PutMapping
   public AjaxResult update(@Validated @RequestBody SysMenu menu) {
     //    if (!menuService.checkMenuNameUnique(menu)) {
     //      return error("新增菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");

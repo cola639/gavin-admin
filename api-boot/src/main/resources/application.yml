@@ -21,6 +21,10 @@ token:
   secret: ME0Hqi962lbRgaQvejjqo2MkYt8pWb5s412tRn2K56CWDIQh0VI0l0fw7kYM6wUS
   expireTime: 30
 
+user:
+  password:
+    maxRetryCount: 5
+    lockTime: 10
 
 spring:
   datasource:
