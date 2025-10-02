@@ -1,4 +1,4 @@
-package com.api.persistence.domain;
+package com.api.persistence.domain.system;
 
 import jakarta.persistence.*;
 import lombok.*;

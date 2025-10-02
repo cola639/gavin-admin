@@ -1,7 +1,7 @@
 package com.api.system.service;
 
-import com.api.persistence.domain.SysPost;
-import com.api.persistence.domain.SysUserPost;
+import com.api.persistence.domain.system.SysPost;
+import com.api.persistence.domain.system.SysUserPost;
 import com.api.persistence.domain.common.SysUser;
 import com.api.persistence.repository.SysUserPostRepository;
 import lombok.RequiredArgsConstructor;

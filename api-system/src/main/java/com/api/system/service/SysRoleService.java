@@ -2,7 +2,7 @@ package com.api.system.service;
 
 import com.api.common.utils.jpa.SpecificationBuilder;
 
-import com.api.persistence.domain.SysRoleMenu;
+import com.api.persistence.domain.system.SysRoleMenu;
 import com.api.persistence.domain.common.SysRole;
 import com.api.persistence.repository.SysRoleMenuRepository;
 import com.api.persistence.repository.SysRoleRepository;

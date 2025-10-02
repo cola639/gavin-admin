@@ -1,8 +1,7 @@
-package com.api.persistence.domain;
+package com.api.persistence.domain.system;
 
 import com.api.persistence.domain.common.BaseEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 

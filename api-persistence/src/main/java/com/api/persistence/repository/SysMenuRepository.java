@@ -1,6 +1,6 @@
 package com.api.persistence.repository;
 
-import com.api.persistence.domain.SysMenu;
+import com.api.persistence.domain.system.SysMenu;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;

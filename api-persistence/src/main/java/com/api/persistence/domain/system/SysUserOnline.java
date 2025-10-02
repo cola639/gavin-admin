@@ -1,4 +1,4 @@
-package com.api.persistence.domain;
+package com.api.persistence.domain.system;
 
 /**
  * 当前在线会话

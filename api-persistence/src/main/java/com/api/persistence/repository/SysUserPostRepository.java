@@ -1,6 +1,6 @@
 package com.api.persistence.repository;
 
-import com.api.persistence.domain.SysUserPost;
+import com.api.persistence.domain.system.SysUserPost;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;

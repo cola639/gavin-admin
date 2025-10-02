@@ -1,8 +1,7 @@
 package com.api.persistence.repository;
 
-import com.api.persistence.domain.SysUserRole;
+import com.api.persistence.domain.system.SysUserRole;
 import org.springframework.data.jpa.repository.*;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
