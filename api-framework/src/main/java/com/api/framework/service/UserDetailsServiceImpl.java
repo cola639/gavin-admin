@@ -1,67 +1,83 @@
-// package com.api.framework.service;
-//
-// import com.ruoyi.common.core.domain.entity.SysUser;
-// import com.ruoyi.common.core.domain.model.LoginUser;
-// import com.ruoyi.common.enums.UserStatus;
-// import com.ruoyi.common.exception.ServiceException;
-// import com.ruoyi.common.utils.MessageUtils;
-// import com.ruoyi.common.utils.StringUtils;
-// import com.ruoyi.system.service.ISysUserService;
-// import org.slf4j.Logger;
-// import org.slf4j.LoggerFactory;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.security.core.userdetails.UserDetails;
-// import org.springframework.security.core.userdetails.UserDetailsService;
-// import org.springframework.security.core.userdetails.UsernameNotFoundException;
-// import org.springframework.stereotype.Service;
-//
-/// **
-// * 用户验证处理
-// *
-// * @author ruoyi
-// */
-// @Service
-// public class UserDetailsServiceImpl implements UserDetailsService
-// {
-//    private static final Logger log = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
-//
-//    @Autowired
-//    private ISysUserService userService;
-//
-//    @Autowired
-//    private SysPasswordService passwordService;
-//
-//    @Autowired
-//    private SysPermissionService permissionService;
-//
-//    @Override
-//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
-//    {
-//        SysUser user = userService.selectUserByUserName(username);
-//        if (StringUtils.isNull(user))
-//        {
-//            log.info("登录用户：{} 不存在.", username);
-//            throw new ServiceException(MessageUtils.message("user.not.exists"));
-//        }
-//        else if (UserStatus.DELETED.getCode().equals(user.getDelFlag()))
-//        {
-//            log.info("登录用户：{} 已被删除.", username);
-//            throw new ServiceException(MessageUtils.message("user.password.delete"));
-//        }
-//        else if (UserStatus.DISABLE.getCode().equals(user.getStatus()))
-//        {
-//            log.info("登录用户：{} 已被停用.", username);
-//            throw new ServiceException(MessageUtils.message("user.blocked"));
-//        }
-//
-//        passwordService.validate(user);
-//
-//        return createLoginUser(user);
-//    }
-//
-//    public UserDetails createLoginUser(SysUser user)
-//    {
-//        return new LoginUser(user.getUserId(), user.getDeptId(), user,
-// permissionService.getMenuPermission(user));
-//    }
-// }
+package com.api.framework.service;
+
+import com.api.common.utils.MessageUtils;
+import com.api.common.utils.StringUtils;
+import com.api.framework.exception.ServiceException;
+import com.api.persistence.domain.common.LoginUser;
+import com.api.persistence.domain.common.SysUser;
+import com.api.system.service.SysUserService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+/**
+ * Custom implementation of Spring Security's {@link UserDetailsService}.
+ *
+ * <p>Responsibilities:
+ *
+ * <ul>
+ *   <li>Load user details from the database.
+ *   <li>Validate account status (active, deleted, disabled).
+ *   <li>Delegate password validation.
+ *   <li>Assemble a {@link LoginUser} with roles and permissions.
+ * </ul>
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class UserDetailsServiceImpl implements UserDetailsService {
+
+  private final SysUserService userService;
+  private final SysPasswordService passwordService;
+  private final SysPermissionService permissionService;
+
+  /**
+   * Load user details by username.
+   *
+   * @param username username provided during login
+   * @return {@link UserDetails} for Spring Security authentication
+   * @throws UsernameNotFoundException if user not found or invalid
+   */
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    SysUser user = userService.selectUserByUserName(username);
+
+    //    if (StringUtils.isNull(user)) {
+    //      log.warn("Login attempt with non-existent user: {}", username);
+    //      throw new ServiceException(MessageUtils.message("user.not.exists"));
+    //    }
+    //
+    //    if (UserStatus.DELETED.getCode().equals(user.getDelFlag())) {
+    //      log.warn("Login attempt with deleted user: {}", username);
+    //      throw new ServiceException(MessageUtils.message("user.password.delete"));
+    //    }
+    //
+    //    if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+    //      log.warn("Login attempt with disabled user: {}", username);
+    //      throw new ServiceException(MessageUtils.message("user.blocked"));
+    //    }
+
+    // Validate password policy or expiration
+    passwordService.validate(user);
+
+    return createLoginUser(user);
+  }
+
+  /**
+   * Assemble {@link LoginUser} with roles and permissions.
+   *
+   * @param user SysUser entity
+   * @return authenticated LoginUser
+   */
+  private UserDetails createLoginUser(SysUser user) {
+    return LoginUser.builder()
+        .userId(user.getUserId())
+        .deptId(user.getDeptId())
+        .user(user)
+        .permissions(permissionService.getMenuPermission(user))
+        .build();
+  }
+}

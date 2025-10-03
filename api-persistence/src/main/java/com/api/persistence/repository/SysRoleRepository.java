@@ -52,4 +52,13 @@ public interface SysRoleRepository
   @Modifying
   @Query("update SysRole r set r.delFlag = '2' where r.roleId in :roleIds")
   int softDeleteByIds(@Param("roleIds") Long[] roleIds);
+
+  @Query(
+      """
+        select distinct r from SysRole r
+        join SysUser u on u.userId = :userId
+        join u.roles ur
+        where r.delFlag = '0'
+    """)
+  List<SysRole> selectRolePermissionByUserId(Long userId);
 }

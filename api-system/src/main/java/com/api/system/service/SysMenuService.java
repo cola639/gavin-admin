@@ -107,4 +107,27 @@ public class SysMenuService {
     }
     sysMenuRepository.deleteById(menuId);
   }
+
+  /** Get permissions by role ID. */
+  public Set<String> selectMenuPermsByRoleId(Long roleId) {
+    List<String> perms = sysMenuRepository.findPermsByRoleId(roleId);
+    return toPermSet(perms);
+  }
+
+  /** Get permissions by user ID. */
+  public Set<String> selectMenuPermsByUserId(Long userId) {
+    List<String> perms = sysMenuRepository.findPermsByUserId(userId);
+    return toPermSet(perms);
+  }
+
+  /** Convert list of comma-separated permissions to a clean set. */
+  private Set<String> toPermSet(List<String> perms) {
+    Set<String> permsSet = new HashSet<>();
+    for (String perm : perms) {
+      if (perm != null && !perm.isBlank()) {
+        permsSet.addAll(Arrays.asList(perm.trim().split(",")));
+      }
+    }
+    return permsSet;
+  }
 }

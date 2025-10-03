@@ -1,5 +1,6 @@
 package com.api.system.service;
 
+import com.api.common.utils.StringUtils;
 import com.api.common.utils.jpa.SpecificationBuilder;
 
 import com.api.persistence.domain.system.SysRoleMenu;
@@ -8,6 +9,7 @@ import com.api.persistence.repository.SysRoleMenuRepository;
 import com.api.persistence.repository.SysRoleRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +17,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SysRoleService {
@@ -176,5 +177,29 @@ public class SysRoleService {
         .findFirstByRoleKeyAndDelFlag(role.getRoleKey(), "0")
         .map(existingRole -> existingRole.getRoleId().equals(role.getRoleId()))
         .orElse(true);
+  }
+
+  /**
+   * Get role permissions (role keys) for a given user.
+   *
+   * @param userId user ID
+   * @return set of role permission strings
+   */
+  public Set<String> selectRolePermissionByUserId(Long userId) {
+    List<SysRole> roles = roleRepository.selectRolePermissionByUserId(userId);
+    Set<String> permissions = new HashSet<>();
+
+    for (SysRole role : roles) {
+      if (role != null && role.getRoleKey() != null) {
+        // Split roleKey by comma (e.g., "admin,system:user:view")
+        Arrays.stream(role.getRoleKey().trim().split(","))
+            .map(String::trim)
+            .filter(s -> !s.isEmpty())
+            .forEach(permissions::add);
+      }
+    }
+
+    log.debug("Resolved permissions for user {}: {}", userId, permissions);
+    return permissions;
   }
 }

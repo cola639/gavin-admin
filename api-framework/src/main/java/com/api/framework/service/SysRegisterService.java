@@ -29,6 +29,7 @@ public class SysRegisterService {
 
   private final SysUserRepository userRepository;
   private final RedisCache redisCache;
+  private final String DEL_FLAG = "0";
 
   /**
    * Handles user registration.
@@ -53,6 +54,7 @@ public class SysRegisterService {
     }
 
     // Set user details
+    sysUser.setDelFlag(DEL_FLAG);
     sysUser.setNickName(username);
     sysUser.setPwdUpdateDate(DateEnhancedUtil.getNowDate());
     sysUser.setPassword(SecurityUtils.encryptPassword(password));
@@ -120,7 +122,7 @@ public class SysRegisterService {
         || password.length() > UserConstants.PASSWORD_MAX_LENGTH) {
       return "Password length must be between 5 and 20 characters.";
     }
-    if (!userRepository.existsByUserName(sysUser.getUserName())) {
+    if (userRepository.existsByUserName(sysUser.getUserName())) {
       return "Registration failed. Username '" + username + "' already exists.";
     }
     return "";
