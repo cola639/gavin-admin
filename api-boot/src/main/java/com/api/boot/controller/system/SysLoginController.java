@@ -57,6 +57,13 @@ public class SysLoginController {
     return ajax;
   }
 
+  @PostMapping("/testToken")
+  public AjaxResult testLogin() {
+
+    AjaxResult ajax = AjaxResult.success();
+    return ajax;
+  }
+
   /**
    * Get information about the currently logged-in user.
    *

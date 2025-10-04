@@ -19,7 +19,7 @@ app:
 token:
   header: Authorization
   secret: a8f9e5c3b7d1f4a2c6e8d9b3a1f7c5d2b9e7f6c4a2d8b1f3e9c7d5a3b1f9e4c2a8f9e5c3b7d1f4a2c6e8d9b3a1f7c5d2b9e7f6c4a2d8b1f3e9c7d5a3b1f9e4c2
-  expireTime: 30
+  expireTime: 300000
 
 user:
   password:
