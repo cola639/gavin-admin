@@ -18,7 +18,7 @@ app:
 
 token:
   header: Authorization
-  secret: ME0Hqi962lbRgaQvejjqo2MkYt8pWb5s412tRn2K56CWDIQh0VI0l0fw7kYM6wUS
+  secret: a8f9e5c3b7d1f4a2c6e8d9b3a1f7c5d2b9e7f6c4a2d8b1f3e9c7d5a3b1f9e4c2a8f9e5c3b7d1f4a2c6e8d9b3a1f7c5d2b9e7f6c4a2d8b1f3e9c7d5a3b1f9e4c2
   expireTime: 30
 
 user:

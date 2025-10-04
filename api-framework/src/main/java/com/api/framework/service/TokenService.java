@@ -12,6 +12,7 @@ import com.api.persistence.domain.common.LoginUser;
 import eu.bitwalker.useragentutils.UserAgent;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -106,7 +107,19 @@ public class TokenService {
     claims.put(Constants.LOGIN_USER_KEY, token);
     claims.put(Constants.JWT_USERNAME, loginUser.getUsername());
 
-    return Jwts.builder().setClaims(claims).signWith(signingKey).compact();
+    return createToken(claims);
+  }
+
+  /**
+   * Generate JWT from claims.
+   *
+   * @param claims Claims to include in the token
+   * @return Generated JWT string
+   */
+  private String createToken(Map<String, Object> claims) {
+    String token =
+        Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS512, secret).compact();
+    return token;
   }
 
   /** Verify token expiration. Refresh if less than 20 minutes left. */
