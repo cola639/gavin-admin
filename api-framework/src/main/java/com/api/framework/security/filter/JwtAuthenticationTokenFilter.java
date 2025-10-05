@@ -10,21 +10,18 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-/**
- * token过滤器 验证token有效性
- *
- * @author ruoyi
- */
+/** token filter to validate the token's validity */
+@RequiredArgsConstructor
 @Component
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
-  @Autowired private TokenService tokenService;
+  private final TokenService tokenService;
 
   @Override
   protected void doFilterInternal(
@@ -32,12 +29,19 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
     LoginUser loginUser = tokenService.getLoginUser(request);
     if (StringUtils.isNotNull(loginUser) && StringUtils.isNull(SecurityUtils.getAuthentication())) {
+      // Validate the token
       tokenService.verifyToken(loginUser);
+
+      // Set the authentication in the security context
+      // Create an authentication token
       UsernamePasswordAuthenticationToken authenticationToken =
           new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
+      // Set details
       authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+      // Set the authentication in the security context
       SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }
+    // Continue the filter chain
     chain.doFilter(request, response);
   }
 }
