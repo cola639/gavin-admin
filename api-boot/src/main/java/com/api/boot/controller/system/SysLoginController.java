@@ -48,8 +48,7 @@ public class SysLoginController {
   private final RedisCache redisCache;
   private final SysUserRepository userRepository;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
   /**
    * Login endpoint.
@@ -85,10 +84,7 @@ public class SysLoginController {
 
     // Serialize to JSON string
     String json = objectMapper.writeValueAsString(user);
-
-    // ❗ Do not touch user.getRoles() here — leave it as lazy
     redisCache.setCacheObject("user:" + user.getUserId(), user);
-    System.out.println("✅ User cached in Redis");
     return AjaxResult.success();
   }
 
@@ -100,7 +96,6 @@ public class SysLoginController {
     // Deserialize back into SysUser
     SysUser user = objectMapper.readValue(json, SysUser.class);
 
-    System.out.println("✅ Read user: " + user.getUserName());
     return AjaxResult.success();
   }
 

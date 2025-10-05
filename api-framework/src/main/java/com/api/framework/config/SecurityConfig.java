@@ -77,8 +77,6 @@ public class SecurityConfig {
     return http
         // Disable CSRF (since we’re stateless)
         .csrf(csrf -> csrf.disable())
-        // 允许所有请求，不需要登录
-        .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
 
         // Configure HTTP headers (allow same-origin iframes for H2/Swagger)
         .headers(
@@ -95,41 +93,37 @@ public class SecurityConfig {
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
         // Authorization rules
-        //        .authorizeHttpRequests(
-        //            requests -> {
-        //              // Allow public URLs (from configuration)
-        //              permitAllUrlProperties
-        //                  .getUrls()
-        //                  .forEach(url -> requests.antMatchers(url).permitAll());
-        //
-        //              // Open login/register/captcha endpoints
-        //              requests.antMatchers("/login", "/register", "/captchaImage").permitAll();
-        //
-        //              // Allow static resources
-        //              requests
-        //                  .antMatchers(
-        //                      HttpMethod.GET,
-        //                      "/",
-        //                      "/*.html",
-        //                      "/**/*.html",
-        //                      "/**/*.css",
-        //                      "/**/*.js",
-        //                      "/profile/**")
-        //                  .permitAll();
-        //
-        //              // Allow Swagger & monitoring tools
-        //              requests
-        //                  .antMatchers(
-        //                      "/swagger-ui.html",
-        //                      "/swagger-resources/**",
-        //                      "/webjars/**",
-        //                      "/*/api-docs",
-        //                      "/druid/**")
-        //                  .permitAll();
-        //
-        //              // Everything else requires authentication
-        //              requests.anyRequest().authenticated();
-        //            })
+        .authorizeHttpRequests(
+            requests -> {
+
+              // Open login/register/captcha endpoints
+              requests.requestMatchers("/login", "/register", "/captchaImage").permitAll();
+
+              // Allow static resources
+              requests
+                  .requestMatchers(
+                      HttpMethod.GET,
+                      "/",
+                      "/*.html",
+                      "/**/*.html",
+                      "/**/*.css",
+                      "/**/*.js",
+                      "/profile/**")
+                  .permitAll();
+
+              // Allow Swagger & monitoring tools
+              requests
+                  .requestMatchers(
+                      "/swagger-ui.html",
+                      "/swagger-resources/**",
+                      "/webjars/**",
+                      "/*/api-docs",
+                      "/druid/**")
+                  .permitAll();
+
+              // Everything else requires authentication
+              requests.anyRequest().authenticated();
+            })
 
         // Configure logout behavior
         .logout(logout -> logout.logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler))
