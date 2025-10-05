@@ -108,9 +108,9 @@ public class SecurityConfig {
                       HttpMethod.GET,
                       "/",
                       "/*.html",
-                      "/**/*.html",
-                      "/**/*.css",
-                      "/**/*.js",
+                      "/**.html",
+                      "/**.css",
+                      "/**.js",
                       "/profile/**")
                   .permitAll();
 
