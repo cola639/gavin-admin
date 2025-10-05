@@ -2,6 +2,7 @@ package com.api.framework.domain;
 
 import com.api.common.utils.Arith;
 import com.api.common.utils.DateEnhancedUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -25,14 +26,14 @@ public class Jvm implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  /** Current total JVM memory usage (in bytes). */
-  private double total;
+  /** Current total JVM memory usage (in bytes, internal use only)). */
+  @JsonIgnore private double total;
 
-  /** Maximum available JVM memory (in bytes). */
-  private double max;
+  /** Maximum available JVM memory (in bytes, internal use only)). */
+  @JsonIgnore private double max;
 
-  /** Current free JVM memory (in bytes). */
-  private double free;
+  /** Current free JVM memory (in bytes, internal use only)). */
+  @JsonIgnore private double free;
 
   /** JDK version. */
   private String version;

@@ -1,6 +1,7 @@
 package com.api.framework.domain;
 
 import com.api.common.utils.Arith;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -14,14 +15,14 @@ public class Mem implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  /** Total memory (in bytes). */
-  private double total;
+  /** Total memory (in bytes, internal use only). */
+  @JsonIgnore private double total;
 
-  /** Used memory (in bytes). */
-  private double used;
+  /** Used memory (in bytes, internal use only). */
+  @JsonIgnore private double used;
 
-  /** Free memory (in bytes). */
-  private double free;
+  /** Free memory (in bytes, internal use only). */
+  @JsonIgnore private double free;
 
   /** Gets total memory in gigabytes (GB). */
   @JsonProperty("totalGB")

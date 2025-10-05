@@ -3,15 +3,16 @@ Project GOAL
 2 role management
 3 menu management
 4 dept management
+5 schedule/quartz task
 
 monitor
 1 online user
-2 machine status
+2 machine status ✅
 3 sql/uri vistior
 4 operation logs management
 
 quartz
-1 schedule task
+1 schedule/quartz task
 2 delete task
 3 generate task
 
