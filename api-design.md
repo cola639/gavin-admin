@@ -1,4 +1,4 @@
-项目结构 设计
+Project GOAL
 1 user management
 2 role management
 3 menu management
@@ -156,14 +156,15 @@ LocalDateTime、LocalDate、LocalTime 不需要 @Temporal，JPA 可以直接映�
 21 存储 (TIMESTAMP) → 读取 (JDBC/应用)
 
 22
-Improve code elegance and maintainability.
-Use Lombok annotations (e.g., @Data, @Getter, @Setter) to reduce boilerplate code.
-Ensure proper JPA annotations for entity mapping.
-Replace @RequiredArgsConstructor with @Autowired.
-Replace Fastjson with Jackson for JSON processing.
-Add clear English comments in the code.
-Use @Slf4j for logging
-Remove author name comments.
+
+1. Improve code elegance and maintainability.
+2. Use Lombok annotations (e.g., @Data, @Getter, @Setter) to reduce boilerplate code.
+3. Ensure proper JPA annotations for entity mapping.
+4. Replace @RequiredArgsConstructor with @Autowired.
+5. Replace Fastjson with Jackson for JSON processing.
+6. Add clear English comments in the code.
+7. Use @Slf4j for logging
+8. Remove author name comments.
 
 23
 gavin/
