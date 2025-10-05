@@ -99,6 +99,9 @@ public class SecurityConfig {
               // Open login/register/captcha endpoints
               requests.requestMatchers("/login", "/register", "/captchaImage").permitAll();
 
+              // Open all /auth/** endpoints
+              requests.requestMatchers("/auth/**").permitAll();
+
               // Allow static resources
               requests
                   .requestMatchers(

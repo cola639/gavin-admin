@@ -27,9 +27,10 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain chain)
       throws ServletException, IOException {
+
     LoginUser loginUser = tokenService.getLoginUser(request);
     if (StringUtils.isNotNull(loginUser) && StringUtils.isNull(SecurityUtils.getAuthentication())) {
-      // Validate the token
+      // Validate and refresh the token
       tokenService.verifyToken(loginUser);
 
       // Set the authentication in the security context

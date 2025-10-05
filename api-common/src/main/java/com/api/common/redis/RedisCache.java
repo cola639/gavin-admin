@@ -83,10 +83,18 @@ public class RedisCache {
   public <T> T getCacheObject(final String key, Class<T> clazz) {
     try {
       ValueOperations<Object, Object> ops = redisTemplate.opsForValue();
-      String json = ops.get(key).toString();
-      if (json == null) {
+      Object value = ops.get(key);
+      if (value == null) {
         return null;
       }
+
+      // If it's already stored as an object, just cast
+      if (clazz.isInstance(value)) {
+        return clazz.cast(value);
+      }
+
+      // Otherwise, treat it as JSON and deserialize
+      String json = value.toString();
       return objectMapper.readValue(json, clazz);
     } catch (Exception e) {
       log.error("❌ Failed to deserialize Redis key: {}", key, e);

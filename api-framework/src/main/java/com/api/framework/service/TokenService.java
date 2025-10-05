@@ -9,6 +9,7 @@ import com.api.common.utils.ip.AddressUtils;
 import com.api.common.utils.ip.IpUtils;
 import com.api.common.utils.uuid.IdUtils;
 import com.api.persistence.domain.common.LoginUser;
+import com.api.persistence.domain.common.SysUser;
 import eu.bitwalker.useragentutils.UserAgent;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -54,14 +55,6 @@ public class TokenService {
   @Value("${token.expireTime}")
   private int expireTime;
 
-  private SecretKey signingKey;
-
-  /** Init signing key once after bean creation */
-  @PostConstruct
-  public void init() {
-    this.signingKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-  }
-
   private static final long MILLIS_SECOND = 1000;
   private static final long MILLIS_MINUTE = 60 * MILLIS_SECOND;
   private static final long REFRESH_THRESHOLD = 20 * 60 * 1000L; // 20 min
@@ -74,7 +67,7 @@ public class TokenService {
         Claims claims = parseToken(token);
         String uuid = claims.get(Constants.LOGIN_USER_KEY, String.class);
         String userKey = getTokenKey(uuid);
-        return redisCache.getCacheObject(userKey);
+        return redisCache.getCacheObject(userKey, LoginUser.class);
       } catch (Exception e) {
         log.error("Failed to retrieve login user from token: {}", e.getMessage());
       }
@@ -153,7 +146,7 @@ public class TokenService {
 
   /** Parse token into claims. */
   private Claims parseToken(String token) {
-    return Jwts.parserBuilder().setSigningKey(signingKey).build().parseClaimsJws(token).getBody();
+    return Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token).getBody();
   }
 
   /** Get username from token. */
