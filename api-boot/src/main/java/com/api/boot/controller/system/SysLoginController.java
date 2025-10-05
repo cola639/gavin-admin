@@ -3,6 +3,7 @@ package com.api.boot.controller.system;
 import com.api.common.constant.Constants;
 
 import com.api.common.domain.AjaxResult;
+import com.api.common.redis.RedisCache;
 import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.framework.service.SysLoginService;
@@ -10,9 +11,18 @@ import com.api.framework.service.SysPermissionService;
 import com.api.framework.service.TokenService;
 
 import com.api.persistence.domain.common.LoginBody;
+import com.api.persistence.domain.common.SysUser;
+import com.api.persistence.repository.SysUserPostRepository;
+import com.api.persistence.repository.SysUserRepository;
 import com.api.system.service.SysMenuService;
+import com.api.system.service.SysUserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -35,6 +45,11 @@ public class SysLoginController {
   private final SysMenuService menuService;
   private final SysPermissionService permissionService;
   private final TokenService tokenService;
+  private final RedisCache redisCache;
+  private final SysUserRepository userRepository;
+
+  @Autowired
+  private ObjectMapper objectMapper;
 
   /**
    * Login endpoint.
@@ -62,6 +77,31 @@ public class SysLoginController {
 
     AjaxResult ajax = AjaxResult.success();
     return ajax;
+  }
+
+  @GetMapping("/write")
+  public AjaxResult testWrite() throws JsonProcessingException {
+    SysUser user = userRepository.findById(1L).orElseThrow();
+
+    // Serialize to JSON string
+    String json = objectMapper.writeValueAsString(user);
+
+    // ❗ Do not touch user.getRoles() here — leave it as lazy
+    redisCache.setCacheObject("user:" + user.getUserId(), user);
+    System.out.println("✅ User cached in Redis");
+    return AjaxResult.success();
+  }
+
+  @GetMapping("/read")
+  public AjaxResult testGet() throws JsonProcessingException {
+    // Get JSON string from Redis
+    String json = redisCache.getCacheObject("user:1");
+
+    // Deserialize back into SysUser
+    SysUser user = objectMapper.readValue(json, SysUser.class);
+
+    System.out.println("✅ Read user: " + user.getUserName());
+    return AjaxResult.success();
   }
 
   /**

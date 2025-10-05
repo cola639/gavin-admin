@@ -1,12 +1,16 @@
 package com.api.common.redis;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -26,16 +30,27 @@ import java.util.stream.Collectors;
 public class RedisCache {
 
   private final RedisTemplate<Object, Object> redisTemplate;
+  private final ObjectMapper objectMapper; // ✅ Inject Jackson mapper
 
-  /** Cache a basic object (String, Integer, entity, etc.) */
+  /** Store any object as JSON */
   public <T> void setCacheObject(final String key, final T value) {
-    redisTemplate.opsForValue().set(key, value);
+    try {
+      String json = objectMapper.writeValueAsString(value);
+      redisTemplate.opsForValue().set(key, json);
+    } catch (Exception e) {
+      log.error("❌ Failed to serialize object for Redis key: {}", key, e);
+    }
   }
 
-  /** Cache a basic object with expiration. */
+  /** Store any object as JSON with expiration */
   public <T> void setCacheObject(
-      final String key, final T value, final Integer timeout, final TimeUnit timeUnit) {
-    redisTemplate.opsForValue().set(key, value, timeout, timeUnit);
+      final String key, final T value, final Integer timeout, final TimeUnit unit) {
+    try {
+      String json = objectMapper.writeValueAsString(value);
+      redisTemplate.opsForValue().set(key, json, timeout, unit);
+    } catch (Exception e) {
+      log.error("❌ Failed to serialize object for Redis key: {}", key, e);
+    }
   }
 
   /** Set expiration time (in seconds by default). */
@@ -62,6 +77,21 @@ public class RedisCache {
   public <T> T getCacheObject(final String key) {
     ValueOperations<String, T> operation = (ValueOperations) redisTemplate.opsForValue();
     return operation.get(key);
+  }
+
+  /** Read JSON string from Redis and deserialize into an object */
+  public <T> T getCacheObject(final String key, Class<T> clazz) {
+    try {
+      ValueOperations<Object, Object> ops = redisTemplate.opsForValue();
+      String json = ops.get(key).toString();
+      if (json == null) {
+        return null;
+      }
+      return objectMapper.readValue(json, clazz);
+    } catch (Exception e) {
+      log.error("❌ Failed to deserialize Redis key: {}", key, e);
+      return null;
+    }
   }
 
   /** Delete a single key. */
