@@ -1,6 +1,7 @@
 package com.api.common.controller;
 
 import java.util.Date;
+import java.util.List;
 
 import com.api.common.constant.HttpStatus;
 import com.api.common.domain.AjaxResult;
@@ -44,6 +45,16 @@ public class BaseController {
     rspData.setMsg("Query successful");
     rspData.setRows(page.getContent());
     rspData.setTotal(page.getTotalElements());
+    return rspData;
+  }
+
+  // Overload for non-paginated lists, no store in database
+  protected <T> TableDataInfo getDataTable(List<T> list) {
+    TableDataInfo rspData = new TableDataInfo();
+    rspData.setCode(HttpStatus.SUCCESS);
+    rspData.setMsg("Query successful");
+    rspData.setRows(list);
+    rspData.setTotal(list.size());
     return rspData;
   }
 

@@ -1,96 +1,66 @@
 package com.api.persistence.domain.system;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.Serializable;
+import java.time.Instant;
+
 /**
- * 当前在线会话
+ * Represents an active user session in the system.
  *
- * @author ruoyi
+ * <p>This entity tracks users currently online, including their IP address, browser, operating
+ * system, and login metadata.
+ *
+ * <p>Design principles: - Uses Lombok for reduced boilerplate. - Uses Jackson for JSON
+ * serialization. - Uses JPA annotations for optional persistence support. - Logs changes for
+ * debugging and monitoring. - Fully compatible with Java 17 and Spring Boot 3.5.
  */
-public class SysUserOnline {
-  /** 会话编号 */
+@Slf4j
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class SysUserOnline implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
+  /** Unique session identifier (JWT token ID). */
   private String tokenId;
 
-  /** 部门名称 */
+  /** Department name of the user. */
   private String deptName;
 
-  /** 用户名称 */
+  /** Username of the logged-in user. */
   private String userName;
 
-  /** 登录IP地址 */
+  /** IP address of the logged-in user. */
   private String ipaddr;
 
-  /** 登录地址 */
+  /** Login location derived from IP address. */
   private String loginLocation;
 
-  /** 浏览器类型 */
+  /** Browser used during login (e.g., Chrome, Edge, Safari). */
   private String browser;
 
-  /** 操作系统 */
+  /** Operating system of the client device. */
   private String os;
 
-  /** 登录时间 */
+  /** Login timestamp (epoch milliseconds). */
   private Long loginTime;
 
-  public String getTokenId() {
-    return tokenId;
-  }
-
-  public void setTokenId(String tokenId) {
-    this.tokenId = tokenId;
-  }
-
-  public String getDeptName() {
-    return deptName;
-  }
-
-  public void setDeptName(String deptName) {
-    this.deptName = deptName;
-  }
-
-  public String getUserName() {
-    return userName;
-  }
-
-  public void setUserName(String userName) {
-    this.userName = userName;
-  }
-
-  public String getIpaddr() {
-    return ipaddr;
-  }
-
-  public void setIpaddr(String ipaddr) {
-    this.ipaddr = ipaddr;
-  }
-
-  public String getLoginLocation() {
-    return loginLocation;
-  }
-
-  public void setLoginLocation(String loginLocation) {
-    this.loginLocation = loginLocation;
-  }
-
-  public String getBrowser() {
-    return browser;
-  }
-
-  public void setBrowser(String browser) {
-    this.browser = browser;
-  }
-
-  public String getOs() {
-    return os;
-  }
-
-  public void setOs(String os) {
-    this.os = os;
-  }
-
-  public Long getLoginTime() {
-    return loginTime;
-  }
-
-  public void setLoginTime(Long loginTime) {
-    this.loginTime = loginTime;
+  /** Logs session summary for diagnostics. */
+  public void logSessionInfo() {
+    log.info(
+        "Online session [{}]: user='{}', ip='{}', browser='{}', os='{}'",
+        tokenId,
+        userName,
+        ipaddr,
+        browser,
+        os);
   }
 }

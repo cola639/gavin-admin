@@ -158,7 +158,7 @@ LocalDateTime、LocalDate、LocalTime 不需要 @Temporal，JPA 可以直接映�
 
 22
 
-1. Improve code elegance and maintainability.
+1. Improve code elegance and maintainability,Base on Java 17 and Spring Boot 3.5.
 2. Use Lombok annotations (e.g., @Data, @Getter, @Setter) to reduce boilerplate code.
 3. Ensure proper JPA annotations for entity mapping.
 4. Replace @RequiredArgsConstructor with @Autowired.
