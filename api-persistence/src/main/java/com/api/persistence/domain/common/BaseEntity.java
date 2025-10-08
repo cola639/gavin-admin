@@ -7,6 +7,10 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,31 +34,31 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+@MappedSuperclass
 public class BaseEntity implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
-  /** Search value (used in filtering/query conditions, not persisted) */
-  @JsonIgnore private String searchValue;
-
-  /** User who created the record */
+  @Column(name = "create_by")
   private String createBy;
 
-  /** Creation timestamp */
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  @Column(name = "create_time")
   private Date createTime;
 
-  /** User who last updated the record */
+  @Column(name = "update_by")
   private String updateBy;
 
-  /** Last updated timestamp */
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  @Column(name = "update_time")
   private Date updateTime;
 
-  /** Remarks or additional notes */
+  @Column(name = "remark")
   private String remark;
 
-  /** Extra request parameters (useful for dynamic queries) */
+  /** Used for searching/filtering only — not persisted. */
+  @Transient // ✅ Tells JPA not to map this field to a column
+  @JsonIgnore
+  private String searchValue;
+
+  /** Used for dynamic query parameters — not persisted. */
+  @Transient // ✅ Same here
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   @Builder.Default
   private Map<String, Object> params = new HashMap<>();
