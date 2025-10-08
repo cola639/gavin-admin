@@ -1,17 +1,21 @@
-package service;
+package com.api.quartz.service;
 
 import com.api.common.exceptions.TaskException;
-import constant.ScheduleConstants;
-import domain.SysJob;
+import com.api.common.utils.jpa.SpecificationBuilder;
+import com.api.quartz.constant.ScheduleConstants;
+import com.api.quartz.domain.SysJob;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import repository.SysJobRepository;
-import util.CronUtils;
-import util.ScheduleUtils;
+import com.api.quartz.repository.SysJobRepository;
+import com.api.quartz.util.CronUtils;
+import com.api.quartz.util.ScheduleUtils;
 
 import java.util.List;
 
@@ -23,6 +27,7 @@ public class SysJobServiceImpl implements ISysJobService {
   private final Scheduler scheduler;
   private final SysJobRepository jobRepository;
 
+  // Initialize the scheduler on application startup
   @PostConstruct
   public void init() throws SchedulerException, TaskException {
     scheduler.clear();
@@ -36,6 +41,18 @@ public class SysJobServiceImpl implements ISysJobService {
   @Override
   public List<SysJob> selectJobList(SysJob job) {
     return jobRepository.findAll();
+  }
+
+  @Override
+  public Page<SysJob> selectJobList(SysJob job, Pageable pageable) {
+    Specification<SysJob> spec =
+        SpecificationBuilder.<SysJob>builder()
+            .eq("jobId", job.getJobId())
+            .like("jobName", job.getJobName())
+            .eq("jobGroup", job.getJobGroup())
+            .eq("status", job.getStatus());
+
+    return jobRepository.findAll(spec, pageable);
   }
 
   @Override

@@ -1,8 +1,8 @@
-package util;
+package com.api.quartz.util;
 
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.springUtils.SpringUtils;
-import domain.SysJob;
+import com.api.quartz.domain.SysJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

@@ -1,4 +1,4 @@
-package task;
+package com.api.quartz.task;
 
 import com.api.common.utils.StringUtils;
 import org.springframework.stereotype.Component;

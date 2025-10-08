@@ -1,6 +1,6 @@
-package service;
+package com.api.quartz.service;
 
-import domain.SysJobLog;
+import com.api.quartz.domain.SysJobLog;
 
 import java.util.List;
 

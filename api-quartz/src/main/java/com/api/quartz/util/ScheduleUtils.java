@@ -1,11 +1,11 @@
-package util;
+package com.api.quartz.util;
 
 import com.api.common.constant.Constants;
 import com.api.common.exceptions.TaskException;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.springUtils.SpringUtils;
-import constant.ScheduleConstants;
-import domain.SysJob;
+import com.api.quartz.constant.ScheduleConstants;
+import com.api.quartz.domain.SysJob;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 

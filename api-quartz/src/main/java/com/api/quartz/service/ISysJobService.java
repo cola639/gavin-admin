@@ -1,8 +1,11 @@
-package service;
+package com.api.quartz.service;
 
 import com.api.common.exceptions.TaskException;
-import domain.SysJob;
+import com.api.quartz.domain.SysJob;
 import org.quartz.SchedulerException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 /**
@@ -21,6 +24,15 @@ public interface ISysJobService {
    * @return list of scheduled jobs
    */
   List<SysJob> selectJobList(SysJob job);
+
+  /**
+   * Retrieves a paginated list of scheduled jobs matching given criteria.
+   *
+   * @param job
+   * @param pageable
+   * @return
+   */
+  Page<SysJob> selectJobList(SysJob job, Pageable pageable);
 
   /**
    * Retrieves job details by its ID.

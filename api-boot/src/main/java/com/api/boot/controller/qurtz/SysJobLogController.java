@@ -1,17 +1,13 @@
-package controller;
+package com.api.boot.controller.qurtz;
 
 import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
-import com.api.common.utils.pagination.TableDataInfo;
-import domain.SysJobLog;
-import jakarta.servlet.http.HttpServletResponse;
+import com.api.quartz.domain.SysJobLog;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import service.ISysJobLogService;
-
-import java.util.List;
+import com.api.quartz.service.ISysJobLogService;
 
 /**
  * REST Controller for handling Quartz job execution logs.
@@ -24,16 +20,12 @@ import java.util.List;
  * compatible with Java 17 and Spring Boot 3.5.
  */
 @Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/monitor/jobLog")
 public class SysJobLogController extends BaseController {
 
   private final ISysJobLogService jobLogService;
-
-  @Autowired
-  public SysJobLogController(ISysJobLogService jobLogService) {
-    this.jobLogService = jobLogService;
-  }
 
   /**
    * Retrieves a paginated list of scheduled job execution logs.
@@ -41,9 +33,9 @@ public class SysJobLogController extends BaseController {
    * @param sysJobLog filtering criteria for job logs
    * @return paginated list of job logs
    */
-  @PreAuthorize("@ss.hasPermi('monitor:job:list')")
-  @GetMapping("/list")
-  public TableDataInfo list(SysJobLog sysJobLog) {}
+  //  @PreAuthorize("@ss.hasPermi('monitor:job:list')")
+  //  @GetMapping("/list")
+  //  public TableDataInfo list(SysJobLog sysJobLog) {}
 
   /**
    * Retrieves details for a specific job log by ID.

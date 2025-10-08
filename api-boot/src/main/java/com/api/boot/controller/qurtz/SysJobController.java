@@ -1,4 +1,4 @@
-package controller;
+package com.api.boot.controller.qurtz;
 
 import com.api.common.constant.Constants;
 import com.api.common.controller.BaseController;
@@ -6,18 +6,18 @@ import com.api.common.domain.AjaxResult;
 import com.api.common.exceptions.TaskException;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.pagination.TableDataInfo;
-import domain.SysJob;
-import jakarta.servlet.http.HttpServletResponse;
+import com.api.quartz.domain.SysJob;
+import com.api.quartz.service.ISysJobService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.SchedulerException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import service.ISysJobService;
-import util.CronUtils;
-import util.ScheduleUtils;
-
-import java.util.List;
+import com.api.quartz.util.CronUtils;
+import com.api.quartz.util.ScheduleUtils;
 
 /**
  * REST Controller for managing Quartz scheduled jobs.
@@ -29,20 +29,21 @@ import java.util.List;
  * 17 and Spring Boot 3.5
  */
 @Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/monitor/job")
 public class SysJobController extends BaseController {
 
   private final ISysJobService jobService;
 
-  @Autowired
-  public SysJobController(ISysJobService jobService) {
-    this.jobService = jobService;
-  }
-
   /** Retrieves a paginated list of scheduled jobs. */
   @GetMapping("/list")
-  public TableDataInfo list(SysJob sysJob) {}
+  public TableDataInfo list(SysJob sysJob) {
+    Pageable pageable = PageRequest.of(0, 10);
+    Page<SysJob> page = jobService.selectJobList(sysJob, pageable);
+
+    return getDataTable(page);
+  }
 
   /** Retrieves detailed job information by jobId. */
   @GetMapping("/{jobId}")
@@ -67,6 +68,7 @@ public class SysJobController extends BaseController {
   }
 
   /** Updates an existing scheduled job. */
+  @PreAuthorize("@ss.hasPermi('monitor:job:edit')")
   @PutMapping
   public AjaxResult edit(@RequestBody SysJob job) throws SchedulerException, TaskException {
     log.info("Updating scheduled job: {}", job.getJobName());

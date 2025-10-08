@@ -1,6 +1,6 @@
-package util;
+package com.api.quartz.util;
 
-import domain.SysJob;
+import com.api.quartz.domain.SysJob;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,6 @@
-package repository;
+package com.api.quartz.repository;
 
-import domain.SysJobLog;
+import com.api.quartz.domain.SysJobLog;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

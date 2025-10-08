@@ -1,17 +1,17 @@
-package domain;
+package com.api.quartz.domain;
 
 import com.api.common.utils.StringUtils;
 import com.api.persistence.domain.common.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import constant.ScheduleConstants;
+import com.api.quartz.constant.ScheduleConstants;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import util.CronUtils;
+import com.api.quartz.util.CronUtils;
 
 import java.io.Serial;
 import java.io.Serializable;

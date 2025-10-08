@@ -1,4 +1,4 @@
-package constant;
+package com.api.quartz.constant;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

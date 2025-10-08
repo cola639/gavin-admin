@@ -1,11 +1,10 @@
-package service;
+package com.api.quartz.service;
 
-import domain.SysJobLog;
+import com.api.quartz.domain.SysJobLog;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import repository.SysJobLogRepository;
-import service.ISysJobLogService;
+import com.api.quartz.repository.SysJobLogRepository;
 
 import java.util.List;
 
