@@ -111,8 +111,11 @@ public class SysJobServiceImpl implements ISysJobService {
   @Override
   @Transactional
   public boolean run(SysJob job) throws SchedulerException {
+    SysJob properties = selectJobById(job.getJobId());
+
+    // Parameters
     JobDataMap dataMap = new JobDataMap();
-    dataMap.put(ScheduleConstants.TASK_PROPERTIES, job);
+    dataMap.put(ScheduleConstants.TASK_PROPERTIES, properties);
     JobKey jobKey = ScheduleUtils.getJobKey(job.getJobId(), job.getJobGroup());
     if (scheduler.checkExists(jobKey)) {
       scheduler.triggerJob(jobKey, dataMap);

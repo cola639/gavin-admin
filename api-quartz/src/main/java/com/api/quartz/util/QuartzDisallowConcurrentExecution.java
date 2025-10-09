@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 /** Quartz job handler that disallows concurrent execution. */
 @Slf4j
 @Component
-@DisallowConcurrentExecution
+@DisallowConcurrentExecution // Prevents concurrent execution of the same job
 public class QuartzDisallowConcurrentExecution extends AbstractQuartzJob {
 
   @Override
