@@ -1,6 +1,7 @@
 package com.api.common.utils.springUtils;
 
 import com.api.common.utils.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.BeansException;
@@ -9,138 +10,171 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.env.Environment;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
- * spring工具类 方便在非spring管理环境中获取bean
+ * Spring utility class for convenient access to beans and environment configuration.
  *
- * @author ruoyi
+ * <p>Allows retrieval of Spring-managed beans from non-managed classes, access to active profiles,
+ * and safe AOP proxy resolution.
+ *
+ * <p>All method names remain identical to the original Ruoyi implementation for backward
+ * compatibility.
+ *
+ * @author Gavin
  */
+@Slf4j
 @Component
 public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationContextAware {
-  /** Spring应用上下文环境 */
+
+  /** The Spring BeanFactory — set by Spring during context initialization. */
   private static ConfigurableListableBeanFactory beanFactory;
 
+  /** The global ApplicationContext — available after Spring startup. */
   private static ApplicationContext applicationContext;
 
+  // ─────────────────────────────────────────────────────────────
+  // Spring lifecycle callbacks
+  // ─────────────────────────────────────────────────────────────
+
   @Override
-  public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
+  public void postProcessBeanFactory(@NonNull ConfigurableListableBeanFactory beanFactory)
       throws BeansException {
     SpringUtils.beanFactory = beanFactory;
   }
 
   @Override
-  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    SpringUtils.applicationContext = applicationContext;
+  public void setApplicationContext(@NonNull ApplicationContext context) throws BeansException {
+    SpringUtils.applicationContext = context;
   }
 
+  // ─────────────────────────────────────────────────────────────
+  // Bean access methods
+  // ─────────────────────────────────────────────────────────────
+
   /**
-   * 获取对象
+   * Get a bean instance by its name.
    *
-   * @param name
-   * @return Object 一个以所给名字注册的bean的实例
-   * @throws BeansException
+   * @param name the name of the bean
+   * @return the bean instance
+   * @throws BeansException if no such bean exists
    */
   @SuppressWarnings("unchecked")
   public static <T> T getBean(String name) throws BeansException {
+    assertBeanFactory();
     return (T) beanFactory.getBean(name);
   }
 
   /**
-   * 获取类型为requiredType的对象
+   * Get a bean instance by its type.
    *
-   * @param clz
-   * @return
-   * @throws BeansException
+   * @param clz the required bean type
+   * @return the bean instance
+   * @throws BeansException if no such bean exists
    */
   public static <T> T getBean(Class<T> clz) throws BeansException {
-    T result = (T) beanFactory.getBean(clz);
-    return result;
+    assertBeanFactory();
+    return beanFactory.getBean(clz);
   }
 
-  /**
-   * 如果BeanFactory包含一个与所给名称匹配的bean定义，则返回true
-   *
-   * @param name
-   * @return boolean
-   */
+  /** Check if a bean with the given name exists in the Spring context. */
   public static boolean containsBean(String name) {
+    assertBeanFactory();
     return beanFactory.containsBean(name);
   }
 
-  /**
-   * 判断以给定名字注册的bean定义是一个singleton还是一个prototype。
-   * 如果与给定名字相应的bean定义没有被找到，将会抛出一个异常（NoSuchBeanDefinitionException）
-   *
-   * @param name
-   * @return boolean
-   * @throws NoSuchBeanDefinitionException
-   */
+  /** Check whether the given bean name refers to a singleton. */
   public static boolean isSingleton(String name) throws NoSuchBeanDefinitionException {
+    assertBeanFactory();
     return beanFactory.isSingleton(name);
   }
 
-  /**
-   * @param name
-   * @return Class 注册对象的类型
-   * @throws NoSuchBeanDefinitionException
-   */
+  /** Get the type of a bean by name. */
   public static Class<?> getType(String name) throws NoSuchBeanDefinitionException {
+    assertBeanFactory();
     return beanFactory.getType(name);
   }
 
-  /**
-   * 如果给定的bean名字在bean定义中有别名，则返回这些别名
-   *
-   * @param name
-   * @return
-   * @throws NoSuchBeanDefinitionException
-   */
+  /** Get aliases associated with a bean definition. */
   public static String[] getAliases(String name) throws NoSuchBeanDefinitionException {
+    assertBeanFactory();
     return beanFactory.getAliases(name);
   }
 
+  // ─────────────────────────────────────────────────────────────
+  // AOP proxy utilities
+  // ─────────────────────────────────────────────────────────────
+
   /**
-   * 获取aop代理对象
+   * Retrieve the current AOP proxy of the given bean.
    *
-   * @param invoker
-   * @return
+   * <p>If the bean is not proxied or AOP context is not active, returns the bean itself.
+   *
+   * @param invoker original bean instance
+   * @return proxy instance if available; otherwise the original object
    */
   @SuppressWarnings("unchecked")
   public static <T> T getAopProxy(T invoker) {
-    Object proxy = AopContext.currentProxy();
-    if (((Advised) proxy).getTargetSource().getTargetClass() == invoker.getClass()) {
-      return (T) proxy;
+    try {
+      Object proxy = AopContext.currentProxy();
+      if (proxy instanceof Advised advised) {
+        if (advised.getTargetSource().getTargetClass() == invoker.getClass()) {
+          return (T) proxy;
+        }
+      }
+    } catch (IllegalStateException e) {
+      // AOP context is not active — fallback to original
+      log.debug("AOP proxy not available for class {}", invoker.getClass().getSimpleName());
     }
     return invoker;
   }
 
-  /**
-   * 获取当前的环境配置，无配置返回null
-   *
-   * @return 当前的环境配置
-   */
+  // ─────────────────────────────────────────────────────────────
+  // Environment / Profile utilities
+  // ─────────────────────────────────────────────────────────────
+
+  /** Get the currently active Spring environment profiles. */
   public static String[] getActiveProfiles() {
-    return applicationContext.getEnvironment().getActiveProfiles();
+    assertApplicationContext();
+    Environment env = applicationContext.getEnvironment();
+    return env.getActiveProfiles();
   }
 
-  /**
-   * 获取当前的环境配置，当有多个环境配置时，只获取第一个
-   *
-   * @return 当前的环境配置
-   */
+  /** Get the first active Spring environment profile (if any). */
   public static String getActiveProfile() {
-    final String[] activeProfiles = getActiveProfiles();
-    return StringUtils.isNotEmpty(activeProfiles) ? activeProfiles[0] : null;
+    String[] profiles = getActiveProfiles();
+    return StringUtils.isNotEmpty(profiles) ? profiles[0] : null;
   }
 
   /**
-   * 获取配置文件中的值
+   * Retrieve a required property from the active environment.
    *
-   * @param key 配置文件的key
-   * @return 当前的配置文件的值
+   * @param key the property key
+   * @return the property value
+   * @throws IllegalStateException if property not found
    */
   public static String getRequiredProperty(String key) {
+    assertApplicationContext();
     return applicationContext.getEnvironment().getRequiredProperty(key);
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Internal helpers
+  // ─────────────────────────────────────────────────────────────
+
+  /** Ensure that BeanFactory has been initialized. */
+  private static void assertBeanFactory() {
+    if (beanFactory == null) {
+      throw new IllegalStateException("Spring BeanFactory not initialized yet.");
+    }
+  }
+
+  /** Ensure that ApplicationContext has been initialized. */
+  private static void assertApplicationContext() {
+    if (applicationContext == null) {
+      throw new IllegalStateException("Spring ApplicationContext not initialized yet.");
+    }
   }
 }

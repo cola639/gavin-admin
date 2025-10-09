@@ -113,15 +113,15 @@ public class Constants {
 
   // ---------- Security Whitelists ----------
   /** Allowed packages for JSON auto-detection (narrower scope is safer) */
-  public static final String[] JSON_WHITELIST = {"com.ruoyi"};
+  public static final String[] JSON_WHITELIST = {"com.api"};
 
   /** Allowed packages for scheduled jobs (extend if needed) */
-  public static final String[] JOB_WHITELIST = {"com.ruoyi.quartz.task"};
+  public static final String[] JOB_WHITELIST = {"com.api.quartz.task"};
 
   /** Disallowed classes or packages in scheduled jobs (security restriction) */
   public static final String[] JOB_ERROR_LIST = {
     "java.net.URL", "javax.naming.InitialContext", "org.yaml.snakeyaml",
-    "org.springframework", "org.apache", "com.ruoyi.common.utils.file",
-    "com.ruoyi.common.config", "com.ruoyi.generator"
+    "org.springframework", "org.apache", "com.api.common.utils.file",
+    "com.api.common.config", "com.api.generator"
   };
 }
