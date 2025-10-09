@@ -1,12 +1,12 @@
 Project GOAL
-1 user management
-2 role management
-3 menu management
+1 user management ✅
+2 role management ✅
+3 menu management ✅
 4 dept management
-5 schedule/quartz task
+5 schedule/quartz task ✅
 
 monitor
-1 online user
+1 online user ✅
 2 machine status ✅
 3 sql/uri vistior
 4 operation logs management
@@ -166,6 +166,11 @@ LocalDateTime、LocalDate、LocalTime 不需要 @Temporal，JPA 可以直接映�
 6. Add clear English comments in the code.
 7. Use @Slf4j for logging
 8. Remove author name comments.
+
+22 - 2
+Could you refactor it from mapper to JPA using Java 17 and Spring Boot 3.5? 
+If you need any additional details, 
+please don’t proceed yet — just let me know, and I’ll provide them.
 
 23
 gavin/
