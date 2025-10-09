@@ -13,8 +13,6 @@ import org.quartz.*;
 @Slf4j
 public final class ScheduleUtils {
 
-  private ScheduleUtils() {}
-
   /** Determines which job class to use (concurrent or not). */
   private static Class<? extends Job> getQuartzJobClass(SysJob job) {
     return "0".equals(job.getConcurrent())

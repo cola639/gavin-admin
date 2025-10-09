@@ -146,12 +146,15 @@ public class SysJobServiceImpl implements ISysJobService {
     return 1;
   }
 
+  // Update the scheduled job in Quartz
   public void updateSchedulerJob(SysJob job, String jobGroup)
       throws SchedulerException, TaskException {
     JobKey jobKey = ScheduleUtils.getJobKey(job.getJobId(), jobGroup);
+    // Remove existing job
     if (scheduler.checkExists(jobKey)) {
       scheduler.deleteJob(jobKey);
     }
+    // Recreate job with updated details
     ScheduleUtils.createScheduleJob(scheduler, job);
   }
 
