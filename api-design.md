@@ -2,7 +2,7 @@ Project GOAL
 1 user management ✅
 2 role management ✅
 3 menu management ✅
-4 dept management
+4 dept management ✅
 5 schedule/quartz task ✅
 
 monitor
