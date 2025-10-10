@@ -1,41 +1,44 @@
 package com.api.persistence.domain.system;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
+import com.api.persistence.domain.common.SysDept;
+import com.api.persistence.domain.common.SysRole;
+import jakarta.persistence.*;
+import lombok.*;
 
-/**
- * 角色和部门关联 sys_role_dept
- *
- * @author ruoyi
- */
-public class SysRoleDept {
-  /** 角色ID */
+import java.io.Serializable;
+
+/** Role-Department association entity (sys_role_dept) */
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "sys_role_dept")
+@IdClass(SysRoleDept.SysRoleDeptId.class)
+public class SysRoleDept implements Serializable {
+  /** Composite primary key for SysUserRole. */
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class SysRoleDeptId implements Serializable {
+    private Long roleId;
+    private Long deptId;
+  }
+
+  @Id
+  @Column(name = "role_id")
   private Long roleId;
 
-  /** 部门ID */
+  @Id
+  @Column(name = "dept_id")
   private Long deptId;
 
-  public Long getRoleId() {
-    return roleId;
-  }
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "role_id", insertable = false, updatable = false)
+  private SysRole role;
 
-  public void setRoleId(Long roleId) {
-    this.roleId = roleId;
-  }
-
-  public Long getDeptId() {
-    return deptId;
-  }
-
-  public void setDeptId(Long deptId) {
-    this.deptId = deptId;
-  }
-
-  @Override
-  public String toString() {
-    return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
-        .append("roleId", getRoleId())
-        .append("deptId", getDeptId())
-        .toString();
-  }
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "dept_id", insertable = false, updatable = false)
+  private SysDept dept;
 }
