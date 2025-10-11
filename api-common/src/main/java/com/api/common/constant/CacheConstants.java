@@ -22,4 +22,7 @@ public class CacheConstants {
 
   /** max try counts redis key */
   public static final String PWD_ERR_CNT_KEY = "pwd_err_cnt:";
+
+  /** monitor uri redis key */
+  public static final String MONITOR_URI_KEY = "metrics:endpoint:*";
 }

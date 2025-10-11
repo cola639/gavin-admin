@@ -1,4 +1,4 @@
-package com.api.framework.domain;
+package com.api.framework.domain.server;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

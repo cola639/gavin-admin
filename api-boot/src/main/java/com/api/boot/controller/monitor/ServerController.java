@@ -1,8 +1,7 @@
 package com.api.boot.controller.monitor;
 
 import com.api.common.domain.AjaxResult;
-import com.api.framework.domain.Server;
-import org.springframework.security.access.prepost.PreAuthorize;
+import com.api.framework.domain.server.Server;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

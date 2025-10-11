@@ -1,4 +1,4 @@
-package com.api.framework.domain;
+package com.api.framework.domain.server;
 
 import com.api.common.utils.Arith;
 import com.api.common.utils.DateEnhancedUtil;
