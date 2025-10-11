@@ -21,11 +21,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.gavin</groupId>
-            <artifactId>api-system</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <!-- Spring Boot Starters -->
         <dependency>

@@ -5,10 +5,10 @@ import java.util.List;
 
 import com.api.common.constant.HttpStatus;
 import com.api.common.domain.AjaxResult;
+import com.api.common.domain.LoginUser;
 import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.pagination.TableDataInfo;
-import com.api.persistence.domain.common.LoginUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 
@@ -55,6 +55,16 @@ public class BaseController {
     rspData.setMsg("Query successful");
     rspData.setRows(list);
     rspData.setTotal(list.size());
+    return rspData;
+  }
+
+  /** Build a paginated response manually (e.g., for Redis metrics or in-memory lists). */
+  protected <T> TableDataInfo getDataTable(List<T> list, long total) {
+    TableDataInfo rspData = new TableDataInfo();
+    rspData.setCode(HttpStatus.SUCCESS);
+    rspData.setMsg("Query successful");
+    rspData.setRows(list);
+    rspData.setTotal(total);
     return rspData;
   }
 

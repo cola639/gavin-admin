@@ -1,8 +1,8 @@
 package com.api.system.service;
 
+import com.api.common.domain.SysUser;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.jpa.SpecificationBuilder;
-import com.api.persistence.domain.common.SysUser;
 import com.api.persistence.repository.SysUserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

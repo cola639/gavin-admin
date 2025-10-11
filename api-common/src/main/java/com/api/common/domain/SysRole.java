@@ -1,4 +1,4 @@
-package com.api.persistence.domain.common;
+package com.api.common.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

@@ -1,7 +1,7 @@
 package com.api.persistence.domain.system;
 
-import com.api.persistence.domain.common.BaseEntity;
-import com.api.persistence.domain.common.SysUser;
+import com.api.common.domain.BaseEntity;
+import com.api.common.domain.SysUser;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

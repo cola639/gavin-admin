@@ -1,11 +1,8 @@
-package com.api.framework.service;
+package com.api.system.service;
 
-import com.api.common.utils.MessageUtils;
-import com.api.common.utils.StringUtils;
-import com.api.framework.exception.ServiceException;
-import com.api.persistence.domain.common.LoginUser;
-import com.api.persistence.domain.common.SysUser;
-import com.api.system.service.SysUserService;
+import com.api.common.domain.LoginUser;
+import com.api.common.domain.SysUser;
+import com.api.framework.service.SysPasswordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;

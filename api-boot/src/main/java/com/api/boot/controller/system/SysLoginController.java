@@ -3,31 +3,21 @@ package com.api.boot.controller.system;
 import com.api.common.constant.Constants;
 
 import com.api.common.domain.AjaxResult;
+import com.api.common.domain.LoginBody;
+import com.api.common.domain.SysUser;
 import com.api.common.redis.RedisCache;
-import com.api.common.utils.SecurityUtils;
-import com.api.common.utils.StringUtils;
 import com.api.framework.service.SysLoginService;
-import com.api.framework.service.SysPermissionService;
+import com.api.system.service.SysPermissionService;
 import com.api.framework.service.TokenService;
 
-import com.api.persistence.domain.common.LoginBody;
-import com.api.persistence.domain.common.SysUser;
-import com.api.persistence.repository.SysUserPostRepository;
 import com.api.persistence.repository.SysUserRepository;
 import com.api.system.service.SysMenuService;
-import com.api.system.service.SysUserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 /**
  * REST controller for login and authentication endpoints.

@@ -1,6 +1,6 @@
 package com.api.system.service;
 
-import com.api.persistence.domain.common.SysDept;
+import com.api.common.domain.SysDept;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

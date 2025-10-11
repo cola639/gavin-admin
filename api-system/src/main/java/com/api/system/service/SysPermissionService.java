@@ -1,11 +1,9 @@
-package com.api.framework.service;
+package com.api.system.service;
 
 import com.api.common.constant.UserConstants;
+import com.api.common.domain.SysRole;
+import com.api.common.domain.SysUser;
 import com.api.common.utils.StringUtils;
-import com.api.persistence.domain.common.SysRole;
-import com.api.persistence.domain.common.SysUser;
-import com.api.system.service.SysMenuService;
-import com.api.system.service.SysRoleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

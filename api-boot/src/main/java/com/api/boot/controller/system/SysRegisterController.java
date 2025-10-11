@@ -2,9 +2,9 @@ package com.api.boot.controller.system;
 
 import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
+import com.api.common.domain.RegisterBody;
 import com.api.common.utils.StringUtils;
-import com.api.framework.service.SysRegisterService;
-import com.api.persistence.domain.common.RegisterBody;
+import com.api.system.service.SysRegisterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

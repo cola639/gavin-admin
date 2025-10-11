@@ -25,4 +25,10 @@ public class CacheConstants {
 
   /** monitor uri redis key */
   public static final String MONITOR_URI_KEY = "metrics:endpoint:*";
+
+  /** SQL metrics Redis key pattern */
+  public static final String MONITOR_SQL_KEY = "metrics:sqlDetail:*";
+
+  /** SQL metrics key prefix */
+  public static final String MONITOR_SQL_PREFIX = "metrics:sqlDetail:";
 }

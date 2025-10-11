@@ -1,7 +1,7 @@
 package com.api.persistence.domain.system;
 
-import com.api.persistence.domain.common.SysDept;
-import com.api.persistence.domain.common.SysRole;
+import com.api.common.domain.SysDept;
+import com.api.common.domain.SysRole;
 import jakarta.persistence.*;
 import lombok.*;
 

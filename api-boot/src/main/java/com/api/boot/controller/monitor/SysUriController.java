@@ -34,7 +34,7 @@ import static com.api.common.constant.CacheConstants.MONITOR_URI_KEY;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/monitor/uri")
-public class UriController {
+public class SysUriController {
 
   private final RedisCache redisCache;
 

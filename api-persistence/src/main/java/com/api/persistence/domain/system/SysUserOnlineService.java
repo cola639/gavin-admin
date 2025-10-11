@@ -1,6 +1,6 @@
 package com.api.persistence.domain.system;
 
-import com.api.persistence.domain.common.LoginUser;
+import com.api.common.domain.LoginUser;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

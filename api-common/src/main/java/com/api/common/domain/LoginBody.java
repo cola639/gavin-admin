@@ -1,4 +1,4 @@
-package com.api.persistence.domain.common;
+package com.api.common.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -2,11 +2,11 @@ package com.api.boot.controller.system;
 
 import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
+import com.api.common.domain.SysUser;
 import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.pagination.TableDataInfo;
 
-import com.api.persistence.domain.common.SysUser;
 import com.api.system.service.SysDeptService;
 import com.api.system.service.SysUserService;
 import jakarta.servlet.http.HttpServletResponse;

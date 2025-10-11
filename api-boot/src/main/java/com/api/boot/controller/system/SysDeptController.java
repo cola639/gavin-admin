@@ -2,10 +2,10 @@ package com.api.boot.controller.system;
 
 import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
+import com.api.common.domain.SysDept;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.pagination.TableDataInfo;
 import com.api.framework.annotation.TrackEndpointStats;
-import com.api.persistence.domain.common.SysDept;
 import com.api.system.service.SysDeptService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

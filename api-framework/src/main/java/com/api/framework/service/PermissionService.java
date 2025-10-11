@@ -3,11 +3,11 @@ package com.api.framework.service;
 import java.util.Set;
 
 import com.api.common.constant.Constants;
+import com.api.common.domain.LoginUser;
+import com.api.common.domain.SysRole;
 import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.framework.security.context.PermissionContextHolder;
-import com.api.persistence.domain.common.LoginUser;
-import com.api.persistence.domain.common.SysRole;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 

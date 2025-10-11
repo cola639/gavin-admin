@@ -1,7 +1,7 @@
 package com.api.quartz.domain;
 
+import com.api.common.domain.BaseEntity;
 import com.api.common.utils.StringUtils;
-import com.api.persistence.domain.common.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.api.quartz.constant.ScheduleConstants;

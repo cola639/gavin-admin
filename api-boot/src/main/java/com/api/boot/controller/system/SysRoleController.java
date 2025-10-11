@@ -2,8 +2,8 @@ package com.api.boot.controller.system;
 
 import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
+import com.api.common.domain.SysRole;
 import com.api.common.utils.pagination.TableDataInfo;
-import com.api.persistence.domain.common.SysRole;
 import com.api.system.service.*;
 
 import lombok.RequiredArgsConstructor;

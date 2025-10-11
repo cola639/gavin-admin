@@ -1,7 +1,7 @@
 package com.api.system.service;
 
+import com.api.common.domain.SysDept;
 import com.api.common.utils.jpa.SpecificationBuilder;
-import com.api.persistence.domain.common.SysDept;
 import com.api.persistence.repository.SysDeptRepository;
 import com.api.system.service.SysDeptService;
 import com.api.common.utils.StringUtils;

@@ -1,6 +1,6 @@
 package com.api.persistence.domain.system;
 
-import com.api.persistence.domain.common.BaseEntity;
+import com.api.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

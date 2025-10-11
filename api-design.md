@@ -38,6 +38,15 @@ gavin-admin
 ├── api-thirdparty # 第三方服务
 └── pom.xml # 父级依赖管理
 
+| Module                | Depends On                                                     | Purpose / Responsibility                                                                  | Example Contents                                                               |
+|:----------------------|:---------------------------------------------------------------|:------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------|
+| **`api-common`**      | *(none)*                                                       | Core utilities, shared constants, enums, exceptions, annotations                          | `RedisCache`, `CacheConstants`, `AjaxResult`, `@TrackSQLDetail`, `StringUtils` |
+| **`api-framework`**   | `api-common`                                                   | Infrastructure & cross-cutting concerns (AOP, security, interceptors, exception handlers) | `SQLMetricsInspectorAspect`, `GlobalExceptionHandler`, `SQLDetailInspector`    |
+| **`api-persistence`** | `api-common`, `api-framework`                                  | JPA entities, repositories, and specifications                                            | `SysUser`, `SysDept`, `SysUserRepository`, `SpecificationBuilder`              |
+| **`api-system`**      | `api-common`, `api-framework`, `api-persistence`               | Business logic & domain services                                                          | `SysDeptService`, `SysUserService`, `SysRoleServiceImpl`                       |
+| **`api-quartz`**      | `api-common`, `api-framework`, `api-persistence`, `api-system` | Scheduled jobs, task definitions, Quartz configuration                                    | `SysJob`, `SysJobService`, `JobExecutionAspect`                                |
+| **`api-boot`**        | *All other modules*                                            | Application entry point, REST controllers, configuration                                  | `SysDeptController`, `SysSqlController`, `Application.java`                    |
+
 依赖问题
 
 1 由父模块统一管理版本，子模块只声明依赖，不写版本号
@@ -168,8 +177,8 @@ LocalDateTime、LocalDate、LocalTime 不需要 @Temporal，JPA 可以直接映�
 8. Remove author name comments.
 
 22 - 2
-Could you refactor it from mapper to JPA using Java 17 and Spring Boot 3.5? 
-If you need any additional details, 
+Could you refactor it from mapper to JPA using Java 17 and Spring Boot 3.5?
+If you need any additional details,
 please don’t proceed yet — just let me know, and I’ll provide them.
 
 23

@@ -1,6 +1,7 @@
 package com.api.persistence.repository;
 
-import com.api.persistence.domain.common.SysUser;
+import com.api.common.domain.SysUser;
+import com.api.framework.annotation.TrackSQLDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -20,6 +21,7 @@ public interface SysUserRepository
 
   Optional<SysUser> findByEmailAndDelFlag(String email, String delFlag);
 
+  @TrackSQLDetail
   @Modifying
   @Query("update SysUser u set u.delFlag = '2' where u.userId in :userIds")
   int softDeleteUsers(@Param("userIds") List<Long> userIds);
