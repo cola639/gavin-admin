@@ -10,6 +10,7 @@ import com.api.system.service.SysDeptService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -67,6 +68,17 @@ public class SysDeptController extends BaseController {
     log.debug(
         "Fetched {} departments (page={}, size={})", resultPage.getTotalElements(), page, size);
     return getDataTable(resultPage);
+  }
+
+  @TrackEndpointStats
+  @GetMapping("/listAll")
+  public TableDataInfo listAll(
+      @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+
+    Pageable pageable = PageRequest.of(page, size);
+    Page<SysDept> result = deptService.getAllDept(pageable);
+
+    return getDataTable(result);
   }
 
   /**

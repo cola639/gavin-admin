@@ -91,6 +91,31 @@ provided → 仅编译时需要，运行时不打包（Lombok、MapStruct）
 
 test → 单元测试依赖
 
+           ┌──────────────────────┐
+           │      api-boot        │
+           │ (controllers, main)  │
+           └────────▲─────────────┘
+                    │
+           ┌──────────────────────┐
+           │      api-system      │
+           │ (business logic)     │
+           └────────▲─────────────┘
+                    │
+           ┌──────────────────────┐
+           │    api-persistence   │
+           │ (entities + repos)   │
+           └────────▲─────────────┘
+                    │
+           ┌──────────────────────┐
+           │    api-framework     │
+           │ (AOP + crosscutting) │
+           └────────▲─────────────┘
+                    │
+           ┌──────────────────────┐
+           │     api-common       │
+           │ (utilities, base)    │
+           └──────────────────────┘
+
 3 是那个组织在维护 有哪些著名的项目或者公司使用
 
 4 jackjson lombook rewrite

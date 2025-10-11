@@ -10,6 +10,8 @@ public interface SysDeptService {
 
   Page<SysDept> selectDeptList(SysDept filter, Pageable pageable);
 
+  Page<SysDept> getAllDept(Pageable pageable);
+
   SysDept selectDeptById(Long deptId);
 
   SysDept saveDept(SysDept dept);

@@ -32,6 +32,8 @@ public class SQLMetricsInspectorAspect {
 
   @Around("@annotation(com.api.framework.annotation.TrackSQLDetail)")
   public Object recordSQLMetrics(ProceedingJoinPoint joinPoint) throws Throwable {
+    log.info("✅ SQLMetricsInspectorAspect initialized successfully");
+
     MethodSignature signature = (MethodSignature) joinPoint.getSignature();
     com.api.framework.annotation.TrackSQLDetail annotation =
         signature.getMethod().getAnnotation(com.api.framework.annotation.TrackSQLDetail.class);
@@ -68,6 +70,11 @@ public class SQLMetricsInspectorAspect {
 
   private void updateSQLStats(
       String redisKey, String method, long duration, int concurrentNow, boolean success) {
+    log.info(
+        "[SQL-METRICS] Captured SQL metrics -> key={} duration={}ms success={}",
+        redisKey,
+        duration,
+        success);
     try {
       Map<String, Object> metrics = redisCache.getCacheMap(redisKey);
 
@@ -93,9 +100,6 @@ public class SQLMetricsInspectorAspect {
       redisCache.setCacheMapValue(redisKey, "FailCount", failCount);
       redisCache.setCacheMapValue(redisKey, "ConcurrentMax", maxConcurrent);
       redisCache.setCacheMapValue(redisKey, "TotalTime", totalTime);
-
-      // No expiration — keep forever
-      redisCache.expire(redisKey, -1, java.util.concurrent.TimeUnit.SECONDS);
 
       log.debug(
           "[SQL-METRICS] key={} | method={} | duration={}ms | success={} | concurrentNow={}",

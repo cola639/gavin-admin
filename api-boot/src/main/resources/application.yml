@@ -70,7 +70,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        hibernate.session_factory.statement_inspector: com.api.framework.interceptor.SqlInterceptor
+        hibernate.session_factory.statement_inspector: com.api.framework.interceptor.SQLDetailInspector
     database-platform: org.hibernate.dialect.MySQL8Dialect
   jackson:
     time-zone: Asia/Shanghai

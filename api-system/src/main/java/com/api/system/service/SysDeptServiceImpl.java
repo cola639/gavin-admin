@@ -2,10 +2,8 @@ package com.api.system.service;
 
 import com.api.common.domain.SysDept;
 import com.api.common.utils.jpa.SpecificationBuilder;
+import com.api.framework.annotation.TrackSQLDetail;
 import com.api.persistence.repository.SysDeptRepository;
-import com.api.system.service.SysDeptService;
-import com.api.common.utils.StringUtils;
-import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +29,11 @@ public class SysDeptServiceImpl implements SysDeptService {
             .eq("parentId", filter.getParentId());
 
     return deptRepository.findAll(spec, pageable);
+  }
+
+  @Override
+  public Page<SysDept> getAllDept(Pageable pageable) {
+    return deptRepository.getAllDept(pageable);
   }
 
   @Override
