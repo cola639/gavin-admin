@@ -80,7 +80,11 @@ public class SysDept extends BaseEntity implements Serializable {
 
   /** Parent department reference (optional) */
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "parent_id", insertable = false, updatable = false)
+  @JoinColumn(
+      name = "parent_id",
+      insertable = false,
+      updatable = false,
+      foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
   @JsonIgnore // Prevent JSON recursion
   @ToString.Exclude
   private SysDept parent;
