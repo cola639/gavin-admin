@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 /** Intercepts SQL executed by Hibernate and links it to repository methods tracked by Aspect. */
 @Slf4j
 @Component
-public class SQLDetailInspector implements StatementInspector {
+public class TrackSQLDetailInspector implements StatementInspector {
 
   @Resource private RedisCache redisCache;
 

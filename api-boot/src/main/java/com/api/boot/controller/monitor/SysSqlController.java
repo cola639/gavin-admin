@@ -1,12 +1,13 @@
 package com.api.boot.controller.monitor;
 
-import com.api.framework.aspectj.SQLMetricsInspectorAspect;
+import com.api.framework.aspectj.TrackSQLDetailAspect;
 import com.api.common.constant.CacheConstants;
 import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
 import com.api.common.redis.RedisCache;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.pagination.TableDataInfo;
+import com.api.framework.interceptor.TrackSQLDetailInspector;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +19,8 @@ import java.util.stream.Collectors;
  * REST Controller for monitoring SQL performance and statistics.
  *
  * <p>Retrieves SQL metrics collected via {@link
- * SQLMetricsInspectorAspect} and {@link
- * com.api.framework.interceptor.SQLDetailInspector}.
+ * TrackSQLDetailAspect} and {@link
+ * TrackSQLDetailInspector}.
  *
  * <p>Data source: Redis keys with pattern "metrics:sqlDetail:*"
  */

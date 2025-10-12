@@ -1,7 +1,7 @@
 package com.api.framework.aspectj;
 
 import com.api.common.constant.CacheConstants;
-import com.api.framework.interceptor.SQLDetailInspector;
+import com.api.framework.interceptor.TrackSQLDetailInspector;
 import com.api.common.redis.RedisCache;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @Aspect
 @Component
-public class SQLMetricsInspectorAspect {
+public class TrackSQLDetailAspect {
 
   @Resource private RedisCache redisCache;
 
@@ -45,7 +45,7 @@ public class SQLMetricsInspectorAspect {
     String redisKey = CacheConstants.MONITOR_SQL_PREFIX + repositoryMethod;
 
     // Pass method name to Hibernate SQL inspector via ThreadLocal
-    SQLDetailInspector.setCurrentMethod(repositoryMethod);
+    TrackSQLDetailInspector.setCurrentMethod(repositoryMethod);
 
     AtomicInteger concurrent = concurrentMap.computeIfAbsent(redisKey, k -> new AtomicInteger(0));
     int concurrentNow = concurrent.incrementAndGet();
@@ -61,7 +61,7 @@ public class SQLMetricsInspectorAspect {
       success = false;
       throw ex;
     } finally {
-      SQLDetailInspector.clear(); // clear ThreadLocal after
+      TrackSQLDetailInspector.clear(); // clear ThreadLocal after
       long duration = System.currentTimeMillis() - startTime;
       concurrent.decrementAndGet();
       updateSQLStats(redisKey, repositoryMethod, duration, concurrentNow, success);
