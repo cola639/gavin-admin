@@ -2,17 +2,23 @@ package com.api.framework.interceptor;
 
 import com.api.common.constant.CacheConstants;
 import com.api.common.redis.RedisCache;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.resource.jdbc.spi.StatementInspector;
-import org.springframework.stereotype.Component;
+import org.springframework.context.ApplicationContext;
 
-/** Intercepts SQL executed by Hibernate and links it to repository methods tracked by Aspect. */
+/**
+ * Hibernate StatementInspector to capture SQL details. Not a Spring bean — Hibernate instantiates
+ * it directly.
+ */
 @Slf4j
-@Component
 public class TrackSQLDetailInspector implements StatementInspector {
 
-  @Resource private RedisCache redisCache;
+  private static ApplicationContext context;
+
+  /** Provide Spring context manually so we can fetch RedisCache */
+  public static void setApplicationContext(ApplicationContext ctx) {
+    context = ctx;
+  }
 
   private static final ThreadLocal<String> currentMethodKey = new ThreadLocal<>();
 
@@ -26,14 +32,13 @@ public class TrackSQLDetailInspector implements StatementInspector {
 
   @Override
   public String inspect(String sql) {
+    String methodName = currentMethodKey.get();
+    if (methodName == null) return sql;
+
     try {
-      String methodName = currentMethodKey.get();
-      if (methodName == null) return sql;
-
+      RedisCache redisCache = context.getBean(RedisCache.class);
       String redisKey = CacheConstants.MONITOR_SQL_PREFIX + methodName;
-
       redisCache.setCacheMapValue(redisKey, "SQLDetail", sql);
-
       log.debug("[SQL-DETAIL] method={} | sql={}", methodName, sql);
     } catch (Exception e) {
       log.error("❌ Failed to record SQL detail", e);
