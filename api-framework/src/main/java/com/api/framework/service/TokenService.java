@@ -166,4 +166,23 @@ public class TokenService {
   private String getTokenKey(String uuid) {
     return CacheConstants.LOGIN_TOKEN_KEY + uuid;
   }
+
+  /**
+   * Extracts username from the current HTTP request's JWT token.
+   *
+   * @param request the current HTTP request
+   * @return username if token is valid, otherwise null
+   */
+  public String extractUsername(HttpServletRequest request) {
+    try {
+      String token = getToken(request);
+      if (StringUtils.isNotEmpty(token)) {
+        Claims claims = parseToken(token);
+        return claims.get(Constants.JWT_USERNAME, String.class);
+      }
+    } catch (Exception e) {
+      log.error("❌ Failed to extract username from token: {}", e.getMessage());
+    }
+    return null;
+  }
 }

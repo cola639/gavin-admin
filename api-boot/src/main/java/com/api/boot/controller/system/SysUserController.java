@@ -7,6 +7,7 @@ import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.pagination.TableDataInfo;
 
+import com.api.framework.annotation.RepeatSubmit;
 import com.api.system.service.SysDeptService;
 import com.api.system.service.SysUserService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -82,10 +83,11 @@ public class SysUserController extends BaseController {
   //    }
   //
   @PostMapping
+  @RepeatSubmit(interval = 5000000, message = "Please don’t submit twice quickly.")
   public AjaxResult add(@Validated @RequestBody SysUser user) {
     //  user.setCreateBy(getUsername());
     user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
-    userService.createUser(user); // 把校验和保存逻辑交给 Service
+    userService.createUser(user);
 
     return AjaxResult.success();
   }

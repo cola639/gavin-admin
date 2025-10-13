@@ -21,6 +21,7 @@ public interface SysUserRepository
 
   Optional<SysUser> findByEmailAndDelFlag(String email, String delFlag);
 
+  @TrackSQLDetail
   @Modifying
   @Query("update SysUser u set u.delFlag = '2' where u.userId in :userIds")
   int softDeleteUsers(@Param("userIds") List<Long> userIds);
