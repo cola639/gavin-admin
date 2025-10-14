@@ -20,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -57,6 +59,13 @@ public class TokenService {
   private static final long MILLIS_SECOND = 1000;
   private static final long MILLIS_MINUTE = 60 * MILLIS_SECOND;
   private static final long REFRESH_THRESHOLD = 20 * 60 * 1000L; // 20 min
+
+  public LoginUser getLoginUser() {
+    ServletRequestAttributes attrs =
+        (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+    if (attrs == null) return null;
+    return getLoginUser(attrs.getRequest());
+  }
 
   /** Retrieve user info from request token. */
   public LoginUser getLoginUser(HttpServletRequest request) {

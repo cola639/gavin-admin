@@ -5,7 +5,9 @@ import com.api.common.domain.AjaxResult;
 import com.api.common.domain.SysDept;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.pagination.TableDataInfo;
+import com.api.framework.annotation.RateLimiter;
 import com.api.framework.annotation.TrackEndpointStats;
+import com.api.framework.enums.LimitType;
 import com.api.system.service.SysDeptService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,6 +57,7 @@ public class SysDeptController extends BaseController {
    * @param size the page size
    * @return paginated table data containing department information
    */
+  @RateLimiter(time = 600, count = 3, limitType = LimitType.USER)
   @TrackEndpointStats
   @GetMapping("/list")
   public TableDataInfo list(
