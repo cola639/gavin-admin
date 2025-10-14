@@ -19,6 +19,7 @@ import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,22 +36,26 @@ import java.util.List;
 public class RateLimiterAspect {
 
   private final RedisTemplate<Object, Object> redisTemplate;
-  private final RedisScript<Long> limitScript;
   private final TokenService tokenService;
 
   /** Intercepts methods annotated with {@link RateLimiter} and applies rate limiting. */
   @Before("@annotation(rateLimiter)")
   public void enforceRateLimit(JoinPoint point, RateLimiter rateLimiter) {
     String key = buildKey(rateLimiter, point);
-    List<Object> keys = Collections.singletonList(key);
-
     int limit = rateLimiter.count();
     int windowSeconds = rateLimiter.time();
 
     try {
-      Long currentCount = redisTemplate.execute(limitScript, keys, limit, windowSeconds);
+      // ✅ Increment Redis counter atomically
+      Long currentCount = redisTemplate.opsForValue().increment(key);
 
-      if (StringUtils.isNull(currentCount) || currentCount.intValue() > limit) {
+      // ✅ If this is the first access, set expiration
+      if (currentCount != null && currentCount == 1L) {
+        redisTemplate.expire(key, Duration.ofSeconds(windowSeconds));
+      }
+
+      if (currentCount != null && currentCount > limit) {
+        log.warn("🚫 Rate limit exceeded: key={} count={} limit={}", key, currentCount, limit);
         throw new ServiceException(rateLimiter.message());
       }
 
