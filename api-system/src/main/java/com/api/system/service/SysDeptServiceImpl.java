@@ -1,6 +1,8 @@
 package com.api.system.service;
 
+import com.api.common.annotation.DataSource;
 import com.api.common.domain.SysDept;
+import com.api.common.enums.DataSourceType;
 import com.api.common.utils.jpa.SpecificationBuilder;
 import com.api.framework.annotation.TrackSQLDetail;
 import com.api.persistence.repository.SysDeptRepository;
@@ -31,6 +33,7 @@ public class SysDeptServiceImpl implements SysDeptService {
     return deptRepository.findAll(spec, pageable);
   }
 
+  @DataSource(DataSourceType.SLAVE)
   @Override
   public Page<SysDept> getAllDept(Pageable pageable) {
     return deptRepository.getAllDept(pageable);
