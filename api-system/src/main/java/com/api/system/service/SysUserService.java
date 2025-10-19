@@ -3,7 +3,7 @@ package com.api.system.service;
 import com.api.common.domain.SysUser;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.jpa.SpecificationBuilder;
-import com.api.persistence.repository.SysUserRepository;
+import com.api.persistence.repository.system.SysUserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

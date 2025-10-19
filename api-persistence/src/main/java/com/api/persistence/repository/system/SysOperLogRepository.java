@@ -1,4 +1,4 @@
-package com.api.persistence.repository;
+package com.api.persistence.repository.system;
 
 import com.api.persistence.domain.system.SysOperLog;
 import org.springframework.data.jpa.repository.JpaRepository;

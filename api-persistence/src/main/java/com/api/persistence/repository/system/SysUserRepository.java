@@ -1,4 +1,4 @@
-package com.api.persistence.repository;
+package com.api.persistence.repository.system;
 
 import com.api.common.domain.SysUser;
 import com.api.framework.annotation.TrackSQLDetail;

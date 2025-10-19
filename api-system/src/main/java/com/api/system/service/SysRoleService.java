@@ -1,12 +1,11 @@
 package com.api.system.service;
 
 import com.api.common.domain.SysRole;
-import com.api.common.utils.StringUtils;
 import com.api.common.utils.jpa.SpecificationBuilder;
 
 import com.api.persistence.domain.system.SysRoleMenu;
-import com.api.persistence.repository.SysRoleMenuRepository;
-import com.api.persistence.repository.SysRoleRepository;
+import com.api.persistence.repository.system.SysRoleMenuRepository;
+import com.api.persistence.repository.system.SysRoleRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -10,7 +10,7 @@ import com.api.framework.service.SysLoginService;
 import com.api.system.service.SysPermissionService;
 import com.api.framework.service.TokenService;
 
-import com.api.persistence.repository.SysUserRepository;
+import com.api.persistence.repository.system.SysUserRepository;
 import com.api.system.service.SysMenuService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

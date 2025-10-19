@@ -107,10 +107,12 @@ public class RedisCache {
     return Boolean.TRUE.equals(redisTemplate.delete(key));
   }
 
-  /** Delete multiple keys. */
-  public boolean deleteObject(final Collection<String> keys) {
-    Long deletedCount = redisTemplate.delete(Collections.singleton(keys));
-    return deletedCount != null && deletedCount > 0;
+  /** Delete multiple keys safely (Spring Data Redis 3.x). */
+  public boolean deleteObject(Collection<String> keys) {
+    if (keys == null || keys.isEmpty()) return false;
+    boolean result = Boolean.TRUE.equals(redisTemplate.delete(new ArrayList<>(keys)));
+    log.debug("🧹 Deleted {} keys from Redis", keys.size());
+    return result;
   }
 
   /** Cache a list of objects. */
