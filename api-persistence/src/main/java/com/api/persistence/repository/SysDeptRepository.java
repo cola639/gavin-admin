@@ -1,7 +1,6 @@
 package com.api.persistence.repository;
 
 import com.api.common.domain.SysDept;
-import com.api.framework.annotation.TrackSQLDetail;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,7 +20,6 @@ public interface SysDeptRepository
   long countByParentIdAndDelFlag(Long parentId, String delFlag);
 
   /** Test method for @TrackSQLDetail — retrieves all departments using JPQL. */
-  @TrackSQLDetail
   @Query("SELECT d FROM SysDept d")
   Page<SysDept> getAllDept(Pageable pageable);
 }
