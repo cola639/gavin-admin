@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
-import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -24,14 +23,16 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 
 /**
- * Aspect for recording operation logs.
+ * Aspect for capturing and recording operation logs.
  *
- * <p>Captures method execution annotated with {@link Log} and stores structured operation data
- * asynchronously.
+ * <p>This aspect intercepts methods annotated with {@link Log}, collects contextual data (request
+ * info, parameters, exceptions, etc.), and saves the record asynchronously via {@link
+ * AsyncFactory}.
  */
 @Slf4j
 @Aspect
 @Component
+@RequiredArgsConstructor
 public class LogAspect {
 
   private static final String[] EXCLUDE_PROPERTIES = {
@@ -39,78 +40,88 @@ public class LogAspect {
   };
 
   private static final ThreadLocal<Long> TIME_THREADLOCAL = new ThreadLocal<>();
+
   private final ObjectMapper objectMapper;
+  private final AsyncFactory asyncFactory;
 
-  public LogAspect(ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper.copy().setSerializationInclusion(JsonInclude.Include.NON_NULL);
-  }
-
-  /** Before executing method — record start time */
+  /** Before executing method — record the start timestamp. */
   @Before("@annotation(controllerLog)")
   public void doBefore(JoinPoint joinPoint, Log controllerLog) {
     TIME_THREADLOCAL.set(System.currentTimeMillis());
   }
 
-  /** After successful execution */
+  /** After successful execution — handle normal log recording. */
   @AfterReturning(pointcut = "@annotation(controllerLog)", returning = "jsonResult")
   public void doAfterReturning(JoinPoint joinPoint, Log controllerLog, Object jsonResult) {
     handleLog(joinPoint, controllerLog, null, jsonResult);
   }
 
-  /** After throwing exception */
+  /** After an exception is thrown — handle failed log recording. */
   @AfterThrowing(value = "@annotation(controllerLog)", throwing = "e")
   public void doAfterThrowing(JoinPoint joinPoint, Log controllerLog, Exception e) {
     handleLog(joinPoint, controllerLog, e, null);
   }
 
-  private void handleLog(
-      final JoinPoint joinPoint, Log controllerLog, final Exception e, Object jsonResult) {
+  /** Central log handler for both normal and exceptional outcomes. */
+  private void handleLog(JoinPoint joinPoint, Log controllerLog, Exception e, Object jsonResult) {
     try {
-      SysOperLog operLog = new SysOperLog();
-      operLog.setStatus(BusinessStatus.SUCCESS.ordinal());
-      operLog.setOperIp(IpUtils.getIpAddr());
-      operLog.setOperUrl(ServletUtils.getRequest().getRequestURI());
-      operLog.setMethod(
-          joinPoint.getTarget().getClass().getName()
-              + "."
-              + joinPoint.getSignature().getName()
-              + "()");
+      SysOperLog operLog = buildOperLog(joinPoint, controllerLog, e, jsonResult);
 
-      if (e != null) {
-        operLog.setStatus(BusinessStatus.FAIL.ordinal());
-        operLog.setErrorMsg(StringUtils.truncate(e.getMessage(), 2000));
-      }
+      // ✅ Save asynchronously using AsyncFactory
+      asyncFactory.recordOper(operLog);
 
-      operLog.setRequestMethod(ServletUtils.getRequest().getMethod());
-      fillLogDetails(joinPoint, controllerLog, operLog, jsonResult);
-
-      operLog.setCostTime(System.currentTimeMillis() - TIME_THREADLOCAL.get());
-
+      log.debug("📝 Operation log submitted asynchronously: {}", operLog.getTitle());
     } catch (Exception ex) {
-      log.error("Failed to record operation log: {}", ex.getMessage(), ex);
+      log.error("❌ Failed to record operation log: {}", ex.getMessage(), ex);
     } finally {
       TIME_THREADLOCAL.remove();
     }
   }
 
-  /** Extracts method description and parameters from @Log annotation. */
-  private void fillLogDetails(
-      JoinPoint joinPoint, Log logAnn, SysOperLog operLog, Object jsonResult) {
-    operLog.setBusinessType(logAnn.businessType().ordinal());
-    operLog.setTitle(logAnn.title());
-    operLog.setOperatorType(logAnn.operatorType().ordinal());
+  /** Builds a SysOperLog entity based on the method context and annotation configuration. */
+  private SysOperLog buildOperLog(JoinPoint joinPoint, Log logAnn, Exception e, Object jsonResult) {
+    SysOperLog logEntity = new SysOperLog();
+    logEntity.setTitle(logAnn.title());
+    logEntity.setBusinessType(logAnn.businessType().ordinal());
+    logEntity.setOperatorType(logAnn.operatorType().ordinal());
+    logEntity.setStatus(
+        e == null ? BusinessStatus.SUCCESS.ordinal() : BusinessStatus.FAIL.ordinal());
+    logEntity.setOperIp(IpUtils.getIpAddr());
+    logEntity.setOperUrl(ServletUtils.getRequest().getRequestURI());
+    logEntity.setMethod(
+        joinPoint.getTarget().getClass().getName()
+            + "."
+            + joinPoint.getSignature().getName()
+            + "()");
+    logEntity.setRequestMethod(ServletUtils.getRequest().getMethod());
+    logEntity.setCostTime(System.currentTimeMillis() - TIME_THREADLOCAL.get());
 
-    if (logAnn.isSaveRequestData()) {
-      String params = collectRequestParams(joinPoint, logAnn.excludeParamNames());
-      operLog.setOperParam(StringUtils.truncate(params, 2000));
+    if (e != null) {
+      logEntity.setErrorMsg(StringUtils.truncate(e.getMessage(), 2000));
     }
 
-    if (logAnn.isSaveResponseData() && jsonResult != null) {
-      operLog.setJsonResult(StringUtils.truncate(toJsonSafe(jsonResult), 2000));
+    fillLogDetails(joinPoint, logAnn, logEntity, jsonResult);
+    return logEntity;
+  }
+
+  /** Extracts request/response information and attaches it to the operation log. */
+  private void fillLogDetails(
+      JoinPoint joinPoint, Log logAnn, SysOperLog operLog, Object jsonResult) {
+    try {
+      if (logAnn.isSaveRequestData()) {
+        String params = collectRequestParams(joinPoint, logAnn.excludeParamNames());
+        operLog.setOperParam(StringUtils.truncate(params, 2000));
+      }
+
+      if (logAnn.isSaveResponseData() && jsonResult != null) {
+        operLog.setJsonResult(StringUtils.truncate(toJsonSafe(jsonResult), 2000));
+      }
+    } catch (Exception ex) {
+      log.warn("⚠️ Failed to extract request/response data: {}", ex.getMessage());
     }
   }
 
-  /** Collects request parameters safely and filters sensitive data. */
+  /** Collects and serializes request parameters safely, filtering sensitive or excluded fields. */
   private String collectRequestParams(JoinPoint joinPoint, String[] excludeNames) {
     HttpServletRequest request = ServletUtils.getRequest();
     Map<String, ?> paramMap = ServletUtils.getParamMap(request);
@@ -120,16 +131,18 @@ public class LogAspect {
           && List.of(HttpMethod.POST.name(), HttpMethod.PUT.name(), HttpMethod.DELETE.name())
               .contains(request.getMethod())) {
         return argsToJson(joinPoint.getArgs(), excludeNames);
-      } else {
-        return objectMapper.writeValueAsString(paramMap);
       }
+      return objectMapper
+          .copy()
+          .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+          .writeValueAsString(paramMap);
     } catch (Exception e) {
-      log.warn("Failed to serialize request params: {}", e.getMessage());
+      log.warn("Failed to serialize request parameters: {}", e.getMessage());
       return "{}";
     }
   }
 
-  /** Converts method arguments to JSON safely. */
+  /** Serializes method arguments to JSON while skipping non-serializable or filtered types. */
   private String argsToJson(Object[] args, String[] excludeNames) {
     StringBuilder params = new StringBuilder();
     for (Object arg : args) {
@@ -143,17 +156,21 @@ public class LogAspect {
     return params.toString().trim();
   }
 
-  /** Determines if the argument should be excluded from logging. */
+  /** Determines whether an argument should be excluded from logging. */
   @SuppressWarnings("rawtypes")
   private boolean isFilterObject(final Object obj) {
+    if (obj == null) return true;
     Class<?> clazz = obj.getClass();
+
     if (clazz.isArray()) {
       return MultipartFile.class.isAssignableFrom(clazz.getComponentType());
-    } else if (Collection.class.isAssignableFrom(clazz)) {
+    }
+    if (Collection.class.isAssignableFrom(clazz)) {
       for (Object value : (Collection) obj) {
         if (value instanceof MultipartFile) return true;
       }
-    } else if (Map.class.isAssignableFrom(clazz)) {
+    }
+    if (Map.class.isAssignableFrom(clazz)) {
       for (Object value : ((Map<?, ?>) obj).values()) {
         if (value instanceof MultipartFile) return true;
       }
@@ -164,6 +181,7 @@ public class LogAspect {
         || obj instanceof BindingResult;
   }
 
+  /** Safely converts an object to JSON using Jackson. */
   private String toJsonSafe(Object obj) {
     try {
       return objectMapper.writeValueAsString(obj);
