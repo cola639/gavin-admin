@@ -47,6 +47,15 @@ gavin-admin
 | **`api-quartz`**      | `api-common`, `api-framework`, `api-persistence`, `api-system` | Scheduled jobs, task definitions, Quartz configuration                                    | `SysJob`, `SysJobService`, `JobExecutionAspect`                                |
 | **`api-boot`**        | *All other modules*                                            | Application entry point, REST controllers, configuration                                  | `SysDeptController`, `SysSqlController`, `Application.java`                    |
 
+Log annotation + AsyncFactory
+| Module | Example Classes | Notes |
+| :---------------- | :--------------------------------------- | :------------------------------ |
+| `api-common`      | `@Log`, `BusinessType`, `BusinessStatus` | shared annotation & enums |
+| `api-framework`   | `LogAspect`, `AsyncConfig`, `IpUtils`    | AOP + async infrastructure only |
+| `api-persistence` | `SysOperLog` (JPA entity)                | defines database tables |
+| `api-system`      | `SysOperLogService`, `AsyncFactory`      | implements business logic |
+| `api-boot`        | `Application`, controllers | entry point, REST layer |
+
 依赖问题
 
 1 由父模块统一管理版本，子模块只声明依赖，不写版本号

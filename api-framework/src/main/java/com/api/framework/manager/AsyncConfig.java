@@ -1,4 +1,4 @@
-package com.api.framework.manger;
+package com.api.framework.manager;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

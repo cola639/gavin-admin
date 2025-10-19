@@ -1,4 +1,4 @@
-package com.api.framework.manger;
+package com.api.system.manager;
 
 import com.api.persistence.domain.system.SysOperLog;
 import com.api.system.service.SysOperLogService;

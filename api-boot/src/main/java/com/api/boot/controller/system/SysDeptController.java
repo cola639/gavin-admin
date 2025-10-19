@@ -1,8 +1,10 @@
 package com.api.boot.controller.system;
 
+import com.api.common.annotation.Log;
 import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
 import com.api.common.domain.SysDept;
+import com.api.common.enums.LogBusinessType;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.pagination.TableDataInfo;
 import com.api.framework.annotation.RateLimiter;
@@ -129,6 +131,7 @@ public class SysDeptController extends BaseController {
    * @param dept the department to create
    * @return success or error result
    */
+  @Log(title = "Get dept list", businessType = LogBusinessType.INSERT)
   @PostMapping
   public AjaxResult add(@Validated @RequestBody SysDept dept) {
     log.info("Creating new department: {}", dept.getDeptName());

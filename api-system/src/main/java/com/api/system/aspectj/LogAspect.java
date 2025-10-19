@@ -1,12 +1,12 @@
-package com.api.framework.aspectj;
+package com.api.system.aspectj;
 
 import com.api.common.annotation.Log;
 import com.api.common.enums.BusinessStatus;
 import com.api.common.utils.ServletUtils;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.ip.IpUtils;
-import com.api.framework.manger.AsyncFactory;
 import com.api.persistence.domain.system.SysOperLog;
+import com.api.system.manager.AsyncFactory;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
