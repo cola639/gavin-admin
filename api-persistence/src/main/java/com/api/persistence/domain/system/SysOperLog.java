@@ -66,7 +66,7 @@ public class SysOperLog {
 
   /** Request parameters */
   @Lob
-  @Column(name = "oper_param")
+  @Column(name = "oper_param", columnDefinition = "MEDIUMTEXT")
   private String operParam;
 
   /** Response JSON */
