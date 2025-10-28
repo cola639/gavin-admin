@@ -17,6 +17,8 @@ public interface SysUserRepository
 
   Optional<SysUser> findByUserNameAndDelFlag(String userName, String delFlag);
 
+  Optional<SysUser> findByEmail(String email);
+
   Optional<SysUser> findByPhonenumberAndDelFlag(String phonenumber, String delFlag);
 
   Optional<SysUser> findByEmailAndDelFlag(String email, String delFlag);

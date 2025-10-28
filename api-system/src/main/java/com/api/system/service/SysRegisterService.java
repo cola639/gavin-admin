@@ -38,24 +38,24 @@ public class SysRegisterService {
    * @return message indicating success or failure
    */
   public String register(RegisterBody registerBody) {
-    String username = registerBody.getUsername();
+    String email = registerBody.getEmail();
     String password = registerBody.getPassword();
     SysUser sysUser = new SysUser();
-    sysUser.setUserName(username);
+    sysUser.setUserName(email);
 
     // Check captcha if enabled
     //    if (configService.selectCaptchaEnabled()) {
-    //      validateCaptcha(username, registerBody.getCode(), registerBody.getUuid());
+    //      validateCaptcha(email, registerBody.getCode(), registerBody.getUuid());
     //    }
     //
-    String msg = validateUserInput(username, password, sysUser);
+    String msg = validateUserInput(email, password, sysUser);
     if (StringUtils.isNotEmpty(msg)) {
       return msg;
     }
 
     // Set user details
     sysUser.setDelFlag(DEL_FLAG);
-    sysUser.setNickName(username);
+    sysUser.setNickName(email);
     sysUser.setPwdUpdateDate(DateEnhancedUtil.getNowDate());
     sysUser.setPassword(SecurityUtils.encryptPassword(password));
 
@@ -71,7 +71,7 @@ public class SysRegisterService {
     //            AsyncFactory.recordLogininfor(
     //                username, Constants.REGISTER, MessageUtils.message("user.register.success")));
 
-    log.info("User [{}] registered successfully.", username);
+    log.info("User [{}] registered successfully.", email);
     return "";
   }
 

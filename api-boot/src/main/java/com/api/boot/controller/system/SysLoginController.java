@@ -6,7 +6,7 @@ import com.api.common.domain.AjaxResult;
 import com.api.common.domain.LoginBody;
 import com.api.common.domain.SysUser;
 import com.api.common.redis.RedisCache;
-import com.api.framework.service.SysLoginService;
+import com.api.system.service.SysLoginService;
 import com.api.system.service.SysPermissionService;
 import com.api.framework.service.TokenService;
 
@@ -48,10 +48,11 @@ public class SysLoginController {
    */
   @PostMapping("/login")
   public AjaxResult login(@RequestBody LoginBody loginBody) {
-    log.info("Login attempt for user: {}", loginBody.getUsername());
+    log.info("Login attempt for user: {}", loginBody.getEmail());
+
     String token =
         loginService.login(
-            loginBody.getUsername(),
+            loginBody.getEmail(),
             loginBody.getPassword(),
             loginBody.getCode(),
             loginBody.getUuid());

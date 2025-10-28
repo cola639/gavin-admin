@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class LoginBody {
 
   /** Username */
-  private String username;
+  private String email;
 
   /** Password */
   private String password;

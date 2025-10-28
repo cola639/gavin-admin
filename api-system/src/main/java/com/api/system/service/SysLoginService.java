@@ -1,21 +1,19 @@
-package com.api.framework.service;
+package com.api.system.service;
 
-import com.api.common.constant.CacheConstants;
-import com.api.common.constant.Constants;
-import com.api.common.constant.UserConstants;
 import com.api.common.domain.LoginUser;
+import com.api.common.domain.SysUser;
 import com.api.common.redis.RedisCache;
-import com.api.common.utils.MessageUtils;
-import com.api.common.utils.StringUtils;
-import com.api.framework.exception.user.*;
 import com.api.framework.security.context.AuthenticationContextHolder;
+import com.api.framework.service.TokenService;
+import com.api.persistence.repository.system.SysUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 /**
  * Service for handling login authentication and validation.
@@ -33,6 +31,7 @@ public class SysLoginService {
   private final TokenService tokenService;
   private final AuthenticationManager authenticationManager;
   private final RedisCache redisCache;
+  private final SysUserRepository sysUserRepository;
 
   //  private final  userService;
   //  private final ISysConfigService configService;
@@ -40,18 +39,20 @@ public class SysLoginService {
   /**
    * Perform login for a user.
    *
-   * @param username username
+   * @param email email
    * @param password password
    * @param code captcha code
    * @param uuid captcha UUID
    * @return JWT token
    */
-  public String login(String username, String password, String code, String uuid) {
+  public String login(String email, String password, String code, String uuid) {
     // Validate captcha if enabled
-    validateCaptcha(username, code, uuid);
+    validateCaptcha(email, code, uuid);
 
-    // Perform pre-checks (username/password validity, blacklist, etc.)
-    loginPreCheck(username, password);
+    // Perform pre-checks (email/password validity, blacklist, etc.)
+    loginPreCheck(email, password);
+    Optional<SysUser> user = sysUserRepository.findByEmail(email);
+    String username = user.map(SysUser::getUserName).orElse("");
 
     Authentication authentication;
     try {
