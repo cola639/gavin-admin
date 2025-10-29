@@ -4,8 +4,11 @@ import com.api.common.constant.Constants;
 
 import com.api.common.domain.AjaxResult;
 import com.api.common.domain.LoginBody;
+import com.api.common.domain.LoginUser;
 import com.api.common.domain.SysUser;
 import com.api.common.redis.RedisCache;
+import com.api.common.utils.SecurityUtils;
+import com.api.persistence.domain.system.SysMenu;
 import com.api.system.service.SysLoginService;
 import com.api.system.service.SysPermissionService;
 import com.api.framework.service.TokenService;
@@ -18,6 +21,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * REST controller for login and authentication endpoints.
@@ -60,6 +66,41 @@ public class SysLoginController {
     AjaxResult ajax = AjaxResult.success();
     ajax.put(Constants.TOKEN, token);
     return ajax;
+  }
+
+  /**
+   * Get user info endpoint.
+   *
+   * @return user info including roles and permissions
+   */
+  @GetMapping("getInfo")
+  public AjaxResult getInfo() {
+    LoginUser loginUser = SecurityUtils.getLoginUser();
+    SysUser user = loginUser.getUser();
+
+    Set<String> roles = permissionService.getRolePermission(user);
+    Set<String> permissions = permissionService.getMenuPermission(user);
+    if (!loginUser.getPermissions().equals(permissions)) {
+      loginUser.setPermissions(permissions);
+      tokenService.refreshToken(loginUser);
+    }
+    AjaxResult ajax = AjaxResult.success();
+    ajax.put("user", user);
+    ajax.put("roles", roles);
+    ajax.put("permissions", permissions);
+    return ajax;
+  }
+
+  /**
+   * Get routers endpoint.
+   *
+   * @return 路由信息
+   */
+  @GetMapping("getRouters")
+  public AjaxResult getRouters() {
+    Long userId = SecurityUtils.getUserId();
+    List<SysMenu> menus = menuService.selectMenuTreeByUserId(userId);
+    return AjaxResult.success(menuService.buildMenus(menus));
   }
 
   @PostMapping("/testToken")

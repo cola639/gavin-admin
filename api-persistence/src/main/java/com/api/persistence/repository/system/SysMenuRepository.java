@@ -30,4 +30,28 @@ public interface SysMenuRepository
   @Query(
       "select distinct m.perms from SysMenu m join SysRoleMenu rm on m.menuId = rm.menuId join SysUserRole ur on rm.roleId = ur.roleId join SysRole r on r.roleId = ur.roleId where r.status = '0' and m.status = '0' and ur.userId = :userId")
   List<String> findPermsByUserId(@Param("userId") Long userId);
+
+  /** Get all menus visible in the system */
+  @Query(
+      """
+        SELECT DISTINCT m
+        FROM SysMenu m
+        WHERE m.menuType IN ('M', 'C')
+          AND m.status = '0'
+        ORDER BY m.parentId, m.orderNum
+    """)
+  List<SysMenu> findAllVisibleMenus();
+
+  /** Get menus accessible by a specific user */
+  @Query(
+      """
+        SELECT DISTINCT m
+        FROM SysMenu m
+        LEFT JOIN SysRoleMenu rm ON m.menuId = rm.menuId
+        LEFT JOIN SysUserRole ur ON rm.roleId = ur.roleId
+        LEFT JOIN SysRole r ON ur.roleId = r.roleId
+        WHERE ur.userId = :userId
+        ORDER BY m.parentId, m.orderNum
+    """)
+  List<SysMenu> findMenusByUserId(@Param("userId") Long userId);
 }

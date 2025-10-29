@@ -211,7 +211,7 @@ LocalDateTime、LocalDate、LocalTime 不需要 @Temporal，JPA 可以直接映�
 8. Remove author name comments.
 
 22 - 2
-Could you refactor it from mapper to JPA using Java 17 and Spring Boot 3.5?
+Refactor it from mapper to JPA using Java 17 and Spring Boot 3.5?
 If you need any additional details,
 please don’t proceed yet — just let me know, and I’ll provide them.
 
