@@ -21,9 +21,7 @@ import java.util.Objects;
  *
  * @author
  */
-public class AjaxResult<T> extends HashMap<String, Object> implements Serializable {
-
-  private static final long serialVersionUID = 1L;
+public class AjaxResult<T> extends HashMap<String, Object> {
 
   /** Status code key */
   public static final String CODE_TAG = "code";
