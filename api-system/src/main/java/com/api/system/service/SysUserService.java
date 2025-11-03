@@ -1,6 +1,7 @@
 package com.api.system.service;
 
 import com.api.common.domain.SysUser;
+import com.api.common.domain.SysUserDTO;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.jpa.SpecificationBuilder;
 import com.api.persistence.repository.system.SysUserRepository;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,8 @@ public class SysUserService {
   private final SysUserRoleService userRoleService;
   private final SysUserRepository userRepository;
 
-  public Page<SysUser> selectUserList(SysUser user, Map<String, Object> params, Pageable pageable) {
+  public Page<SysUserDTO> selectUserList(
+      SysUser user, Map<String, Object> params, Pageable pageable) {
     Specification<SysUser> spec =
         SpecificationBuilder.<SysUser>builder()
             .eq("delFlag", "0")
@@ -34,7 +37,27 @@ public class SysUserService {
             .like("phonenumber", user.getPhonenumber())
             .between("createTime", (Date) params.get("beginTime"), (Date) params.get("endTime"));
 
-    return userRepository.findAll(spec, pageable);
+    Page<SysUser> entityPage = userRepository.findAll(spec, pageable);
+
+    // Convert Entity -> DTO manually
+    List<SysUserDTO> dtoList =
+        entityPage.getContent().stream()
+            .map(
+                u ->
+                    SysUserDTO.builder()
+                        .userId(u.getUserId())
+                        .userName(u.getUserName())
+                        .nickName(u.getNickName())
+                        .email(u.getEmail())
+                        .phonenumber(u.getPhonenumber())
+                        .status(u.getStatus())
+                        .loginDate(u.getLoginDate())
+                        .deptId(u.getDeptId())
+                        .deptName(u.getDept() != null ? u.getDept().getDeptName() : null)
+                        .build())
+            .toList();
+
+    return new PageImpl<>(dtoList, pageable, entityPage.getTotalElements());
   }
 
   public SysUser selectUserById(Long userId) {

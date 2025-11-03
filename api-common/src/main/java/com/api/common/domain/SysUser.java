@@ -1,12 +1,14 @@
 package com.api.common.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import java.util.Date;
-import java.util.List;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * User entity mapped to sys_user table.
@@ -28,15 +30,11 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "sys_user")
 public class SysUser extends BaseEntity {
 
-  private static final long serialVersionUID = 1L;
-
-  /** Unique User ID */
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "user_id")
   private Long userId;
 
-  /** Department ID */
   @Column(name = "dept_id")
   private Long deptId;
 
@@ -65,46 +63,38 @@ public class SysUser extends BaseEntity {
   @Column(name = "sex")
   private String sex;
 
-  /** Avatar URL */
   @Column(name = "avatar")
   private String avatar;
 
-  /** Encrypted password */
   @Column(name = "password")
+  @JsonIgnore
   private String password;
 
-  /** Account status (0=Active, 1=Disabled) */
   @Column(name = "status")
   private String status;
 
-  /** Deletion flag (0=Exists, 2=Deleted) */
   @Column(name = "del_flag")
   private String delFlag;
 
-  /** Last login IP */
   @Column(name = "login_ip")
   private String loginIp;
 
-  /** Last login time */
   @Column(name = "login_date")
   private Date loginDate;
 
-  /** Last password update timestamp */
   @Column(name = "pwd_update_date")
   private Date pwdUpdateDate;
 
-  /** Associated department */
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "dept_id", insertable = false, updatable = false)
   private SysDept dept;
 
-  /** Associated roles */
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "sys_user_role",
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "role_id"))
-  @org.hibernate.annotations.Immutable // Hibernate won't allow modifications
+  @org.hibernate.annotations.Immutable
   private List<SysRole> roles;
 
   /** Array of role IDs (not persisted, helper field) */
@@ -116,22 +106,7 @@ public class SysUser extends BaseEntity {
   /** Single role ID (legacy use, not persisted) */
   @Transient private Long roleId;
 
-  /**
-   * Check if this user is an administrator.
-   *
-   * @return true if userId equals 1
-   */
   public boolean isAdmin() {
-    return isAdmin(this.userId);
-  }
-
-  /**
-   * Static helper to check admin status by userId.
-   *
-   * @param userId User ID
-   * @return true if userId equals 1
-   */
-  public static boolean isAdmin(Long userId) {
     return userId != null && userId == 1L;
   }
 }

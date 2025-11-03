@@ -3,6 +3,7 @@ package com.api.boot.controller.system;
 import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
 import com.api.common.domain.SysUser;
+import com.api.common.domain.SysUserDTO;
 import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.pagination.TableDataInfo;
@@ -37,15 +38,21 @@ public class SysUserController extends BaseController {
 
   /** Get paginated list of users (with fixed params for now). */
   @GetMapping("/list")
-  public TableDataInfo list(SysUser user) {
+  public TableDataInfo<SysUserDTO> list(
+      SysUser user,
+      @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
+      @RequestParam(value = "pageSize", required = false, defaultValue = "20") Integer pageSize) {
+
     Map<String, Object> params = new HashMap<>();
     params.put("beginTime", null);
     params.put("endTime", null);
 
-    Pageable pageable = PageRequest.of(0, 10);
-    Page<SysUser> page = userService.selectUserList(user, params, pageable);
+    // Spring pageable uses 0-based page index
+    Pageable pageable = PageRequest.of(Math.max(pageNum - 1, 0), pageSize);
 
-    return getDataTable(page);
+    Page<SysUserDTO> page = userService.selectUserList(user, params, pageable);
+
+    return TableDataInfo.of(page); // ✅ Auto wraps into front-end compatible format
   }
 
   //    public void export(HttpServletResponse response, SysUser user) {
