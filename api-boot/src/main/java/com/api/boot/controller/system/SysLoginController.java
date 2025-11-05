@@ -123,10 +123,10 @@ public class SysLoginController {
   @GetMapping("/read")
   public AjaxResult testGet() throws JsonProcessingException {
     // Get JSON string from Redis
-    String json = redisCache.getCacheObject("user:1");
+    //    String json = redisCache.getCacheObject("user:1");
 
     // Deserialize back into SysUser
-    SysUser user = objectMapper.readValue(json, SysUser.class);
+    //    SysUser user = objectMapper.readValue(json, SysUser.class);
 
     return AjaxResult.success();
   }

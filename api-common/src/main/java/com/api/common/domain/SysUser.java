@@ -85,11 +85,11 @@ public class SysUser extends BaseEntity {
   @Column(name = "pwd_update_date")
   private Date pwdUpdateDate;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "dept_id", insertable = false, updatable = false)
   private SysDept dept;
 
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
       name = "sys_user_role",
       joinColumns = @JoinColumn(name = "user_id"),

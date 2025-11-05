@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -51,8 +52,12 @@ public class SysLoginService {
 
     // Perform pre-checks (email/password validity, blacklist, etc.)
     loginPreCheck(email, password);
-    Optional<SysUser> user = sysUserRepository.findByEmail(email);
-    String username = user.map(SysUser::getUserName).orElse("");
+    SysUser user =
+        sysUserRepository
+            .findByEmail(email)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+
+    String username = user.getUserName();
 
     Authentication authentication;
     try {

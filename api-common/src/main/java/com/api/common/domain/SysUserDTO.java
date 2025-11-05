@@ -9,6 +9,7 @@ public record SysUserDTO(
     String userName,
     String nickName,
     String email,
+    String avatar,
     String phonenumber,
     String status,
     Date loginDate,

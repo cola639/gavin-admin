@@ -1,15 +1,17 @@
 package com.api.common.utils.pagination;
 
+import com.api.common.constant.HttpStatus;
 import org.springframework.data.domain.Page;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Generic table pagination response object.
  *
- * <p>Compatible with RuoYi front-end format, but supports type-safety and JPA Page objects.
+ * <p>Consistent with AjaxResult, using standard HttpStatus codes.
  *
  * @author
  */
@@ -17,8 +19,8 @@ public class TableDataInfo<T> implements Serializable {
 
   @Serial private static final long serialVersionUID = 1L;
 
-  /** Status code (0 = success) */
-  private int code = 0;
+  /** Status code (see {@link HttpStatus}) */
+  private int code = HttpStatus.SUCCESS;
 
   /** Message */
   private String msg = "Query successful";
@@ -27,7 +29,7 @@ public class TableDataInfo<T> implements Serializable {
   private long total;
 
   /** Data rows */
-  private List<T> rows;
+  private List<T> rows = Collections.emptyList();
 
   // --------------------------------------------------------
   // Constructors
@@ -51,24 +53,36 @@ public class TableDataInfo<T> implements Serializable {
   // Static factory methods
   // --------------------------------------------------------
 
-  /** ✅ Create from Spring Data Page */
-  public static <T> TableDataInfo<T> of(Page<T> page) {
-    return new TableDataInfo<>(page.getContent(), page.getTotalElements());
+  /** ✅ Create from Spring Data Page (Success) */
+  //  public static <T> TableDataInfo<T> of(Page<T> page) {
+  //    return new TableDataInfo<>(
+  //        page.getContent(), page.getTotalElements(), HttpStatus.SUCCESS, "Query successful");
+  //  }
+
+  /** ✅ Create from list and total (Success) */
+  //  public static <T> TableDataInfo<T> of(List<T> list, long total) {
+  //    return new TableDataInfo<>(list, total, HttpStatus.SUCCESS, "Query successful");
+  //  }
+
+  /** ✅ Success result with custom message */
+  public static <T> TableDataInfo<T> success(String msg, List<T> list, long total) {
+    return new TableDataInfo<>(list, total, HttpStatus.SUCCESS, msg);
   }
 
-  /** ✅ Create from list */
-  public static <T> TableDataInfo<T> of(List<T> list, long total) {
-    return new TableDataInfo<>(list, total);
-  }
-
-  /** ✅ Create success result */
+  /** ✅ Success result from Page */
   public static <T> TableDataInfo<T> success(Page<T> page) {
-    return new TableDataInfo<>(page.getContent(), page.getTotalElements(), 0, "Query successful");
+    return new TableDataInfo<>(
+        page.getContent(), page.getTotalElements(), HttpStatus.SUCCESS, "Query successful");
   }
 
-  /** ✅ Create error result */
+  /** ⚠️ Warning result */
+  public static <T> TableDataInfo<T> warn(String msg, List<T> list) {
+    return new TableDataInfo<>(list, list.size(), HttpStatus.WARN, msg);
+  }
+
+  /** ❌ Error result */
   public static <T> TableDataInfo<T> error(String msg) {
-    return new TableDataInfo<>(List.of(), 0, 500, msg);
+    return new TableDataInfo<>(Collections.emptyList(), 0, HttpStatus.ERROR, msg);
   }
 
   // --------------------------------------------------------

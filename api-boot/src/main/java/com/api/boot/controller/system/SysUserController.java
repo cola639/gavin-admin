@@ -52,7 +52,7 @@ public class SysUserController extends BaseController {
 
     Page<SysUserDTO> page = userService.selectUserList(user, params, pageable);
 
-    return TableDataInfo.of(page); // ✅ Auto wraps into front-end compatible format
+    return TableDataInfo.success(page); // ✅ Auto wraps into front-end compatible format
   }
 
   //    public void export(HttpServletResponse response, SysUser user) {
