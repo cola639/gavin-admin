@@ -2,6 +2,7 @@ package com.api.system.service;
 
 import com.api.common.domain.SysUser;
 import com.api.common.domain.SysUserDTO;
+import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.jpa.SpecificationBuilder;
 import com.api.persistence.repository.system.SysUserRepository;
@@ -79,14 +80,19 @@ public class SysUserService {
   @Transactional
   public void createUser(SysUser user) {
     if (userRepository.existsByUserName(user.getUserName())) {
-      throw new ServiceException("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
+      throw new ServiceException(
+          "Failed to create user '" + user.getUserName() + "': username already exists.");
     }
+
     if (StringUtils.isNotEmpty(user.getPhonenumber())
         && userRepository.existsByPhonenumber(user.getPhonenumber())) {
-      throw new ServiceException("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
+      throw new ServiceException(
+          "Failed to create user '" + user.getUserName() + "': phone number is already in use.");
     }
+
     if (StringUtils.isNotEmpty(user.getEmail()) && userRepository.existsByEmail(user.getEmail())) {
-      throw new ServiceException("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+      throw new ServiceException(
+          "Failed to create user '" + user.getUserName() + "': email address is already in use.");
     }
 
     // Save user info

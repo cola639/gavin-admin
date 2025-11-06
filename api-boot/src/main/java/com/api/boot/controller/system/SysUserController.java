@@ -90,13 +90,14 @@ public class SysUserController extends BaseController {
   //    }
   //
   @PostMapping
-  @RepeatSubmit(interval = 5000000, message = "Please don’t submit twice quickly.")
+  @RepeatSubmit(message = "Please don’t submit twice quickly.")
   public AjaxResult add(@Validated @RequestBody SysUser user) {
-    //  user.setCreateBy(getUsername());
+    user.setCreateBy(getUsername());
     user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+
     userService.createUser(user);
 
-    return AjaxResult.success();
+    return AjaxResult.success("Created user successfully! ");
   }
 
   @PutMapping
