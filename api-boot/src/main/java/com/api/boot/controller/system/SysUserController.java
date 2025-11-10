@@ -37,9 +37,9 @@ public class SysUserController extends BaseController {
   private final SysDeptService sysDeptService;
 
   /** Get paginated list of users (with fixed params for now). */
-  @GetMapping("/list")
+  @PostMapping("/list")
   public TableDataInfo<SysUserDTO> list(
-      SysUser user,
+      @RequestBody SysUser user,
       @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
       @RequestParam(value = "pageSize", required = false, defaultValue = "20") Integer pageSize) {
 

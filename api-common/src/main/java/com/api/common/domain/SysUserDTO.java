@@ -12,6 +12,6 @@ public record SysUserDTO(
     String avatar,
     String phonenumber,
     String status,
-    Date loginDate,
+    Date createTime,
     Long deptId,
     String deptName) {}

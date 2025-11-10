@@ -40,7 +40,7 @@ public class SysUserService {
 
     Page<SysUser> entityPage = userRepository.findAll(spec, pageable);
 
-    // Convert Entity -> DTO manually
+    // Convert Entity -> DTO manually[
     List<SysUserDTO> dtoList =
         entityPage.getContent().stream()
             .map(
@@ -52,7 +52,7 @@ public class SysUserService {
                         .email(u.getEmail())
                         .phonenumber(u.getPhonenumber())
                         .status(u.getStatus())
-                        .loginDate(u.getLoginDate())
+                        .createTime(u.getCreateTime())
                         .deptId(u.getDeptId())
                         .deptName(u.getDept() != null ? u.getDept().getDeptName() : null)
                         .build())
