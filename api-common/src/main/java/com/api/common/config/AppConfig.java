@@ -1,8 +1,9 @@
 package com.api.common.config;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,53 +27,75 @@ import org.springframework.stereotype.Component;
  *
  * @author
  */
-@Getter
-@Setter
-@Component
+@Data
+@Slf4j
+@Configuration
 @ConfigurationProperties(prefix = "app")
 public class AppConfig {
 
-  /** Project name */
+  /** Application display name */
   private String name;
 
-  /** Project version */
+  /** Application version number */
   private String version;
 
   /** Copyright year */
   private String copyrightYear;
 
-  /** Base directory for file uploads (profile path) */
+  /** Base path for file storage (uploads, downloads, avatars, etc.) */
   private String profile;
 
-  /** Whether IP address lookup is enabled */
-  private static boolean addressEnabled;
+  /** Enable IP/geo-address lookup */
+  private boolean addressEnabled;
 
-  /** Captcha type (e.g. "math", "char") */
+  /** Captcha type (e.g., math, char) */
   private String captchaType;
 
-  // ----------------- Derived Paths -----------------
+  // ------------------------------------------------------------------------
+  // 📁 File Path Helpers
+  // ------------------------------------------------------------------------
 
-  /** Import file path */
+  /** Import file directory */
   public String getImportPath() {
     return profile + "/import";
   }
 
-  /** Avatar upload path */
+  /** Avatar storage directory */
   public String getAvatarPath() {
     return profile + "/avatar";
   }
 
-  /** File download path */
+  /** File download directory */
   public String getDownloadPath() {
     return profile + "/download";
   }
 
-  /** General upload path */
+  /** General upload directory */
   public String getUploadPath() {
     return profile + "/upload";
   }
 
-  public static boolean getAddressEnabled() {
-    return addressEnabled;
+  // ------------------------------------------------------------------------
+  // 🧩 Utility
+  // ------------------------------------------------------------------------
+
+  /** Logs all loaded configuration values at startup. */
+  public void logConfiguration() {
+    log.info(
+        """
+            ⚙️ Application Configuration Loaded:
+              • Name: {}
+              • Version: {}
+              • Copyright Year: {}
+              • Profile Path: {}
+              • Address Lookup Enabled: {}
+              • Captcha Type: {}
+            """,
+        name,
+        version,
+        copyrightYear,
+        profile,
+        addressEnabled,
+        captchaType);
   }
 }
