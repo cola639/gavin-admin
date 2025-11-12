@@ -11,7 +11,7 @@ app:
   name: Gavin
   version: 1.0.0
   copyrightYear: 2025
-  profile: /home/gavin/uploadPath
+  profile: ./uploads
   addressEnabled: false
   captchaType: math
 

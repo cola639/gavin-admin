@@ -6,6 +6,7 @@ import com.api.common.config.AppConfig;
 import com.api.common.utils.http.HttpUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +29,9 @@ public class AddressUtils {
   /** Reusable Jackson ObjectMapper */
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+  /** Injected application configuration for path resolution. */
+  private static final AppConfig appConfig = new AppConfig();
+
   /**
    * Get geographic location by IP address.
    *
@@ -41,7 +45,7 @@ public class AddressUtils {
     }
 
     // If external address lookup is enabled
-    if (AppConfig.getAddressEnabled()) {
+    if (appConfig.isAddressEnabled()) {
       try {
         String response =
             HttpUtils.sendGet(IP_LOOKUP_URL, "ip=" + ip + "&json=true", Constants.GBK);

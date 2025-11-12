@@ -32,3 +32,7 @@ build/
 ### VS Code ###
 .vscode/
 /home/gavin/logs/
+
+
+### Temp
+/uploads
