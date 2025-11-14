@@ -8,7 +8,7 @@ import com.api.common.domain.LoginUser;
 import com.api.common.domain.SysUser;
 import com.api.common.redis.RedisCache;
 import com.api.common.utils.SecurityUtils;
-import com.api.persistence.domain.system.SysMenu;
+import com.api.common.domain.SysMenu;
 import com.api.system.service.SysLoginService;
 import com.api.system.service.SysPermissionService;
 import com.api.framework.service.TokenService;

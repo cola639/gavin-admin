@@ -67,7 +67,7 @@ public class AppConfig {
 
   /** File download directory */
   public String getDownloadPath() {
-    return profile + "/download";
+    return profile;
   }
 
   /** General upload directory */

@@ -4,6 +4,7 @@ import com.api.common.annotation.Log;
 import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
 import com.api.common.domain.SysDept;
+import com.api.common.domain.TreeSelect;
 import com.api.common.enums.LogBusinessType;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.pagination.TableDataInfo;
@@ -14,6 +15,7 @@ import com.api.system.service.SysDeptService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
+import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -55,24 +57,15 @@ public class SysDeptController extends BaseController {
    * Retrieves a paginated list of departments based on the provided filter criteria.
    *
    * @param filter filter conditions (e.g., department name, status)
-   * @param page the current page number (0-based)
-   * @param size the page size
    * @return paginated table data containing department information
    */
-  @RateLimiter(time = 600, count = 3, limitType = LimitType.USER)
   @TrackEndpointStats
   @GetMapping("/list")
-  public TableDataInfo list(
-      SysDept filter,
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "10") int size) {
+  public AjaxResult list(SysDept filter) {
 
-    Pageable pageable = PageRequest.of(page, size);
-    var resultPage = deptService.selectDeptList(filter, pageable);
+    List<TreeSelect> sysDeptList = deptService.selectDeptList(filter);
 
-    log.debug(
-        "Fetched {} departments (page={}, size={})", resultPage.getTotalElements(), page, size);
-    return getDataTable(resultPage);
+    return AjaxResult.success(sysDeptList);
   }
 
   @TrackEndpointStats
@@ -92,20 +85,20 @@ public class SysDeptController extends BaseController {
    * @param deptId the department ID to exclude
    * @return list of departments excluding the given node
    */
-  @GetMapping("/list/exclude/{deptId}")
-  public AjaxResult excludeChild(@PathVariable Long deptId) {
-    List<SysDept> departments =
-        deptService.selectDeptList(new SysDept(), Pageable.unpaged()).getContent();
-
-    departments.removeIf(
-        d ->
-            d.getDeptId().equals(deptId)
-                || ArrayUtils.contains(
-                    StringUtils.split(d.getAncestors(), ","), deptId.toString()));
-
-    log.info("Excluded department id={} and its descendants from list", deptId);
-    return success(departments);
-  }
+  //  @GetMapping("/list/exclude/{deptId}")
+  //  public AjaxResult excludeChild(@PathVariable Long deptId) {
+  //    List<SysDept> departments =
+  //        deptService.selectDeptList(new SysDept(), Pageable.unpaged()).getContent();
+  //
+  //    departments.removeIf(
+  //        d ->
+  //            d.getDeptId().equals(deptId)
+  //                || ArrayUtils.contains(
+  //                    StringUtils.split(d.getAncestors(), ","), deptId.toString()));
+  //
+  //    log.info("Excluded department id={} and its descendants from list", deptId);
+  //    return success(departments);
+  //  }
 
   /**
    * Retrieves detailed information for a specific department.

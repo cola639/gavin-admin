@@ -113,7 +113,7 @@ public class FileUploadUtils {
     String profilePath = appConfig.getProfile();
     if (uploadDir.startsWith(profilePath)) {
       String relative = uploadDir.substring(profilePath.length()).replace("\\", "/");
-      return "/profile" + relative + "/" + fileName;
+      return relative + "/" + fileName;
     }
     return uploadDir + "/" + fileName;
   }

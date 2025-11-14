@@ -21,8 +21,6 @@ import java.util.List;
 @SuperBuilder
 @Entity
 @Table(name = "sys_dept")
-@SQLDelete(sql = "UPDATE sys_dept SET del_flag = '2' WHERE dept_id = ?")
-@Where(clause = "del_flag = '0'")
 public class SysDept extends BaseEntity implements Serializable {
 
   @Serial private static final long serialVersionUID = 1L;
@@ -60,10 +58,10 @@ public class SysDept extends BaseEntity implements Serializable {
   private String email;
 
   @Column(name = "status", length = 1)
-  private String status = "0";
+  private String status;
 
   @Column(name = "del_flag", length = 1)
-  private String delFlag = "0";
+  private String delFlag;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "parent_id", insertable = false, updatable = false)

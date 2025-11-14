@@ -1,6 +1,7 @@
 package com.api.system.service;
 
 import com.api.common.domain.SysDept;
+import com.api.common.domain.TreeSelect;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -8,7 +9,7 @@ import java.util.List;
 
 public interface SysDeptService {
 
-  Page<SysDept> selectDeptList(SysDept filter, Pageable pageable);
+  List<TreeSelect> selectDeptList(SysDept filter);
 
   Page<SysDept> getAllDept(Pageable pageable);
 

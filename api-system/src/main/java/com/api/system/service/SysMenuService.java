@@ -5,7 +5,7 @@ import com.api.common.constant.UserConstants;
 import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.jpa.SpecificationBuilder;
-import com.api.persistence.domain.system.SysMenu;
+import com.api.common.domain.SysMenu;
 import com.api.persistence.repository.system.SysMenuRepository;
 import com.api.persistence.repository.system.SysRoleMenuRepository;
 import com.api.persistence.repository.system.SysRoleRepository;

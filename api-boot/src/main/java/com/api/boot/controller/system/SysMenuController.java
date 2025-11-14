@@ -2,7 +2,7 @@ package com.api.boot.controller.system;
 
 import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
-import com.api.persistence.domain.system.SysMenu;
+import com.api.common.domain.SysMenu;
 import com.api.system.service.SysMenuService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
