@@ -58,16 +58,6 @@ public class BaseController {
     return rspData;
   }
 
-  /** Build a paginated response manually (e.g., for Redis metrics or in-memory lists). */
-  protected <T> TableDataInfo getDataTable(List<T> list, long total) {
-    TableDataInfo rspData = new TableDataInfo();
-    rspData.setCode(HttpStatus.SUCCESS);
-    rspData.setMsg("Query successful");
-    rspData.setRows(list);
-    rspData.setTotal(total);
-    return rspData;
-  }
-
   /** ----------- Response Wrappers ----------- */
   public AjaxResult success() {
     return AjaxResult.success();

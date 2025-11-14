@@ -18,8 +18,7 @@ import java.util.stream.Collectors;
 /**
  * REST Controller for monitoring SQL performance and statistics.
  *
- * <p>Retrieves SQL metrics collected via {@link
- * TrackSQLDetailAspect} and {@link
+ * <p>Retrieves SQL metrics collected via {@link TrackSQLDetailAspect} and {@link
  * TrackSQLDetailInspector}.
  *
  * <p>Data source: Redis keys with pattern "metrics:sqlDetail:*"
@@ -94,7 +93,7 @@ public class SysSqlController extends BaseController {
 
     log.debug("Retrieved {} SQL metrics (page={}, size={})", total, page, size);
 
-    return getDataTable(pageData, total);
+    return getDataTable(pageData);
   }
 
   /**
