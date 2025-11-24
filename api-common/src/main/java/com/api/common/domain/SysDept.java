@@ -64,7 +64,12 @@ public class SysDept extends BaseEntity implements Serializable {
   private String delFlag;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "parent_id", insertable = false, updatable = false)
+  @JoinColumn(
+      name = "parent_id",
+      insertable = false,
+      updatable = false,
+      foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT) // ⬅️ key line
+      )
   @JsonIgnore
   private SysDept parent;
 

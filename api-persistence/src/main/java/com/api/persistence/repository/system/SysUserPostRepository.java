@@ -32,7 +32,7 @@ public interface SysUserPostRepository
    * @param postId post id
    * @return count
    */
-  long countByPost_PostId(Long postId);
+  int countByPost_PostId(Long postId);
 
   /**
    * Delete user-post associations by a list of userIds.

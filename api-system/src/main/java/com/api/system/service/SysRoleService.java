@@ -201,4 +201,8 @@ public class SysRoleService {
     log.debug("Resolved permissions for user {}: {}", userId, permissions);
     return permissions;
   }
+
+  public List<SysRole> selectRoleAll() {
+    return roleRepository.findAll();
+  }
 }

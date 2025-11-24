@@ -2,24 +2,20 @@ package com.api.boot.controller.system;
 
 import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
+import com.api.common.domain.SysRole;
 import com.api.common.domain.SysUser;
 import com.api.common.domain.SysUserDTO;
 import com.api.common.utils.SecurityUtils;
-import com.api.common.utils.StringUtils;
 import com.api.common.utils.pagination.TableDataInfo;
 
 import com.api.framework.annotation.RepeatSubmit;
-import com.api.system.service.SysDeptService;
-import com.api.system.service.SysUserService;
-import jakarta.servlet.http.HttpServletResponse;
+import com.api.system.service.*;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +31,10 @@ public class SysUserController extends BaseController {
   private final SysUserService userService;
 
   private final SysDeptService sysDeptService;
+
+  private final SysRoleService sysRoleService;
+
+  private final SysPostService sysPostService;
 
   /** Get paginated list of users (with fixed params for now). */
   @PostMapping("/list")
@@ -70,25 +70,24 @@ public class SysUserController extends BaseController {
   //    }
   //
 
-  /** 根据用户编号获取详细信息 */
-  //    @GetMapping(value = {"/", "/{userId}"})
-  //    public AjaxResult getInfo(@PathVariable(value = "userId", required = false) Long userId) {
-  //        AjaxResult ajax = AjaxResult.success();
-  //        if (StringUtils.isNotNull(userId)) {
-  //            userService.checkUserDataScope(userId);
-  //            SysUser sysUser = userService.selectUserById(userId);
-  //            ajax.put(AjaxResult.DATA_TAG, sysUser);
-  //            ajax.put("postIds", postService.selectPostListByUserId(userId));
-  //            ajax.put("roleIds",
-  // sysUser.getRoles().stream().map(SysRole::getRoleId).collect(Collectors.toList()));
-  //        }
-  //        List<SysRole> roles = roleService.selectRoleAll();
-  //        ajax.put("roles", SysUser.isAdmin(userId) ? roles : roles.stream().filter(r ->
-  // !r.isAdmin()).collect(Collectors.toList()));
-  //        ajax.put("posts", postService.selectPostAll());
-  //        return ajax;
-  //    }
-  //
+  @GetMapping(value = {"/", "/{userId}"})
+  public AjaxResult getInfo(@PathVariable(value = "userId", required = false) Long userId) {
+    AjaxResult ajax = AjaxResult.success();
+    //    if (StringUtils.isNotNull(userId)) {
+    //      userService.checkUserDataScope(userId);
+    //      SysUser sysUser = userService.selectUserById(userId);
+    //      ajax.put(AjaxResult.DATA_TAG, sysUser);
+    //      ajax.put("postIds", postService.selectPostListByUserId(userId));
+    //      ajax.put(
+    //          "roleIds",
+    //          sysUser.getRoles().stream().map(SysRole::getRoleId).collect(Collectors.toList()));
+    //    }
+    List<SysRole> roles = sysRoleService.selectRoleAll();
+    ajax.put("roles", roles.stream().filter(r -> !r.isAdmin()).collect(Collectors.toList()));
+    ajax.put("posts", sysPostService.getAllPosts());
+    return ajax;
+  }
+
   @PostMapping
   @RepeatSubmit(message = "Please don’t submit twice quickly.")
   public AjaxResult add(@Validated @RequestBody SysUser user) {

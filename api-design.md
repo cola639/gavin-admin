@@ -203,7 +203,7 @@ LocalDateTime、LocalDate、LocalTime 不需要 @Temporal，JPA 可以直接映�
 
 1. Improve code elegance and maintainability,Base on Java 17 and Spring Boot 3.5.
 2. Use Lombok annotations (e.g., @Data, @Getter, @Setter) to reduce boilerplate code.
-3. Ensure proper JPA annotations for entity mapping.
+3. Ensure proper JPA annotations for entity mapping, No need Service Interface anymore.
 4. Replace @RequiredArgsConstructor with @Autowired.
 5. Replace Fastjson with Jackson for JSON processing.
 6. Add clear English comments in the code.
@@ -211,7 +211,8 @@ LocalDateTime、LocalDate、LocalTime 不需要 @Temporal，JPA 可以直接映�
 8. Remove author name comments.
 
 22 - 2
-Refactor it from mapper to JPA using Java 17 and Spring Boot 3.5?
+Refactor it from mapper to JPA using Java 17 and Spring Boot 3.5
+No need Service Interface anymore
 If you need any additional details,
 please don’t proceed yet — just let me know, and I’ll provide them.
 
