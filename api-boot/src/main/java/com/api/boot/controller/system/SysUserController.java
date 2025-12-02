@@ -6,8 +6,10 @@ import com.api.common.domain.SysRole;
 import com.api.common.domain.SysUser;
 import com.api.common.domain.SysUserDTO;
 import com.api.common.utils.SecurityUtils;
+import com.api.common.enums.DelFlagEnum;
 import com.api.common.utils.pagination.TableDataInfo;
 
+import com.api.common.utils.uuid.IdUtils;
 import com.api.framework.annotation.RepeatSubmit;
 import com.api.system.service.*;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +57,7 @@ public class SysUserController extends BaseController {
     return TableDataInfo.success(page); // ✅ Auto wraps into front-end compatible format
   }
 
+  //
   //    public void export(HttpServletResponse response, SysUser user) {
   //        List<SysUser> list = userService.selectUserList(user);
   //        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
@@ -92,8 +95,7 @@ public class SysUserController extends BaseController {
   @RepeatSubmit(message = "Please don’t submit twice quickly.")
   public AjaxResult add(@Validated @RequestBody SysUser user) {
     user.setCreateBy(getUsername());
-    user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
-
+    user.setDelFlag(DelFlagEnum.NORMAL.getCode());
     userService.createUser(user);
 
     return AjaxResult.success("Created user successfully! ");

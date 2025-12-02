@@ -65,14 +65,14 @@ public class AppConfig {
     return profile + "/avatar";
   }
 
-  /** File download directory */
-  public String getDownloadPath() {
-    return profile;
-  }
-
   /** General upload directory */
   public String getUploadPath() {
     return profile + "/upload";
+  }
+
+  /** File download directory */
+  public String getDownloadPath() {
+    return profile;
   }
 
   // ------------------------------------------------------------------------

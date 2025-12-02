@@ -5,6 +5,7 @@ import com.api.common.domain.AjaxResult;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.file.FileUploadUtils;
 import com.api.common.utils.file.FileUtils;
+import com.api.common.utils.file.MimeTypeUtils;
 import com.api.framework.config.ServerConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -77,6 +78,32 @@ public class CommonController {
       log.info("✅ File [{}] downloaded successfully", fileName);
     } catch (Exception e) {
       log.error("❌ Failed to download file: {}", fileName, e);
+    }
+  }
+
+  /**
+   * Handle avatar file upload
+   *
+   * @param file The uploaded multipart file.
+   * @return A JSON response containing file metadata.
+   */
+  @PostMapping("/upload-avatar")
+  public AjaxResult uploadAvatar(@RequestParam MultipartFile file) {
+    try {
+      String fileName =
+          fileUploadUtils.upload(
+              appConfig.getAvatarPath(), file, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSIONS);
+      String fileUrl = serverConfig.getUrl() + fileName;
+
+      AjaxResult result = AjaxResult.success("File uploaded successfully");
+      result.put("url", fileUrl);
+      result.put("fileName", fileName);
+      result.put("newFileName", FileUtils.getName(fileName));
+      result.put("originalFilename", file.getOriginalFilename());
+      return result;
+    } catch (Exception e) {
+      log.error("❌ File upload failed: {}", file.getOriginalFilename(), e);
+      return AjaxResult.error("Upload failed: " + e.getMessage());
     }
   }
 

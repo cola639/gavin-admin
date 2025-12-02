@@ -1,5 +1,7 @@
 package com.api.common.domain;
 
+import com.api.common.enums.UserStatusEnum;
+import com.api.common.validation.DictValidator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -40,9 +42,9 @@ public class SysUser extends BaseEntity {
   private Long deptId;
 
   /** Login username */
-  @NotBlank(message = "Username cannot be empty")
+  //  @NotBlank(message = "Username cannot be empty")
   @Size(max = 30, message = "Username length cannot exceed 30 characters")
-  @Column(name = "user_name")
+  @Column(name = "user_name", length = 30, unique = true)
   private String userName;
 
   /** Display nickname */
@@ -71,6 +73,10 @@ public class SysUser extends BaseEntity {
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   private String password;
 
+  @DictValidator(
+      value = UserStatusEnum.class,
+      allowNull = false,
+      message = "User status code is invalid")
   @Column(name = "status")
   private String status;
 

@@ -38,6 +38,7 @@ public class SysUserService {
             .like("phonenumber", user.getPhonenumber())
             .between("createTime", (Date) params.get("beginTime"), (Date) params.get("endTime"));
 
+    //
     Page<SysUser> entityPage = userRepository.findAll(spec, pageable);
 
     // Convert Entity -> DTO manually[
@@ -79,6 +80,10 @@ public class SysUserService {
 
   @Transactional
   public void createUser(SysUser user) {
+    String userName = generateUniqueUserNameFromNickName(user.getNickName());
+    user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+    user.setUserName(userName);
+
     if (userRepository.existsByUserName(user.getUserName())) {
       throw new ServiceException(
           "Failed to create user '" + user.getUserName() + "': username already exists.");
@@ -86,13 +91,11 @@ public class SysUserService {
 
     if (StringUtils.isNotEmpty(user.getPhonenumber())
         && userRepository.existsByPhonenumber(user.getPhonenumber())) {
-      throw new ServiceException(
-          "Failed to create user '" + user.getUserName() + "': phone number is already in use.");
+      throw new ServiceException("Failed to create user phone number is already in use.");
     }
 
     if (StringUtils.isNotEmpty(user.getEmail()) && userRepository.existsByEmail(user.getEmail())) {
-      throw new ServiceException(
-          "Failed to create user '" + user.getUserName() + "': email address is already in use.");
+      throw new ServiceException("Failed to create user email address is already in use.");
     }
 
     // Save user info
@@ -155,5 +158,51 @@ public class SysUserService {
 
     // Soft delete users
     return userRepository.softDeleteUsers(ids);
+  }
+
+  /**
+   * Generate a unique username based on nickname. Examples: nickName "Gavin Li" -> "gavin.li" if
+   * gavin. Li exists -> "gavin.li_1" if gavin.li_1 exists -> "gavin.li_2"
+   */
+  private String generateUniqueUserNameFromNickName(String nickName) {
+    String base = buildBaseUserName(nickName);
+
+    // We need space for: "_" + 5 digits
+    int maxBaseLength = 30 - 1 - 5;
+    if (base.length() > maxBaseLength) {
+      base = base.substring(0, maxBaseLength);
+    }
+
+    int suffix = 1;
+    String candidate;
+
+    // Always use nickname_00001 style
+    do {
+      candidate = String.format("%s_%05d", base, suffix);
+      suffix++;
+    } while (userRepository.existsByUserName(candidate));
+
+    log.debug("Generated unique username '{}' for nickname '{}'", candidate, nickName);
+    return candidate;
+  }
+
+  private String buildBaseUserName(String nickName) {
+    if (nickName == null) {
+      return "user";
+    }
+    // Normalize nickname
+    String normalized = nickName.trim().toLowerCase();
+    // Replace non letter/digit characters with dot
+    normalized = normalized.replaceAll("[^a-z0-9]+", ".");
+    // Remove leading/trailing dots
+    normalized = normalized.replaceAll("^\\.+", "").replaceAll("\\.+$", "");
+
+    if (normalized.isEmpty()) {
+      normalized = "user";
+    }
+
+    // Do NOT cut to 30 here anymore, we handle exact length in generateUniqueUserNameFromNickName
+    log.debug("Built base username '{}' from nickname '{}'", normalized, nickName);
+    return normalized;
   }
 }
