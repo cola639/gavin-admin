@@ -7,12 +7,18 @@ import com.api.common.domain.SysUser;
 import com.api.common.domain.SysUserDTO;
 import com.api.common.utils.SecurityUtils;
 import com.api.common.enums.DelFlagEnum;
+import com.api.common.utils.StringUtils;
+import com.api.common.utils.excel.DictProvider;
+import com.api.common.utils.excel.SimpleExcelWriter;
 import com.api.common.utils.pagination.TableDataInfo;
 
 import com.api.common.utils.uuid.IdUtils;
 import com.api.framework.annotation.RepeatSubmit;
+import com.api.framework.exception.ServiceException;
 import com.api.system.service.*;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /** REST controller for managing user information. */
@@ -41,7 +48,7 @@ public class SysUserController extends BaseController {
   /** Get paginated list of users (with fixed params for now). */
   @PostMapping("/list")
   public TableDataInfo<SysUserDTO> list(
-      @RequestBody SysUser user,
+      @RequestBody(required = false) SysUserDTO user,
       @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
       @RequestParam(value = "pageSize", required = false, defaultValue = "20") Integer pageSize) {
 
@@ -49,20 +56,39 @@ public class SysUserController extends BaseController {
     params.put("beginTime", null);
     params.put("endTime", null);
 
-    // Spring pageable uses 0-based page index
-    Pageable pageable = PageRequest.of(Math.max(pageNum - 1, 0), pageSize);
+    Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
 
-    Page<SysUserDTO> page = userService.selectUserList(user, params, pageable);
+    // if request body is null, use empty criteria
+    SysUserDTO criteria = (user != null) ? user : new SysUserDTO();
 
-    return TableDataInfo.success(page); // ✅ Auto wraps into front-end compatible format
+    Page<SysUserDTO> page = userService.selectUserList(criteria, params, pageable);
+
+    return TableDataInfo.success(page);
   }
 
-  //
-  //    public void export(HttpServletResponse response, SysUser user) {
-  //        List<SysUser> list = userService.selectUserList(user);
-  //        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
-  //        util.exportExcel(response, list, "用户数据");
-  //    }
+  @PostMapping("/export")
+  public void export(HttpServletResponse response, @RequestBody(required = false) SysUserDTO user) {
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("beginTime", null);
+    params.put("endTime", null);
+
+    SysUserDTO criteria = (user != null) ? user : new SysUserDTO();
+
+    // ✅ unpaged: let service/repo fetch all rows matching spec
+    Page<SysUserDTO> page = userService.selectUserList(criteria, params, Pageable.unpaged());
+
+    DictProvider dict = (dictType, value) -> null;
+
+    SimpleExcelWriter.export(
+        page.getContent(), // List<SysUserDTO>
+        SysUserDTO.class,
+        response,
+        "UserList", // file name (without .xlsx)
+        "User Lsit", // sheet name
+        dict);
+  }
+
   //
   //    public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception {
   //        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
@@ -73,18 +99,22 @@ public class SysUserController extends BaseController {
   //    }
   //
 
-  @GetMapping(value = {"/", "/{userId}"})
-  public AjaxResult getInfo(@PathVariable(value = "userId", required = false) Long userId) {
+  @GetMapping("/info")
+  public AjaxResult getInfo(@RequestParam(value = "userId") Long userId) {
+    if (userId == null) {
+      throw new ServiceException("userId can not be null");
+    }
+
+    SysUser sysUser =
+        Optional.ofNullable(userService.selectUserById(userId))
+            .orElseThrow(() -> new ServiceException("User not found for id=" + userId));
+
     AjaxResult ajax = AjaxResult.success();
-    //    if (StringUtils.isNotNull(userId)) {
-    //      userService.checkUserDataScope(userId);
-    //      SysUser sysUser = userService.selectUserById(userId);
-    //      ajax.put(AjaxResult.DATA_TAG, sysUser);
-    //      ajax.put("postIds", postService.selectPostListByUserId(userId));
-    //      ajax.put(
-    //          "roleIds",
-    //          sysUser.getRoles().stream().map(SysRole::getRoleId).collect(Collectors.toList()));
-    //    }
+    ajax.put(AjaxResult.DATA_TAG, sysUser);
+    ajax.put("postIds", sysPostService.selectPostListByUserId(userId));
+    ajax.put(
+        "roleIds",
+        sysUser.getRoles().stream().map(SysRole::getRoleId).collect(Collectors.toList()));
     List<SysRole> roles = sysRoleService.selectRoleAll();
     ajax.put("roles", roles.stream().filter(r -> !r.isAdmin()).collect(Collectors.toList()));
     ajax.put("posts", sysPostService.getAllPosts());
@@ -102,19 +132,24 @@ public class SysUserController extends BaseController {
   }
 
   @PutMapping
-  public AjaxResult update(@Validated @RequestBody SysUser user) {
+  public AjaxResult update(@Validated @RequestBody SysUserDTO user) {
 
     SysUser updatedUser = userService.updateUser(user);
-    return AjaxResult.success(updatedUser);
+
+    if (updatedUser != null) {
+      return AjaxResult.success("Updated user successfully !");
+    } else {
+      return AjaxResult.success("Updated user failed ！");
+    }
   }
 
   @DeleteMapping("/{userIds}")
   public AjaxResult remove(@PathVariable Long[] userIds) {
-    //        if (ArrayUtils.contains(userIds, getUserId())) {
-    //            return AjaxResult.error("Not allow delete current user");
-    //        }
+    if (ArrayUtils.contains(userIds, getUserId())) {
+      return AjaxResult.error("Not allow delete current user");
+    }
     userService.deleteUserByIds(userIds);
-    return AjaxResult.success();
+    return AjaxResult.success("Deleted Successful");
   }
 
   //    @PutMapping("/resetPwd")

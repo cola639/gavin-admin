@@ -25,8 +25,8 @@ public interface SysUserRepository
 
   @TrackSQLDetail
   @Modifying
-  @Query("update SysUser u set u.delFlag = '2' where u.userId in :userIds")
-  int softDeleteUsers(@Param("userIds") List<Long> userIds);
+  @Query("update SysUser u set u.delFlag = :delFlag where u.userId in :userIds")
+  int softDeleteUsers(@Param("userIds") List<Long> userIds, @Param("delFlag") String delFlag);
 
   boolean existsByUserName(String userName);
 

@@ -2,6 +2,8 @@ package com.api.system.service;
 
 import com.api.common.domain.SysUser;
 import com.api.common.domain.SysUserDTO;
+import com.api.common.domain.SysUserMapper;
+import com.api.common.enums.DelFlagEnum;
 import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.jpa.SpecificationBuilder;
@@ -28,36 +30,31 @@ public class SysUserService {
   private final SysUserRepository userRepository;
 
   public Page<SysUserDTO> selectUserList(
-      SysUser user, Map<String, Object> params, Pageable pageable) {
+      SysUserDTO user, Map<String, Object> params, Pageable pageable) {
+
+    Date beginTime = (Date) params.get("beginTime");
+    Date endTime = (Date) params.get("endTime");
+
+    log.debug("Selecting user list, filter user={}, params={}", user, params);
+
     Specification<SysUser> spec =
         SpecificationBuilder.<SysUser>builder()
-            .eq("delFlag", "0")
+            .eq("delFlag", DelFlagEnum.NORMAL.getCode())
+            .eq("deptId", user.getDeptId())
             .eq("userId", user.getUserId())
             .like("userName", user.getUserName())
             .eq("status", user.getStatus())
             .like("phonenumber", user.getPhonenumber())
-            .between("createTime", (Date) params.get("beginTime"), (Date) params.get("endTime"));
+            .between("createTime", beginTime, endTime);
 
-    //
+    if (pageable == null || pageable.isUnpaged()) {
+      List<SysUser> entities = userRepository.findAll(spec);
+      List<SysUserDTO> dtoList = SysUserDTO.fromEntities(entities);
+      return new PageImpl<>(dtoList, Pageable.unpaged(), dtoList.size());
+    }
+
     Page<SysUser> entityPage = userRepository.findAll(spec, pageable);
-
-    // Convert Entity -> DTO manually[
-    List<SysUserDTO> dtoList =
-        entityPage.getContent().stream()
-            .map(
-                u ->
-                    SysUserDTO.builder()
-                        .userId(u.getUserId())
-                        .userName(u.getUserName())
-                        .nickName(u.getNickName())
-                        .email(u.getEmail())
-                        .phonenumber(u.getPhonenumber())
-                        .status(u.getStatus())
-                        .createTime(u.getCreateTime())
-                        .deptId(u.getDeptId())
-                        .deptName(u.getDept() != null ? u.getDept().getDeptName() : null)
-                        .build())
-            .toList();
+    List<SysUserDTO> dtoList = SysUserDTO.fromEntities(entityPage.getContent());
 
     return new PageImpl<>(dtoList, pageable, entityPage.getTotalElements());
   }
@@ -85,8 +82,7 @@ public class SysUserService {
     user.setUserName(userName);
 
     if (userRepository.existsByUserName(user.getUserName())) {
-      throw new ServiceException(
-          "Failed to create user '" + user.getUserName() + "': username already exists.");
+      throw new ServiceException("Failed to create user username already exists.");
     }
 
     if (StringUtils.isNotEmpty(user.getPhonenumber())
@@ -109,37 +105,55 @@ public class SysUserService {
     userRoleService.insertUserRole(savedUser.getUserId(), savedUser.getRoleIds());
   }
 
-  @Transactional
-  public SysUser updateUser(SysUser user) {
-    Optional<SysUser> info = userRepository.findById(user.getUserId());
+  private final SysUserMapper sysUserMapper; // MapStruct mapper
 
-    if (info.isPresent()) {
-      SysUser existingUser = info.get(); // unwrap to real SysUser
-      if (!user.getUserId().equals(existingUser.getUserId())
-          && userRepository.existsByUserName(user.getUserName())) {
-        throw new ServiceException("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
-      }
-      if (!user.getUserId().equals(existingUser.getUserId())
-          && StringUtils.isNotEmpty(existingUser.getPhonenumber())
-          && userRepository.existsByPhonenumber(user.getPhonenumber())) {
-        throw new ServiceException("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
-      }
-      if (!user.getUserId().equals(existingUser.getUserId())
-          && StringUtils.isNotEmpty(user.getEmail())
-          && userRepository.existsByEmail(user.getEmail())) {
-        throw new ServiceException("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
-      }
+  @Transactional
+  public SysUser updateUser(SysUserDTO req) {
+    SysUser existing = loadExisting(req.getUserId());
+
+    validateUniqueness(req, existing);
+
+    // copy non-null DTO fields into entity
+    sysUserMapper.updateFromDto(req, existing);
+
+    updateRelations(req, existing);
+
+    log.info("Updating user id={}", existing.getUserId());
+    return userRepository.save(existing);
+  }
+
+  private SysUser loadExisting(Long userId) {
+    return userRepository
+        .findById(userId)
+        .orElseThrow(() -> new ServiceException("User not found"));
+  }
+
+  private void validateUniqueness(SysUserDTO req, SysUser existing) {
+    if (StringUtils.isNotBlank(req.getEmail())
+        && !req.getEmail().equals(existing.getEmail())
+        && userRepository.existsByEmail(req.getEmail())) {
+      throw new ServiceException("Update user failed, email already exists");
     }
 
-    Long userId = user.getUserId();
-    userRoleService.deleteByUserId(userId);
-    userPostService.deleteByUserId(userId);
-    userPostService.insertUserPost(user);
-    userRoleService.insertUserRole(user.getUserId(), user.getRoleIds());
+    if (StringUtils.isNotBlank(req.getPhonenumber())
+        && !req.getPhonenumber().equals(existing.getPhonenumber())
+        && userRepository.existsByPhonenumber(req.getPhonenumber())) {
+      throw new ServiceException("Update user failed, phone already exists");
+    }
+  }
 
-    // ensure JPA does not touch immutable roles
-    user.setRoles(null);
-    return userRepository.save(user);
+  private void updateRelations(SysUserDTO req, SysUser existing) {
+    Long userId = existing.getUserId();
+
+    if (req.getRoleIds() != null) {
+      userRoleService.deleteByUserId(userId);
+      userRoleService.insertUserRole(userId, req.getRoleIds());
+    }
+
+    if (req.getPostIds() != null) {
+      userPostService.deleteByUserId(userId);
+      userPostService.insertUserPost(existing);
+    }
   }
 
   @Transactional
@@ -157,7 +171,7 @@ public class SysUserService {
     userPostService.deleteByUser_UserIdIn(ids);
 
     // Soft delete users
-    return userRepository.softDeleteUsers(ids);
+    return userRepository.softDeleteUsers(ids, DelFlagEnum.DELETED.getCode());
   }
 
   /**
