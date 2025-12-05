@@ -100,21 +100,20 @@ public class SysUserController extends BaseController {
   //
 
   @GetMapping("/info")
-  public AjaxResult getInfo(@RequestParam(value = "userId") Long userId) {
-    if (userId == null) {
-      throw new ServiceException("userId can not be null");
+  public AjaxResult getInfo(@RequestParam(value = "userId", required = false) Long userId) {
+    AjaxResult ajax = AjaxResult.success();
+    if (userId != null) {
+      SysUser sysUser =
+          Optional.ofNullable(userService.selectUserById(userId))
+              .orElseThrow(() -> new ServiceException("User not found for id=" + userId));
+
+      ajax.put(AjaxResult.DATA_TAG, sysUser);
+      ajax.put("postIds", sysPostService.selectPostListByUserId(userId));
+      ajax.put(
+          "roleIds",
+          sysUser.getRoles().stream().map(SysRole::getRoleId).collect(Collectors.toList()));
     }
 
-    SysUser sysUser =
-        Optional.ofNullable(userService.selectUserById(userId))
-            .orElseThrow(() -> new ServiceException("User not found for id=" + userId));
-
-    AjaxResult ajax = AjaxResult.success();
-    ajax.put(AjaxResult.DATA_TAG, sysUser);
-    ajax.put("postIds", sysPostService.selectPostListByUserId(userId));
-    ajax.put(
-        "roleIds",
-        sysUser.getRoles().stream().map(SysRole::getRoleId).collect(Collectors.toList()));
     List<SysRole> roles = sysRoleService.selectRoleAll();
     ajax.put("roles", roles.stream().filter(r -> !r.isAdmin()).collect(Collectors.toList()));
     ajax.put("posts", sysPostService.getAllPosts());
