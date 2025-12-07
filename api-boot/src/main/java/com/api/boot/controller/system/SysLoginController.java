@@ -91,11 +91,7 @@ public class SysLoginController {
     return ajax;
   }
 
-  /**
-   * Get routers endpoint.
-   *
-   * @return 路由信息
-   */
+  /** Get routers endpoint. */
   @GetMapping("getRouters")
   public AjaxResult getRouters() {
     Long userId = SecurityUtils.getUserId();

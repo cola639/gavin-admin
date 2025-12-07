@@ -3,6 +3,7 @@ package com.api.boot.controller.system;
 import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
 import com.api.common.domain.SysMenu;
+import com.api.persistence.repository.system.SysRoleMenuRepository;
 import com.api.system.service.SysMenuService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import java.util.List;
 public class SysMenuController extends BaseController {
 
   private final SysMenuService sysMenuService;
+  private final SysRoleMenuRepository sysRoleMenuRepository;
 
   /** Get menu list with optional filters. */
   @GetMapping("/list")
@@ -59,15 +61,15 @@ public class SysMenuController extends BaseController {
 
   @DeleteMapping("/{menuId}")
   public AjaxResult remove(@PathVariable("menuId") Long menuId) {
-    //    if (menuService.hasChildByMenuId(menuId))
-    //    {
-    //      return warn("存在子菜单,不允许删除");
-    //    }
-    //    if (menuService.checkMenuExistRole(menuId))
-    //    {
-    //      return warn("菜单已分配,不允许删除");
-    //    }
+    if (sysMenuService.hasChildByMenuId(menuId)) {
+      return warn("Cannot delete menu: it has child menus.");
+    }
+
+    if (sysMenuService.isMenuAssignedToAnyRole(menuId)) {
+      return warn("Cannot delete menu: it is assigned to one or more roles.");
+    }
+
     sysMenuService.deleteMenuById(menuId);
-    return AjaxResult.success();
+    return AjaxResult.success("Menu deleted successfully.");
   }
 }

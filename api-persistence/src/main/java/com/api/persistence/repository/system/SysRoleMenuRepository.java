@@ -28,4 +28,6 @@ public interface SysRoleMenuRepository
 
   /** Find menus by roleId */
   List<SysRoleMenu> findByRoleId(Long roleId);
+
+  boolean existsByMenuId(Long menuId);
 }

@@ -54,4 +54,6 @@ public interface SysMenuRepository
         ORDER BY m.parentId, m.orderNum
     """)
   List<SysMenu> findMenusByUserId(@Param("userId") Long userId);
+
+  boolean existsByParentId(Long parentId);
 }

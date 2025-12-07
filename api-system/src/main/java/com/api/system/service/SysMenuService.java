@@ -28,7 +28,7 @@ public class SysMenuService {
   private final SysRoleRepository sysRoleRepository;
   private final SysRoleMenuRepository sysRoleMenuRepository;
 
-  /** 查询所有菜单（支持动态条件） */
+  /** Query all menus with dynamic filter conditions. */
   public List<SysMenu> getMenuList(SysMenu menu) {
     Specification<SysMenu> spec =
         SpecificationBuilder.<SysMenu>builder()
@@ -41,7 +41,7 @@ public class SysMenuService {
     return sysMenuRepository.findAll(spec);
   }
 
-  /** 构建菜单树结构 */
+  /** Build menu tree structure from a flat menu list. */
   public List<SysMenu> buildMenuTree(List<SysMenu> menus) {
     List<Long> ids = menus.stream().map(SysMenu::getMenuId).toList();
     List<SysMenu> roots =
@@ -54,24 +54,32 @@ public class SysMenuService {
     return roots;
   }
 
-  /** 查询单个菜单 */
+  /** Get a single menu by its ID. */
   public Optional<SysMenu> getMenuById(Long menuId) {
     return sysMenuRepository.findById(menuId);
   }
 
-  /** 新增菜单 */
+  /** Create a new menu. */
   @Transactional
   public SysMenu createMenu(SysMenu menu) {
     return sysMenuRepository.save(menu);
   }
 
-  /** 修改菜单 */
+  /** Update an existing menu. */
   @Transactional
   public SysMenu updateMenu(SysMenu menu) {
     return sysMenuRepository.save(menu);
   }
 
-  // ====== 工具方法 ======
+  // ====== Helper methods for menu tree building ======
+
+  /**
+   * Build menu hierarchy list starting from given parentId.
+   *
+   * @param list flat menu list
+   * @param parentId parent menu id
+   * @return hierarchical menu list
+   */
   private List<SysMenu> buildMenuHierarchy(List<SysMenu> list, Long parentId) {
     List<SysMenu> result = new ArrayList<>();
     for (SysMenu m : list) {
@@ -83,8 +91,14 @@ public class SysMenuService {
     return result;
   }
 
+  /**
+   * Recursively build children for a given menu node.
+   *
+   * @param list full menu list
+   * @param t current menu node
+   */
   private void recursionFn(List<SysMenu> list, SysMenu t) {
-    // 得到子节点列表
+    // Get child menu list
     List<SysMenu> childList = getChildList(list, t);
     t.setChildren(childList);
     for (SysMenu tChild : childList) {
@@ -94,6 +108,7 @@ public class SysMenuService {
     }
   }
 
+  /** Normalize inner-link path (remove protocol/domain and replace with router-safe path). */
   public String innerLinkReplaceEach(String path) {
     return StringUtils.replaceEach(
         path,
@@ -101,32 +116,33 @@ public class SysMenuService {
         new String[] {"", "", "", "/", "/"});
   }
 
+  /** Insert a menu (simple wrapper around save). */
   public SysMenu insertMenu(SysMenu menu) {
     return sysMenuRepository.save(menu);
   }
 
-  /** Delete Menu */
+  /** Delete a menu by id. */
   @Transactional
   public void deleteMenuById(Long menuId) {
     if (!sysMenuRepository.existsById(menuId)) {
-      throw new EntityNotFoundException("Menu is not existed" + menuId);
+      throw new EntityNotFoundException("Menu does not exist: " + menuId);
     }
     sysMenuRepository.deleteById(menuId);
   }
 
-  /** Get permissions by role ID. */
+  /** Get menu permissions by role ID. */
   public Set<String> selectMenuPermsByRoleId(Long roleId) {
     List<String> perms = sysMenuRepository.findPermsByRoleId(roleId);
     return toPermSet(perms);
   }
 
-  /** Get permissions by user ID. */
+  /** Get menu permissions by user ID. */
   public Set<String> selectMenuPermsByUserId(Long userId) {
     List<String> perms = sysMenuRepository.findPermsByUserId(userId);
     return toPermSet(perms);
   }
 
-  /** Convert list of comma-separated permissions to a clean set. */
+  /** Convert list of comma-separated permissions to a clean Set. */
   private Set<String> toPermSet(List<String> perms) {
     Set<String> permsSet = new HashSet<>();
     for (String perm : perms) {
@@ -137,6 +153,12 @@ public class SysMenuService {
     return permsSet;
   }
 
+  /**
+   * Select menu tree by user id, respecting visibility and role permissions.
+   *
+   * @param userId user id
+   * @return menu tree for the user
+   */
   public List<SysMenu> selectMenuTreeByUserId(Long userId) {
     List<SysMenu> menus =
         SecurityUtils.isAdmin(userId)
@@ -146,7 +168,13 @@ public class SysMenuService {
     return getChildPerms(menus, 0L);
   }
 
-  /** Recursively build menu tree */
+  /**
+   * Recursively build menu tree from flat list using Long parentId.
+   *
+   * @param menus menu list
+   * @param parentId parent menu id
+   * @return hierarchical menu list
+   */
   private List<SysMenu> getChildPerms(List<SysMenu> menus, Long parentId) {
     return menus.stream()
         .filter(menu -> parentId.equals(menu.getParentId()))
@@ -154,6 +182,12 @@ public class SysMenuService {
         .toList();
   }
 
+  /**
+   * Build frontend router definitions from menu tree.
+   *
+   * @param menus menu tree
+   * @return router list for frontend
+   */
   public List<RouterVo> buildMenus(List<SysMenu> menus) {
     List<RouterVo> routers = new LinkedList<RouterVo>();
     for (SysMenu menu : menus) {
@@ -171,10 +205,12 @@ public class SysMenuService {
               menu.getPath()));
       List<SysMenu> cMenus = menu.getChildren();
       if (StringUtils.isNotEmpty(cMenus) && UserConstants.TYPE_DIR.equals(menu.getMenuType())) {
+        // Directory with children
         router.setAlwaysShow(true);
         router.setRedirect("noRedirect");
         router.setChildren(buildMenus(cMenus));
       } else if (isMenuFrame(menu)) {
+        // Menu frame (single-level menu that opens sub-route)
         router.setMeta(null);
         List<RouterVo> childrenList = new ArrayList<RouterVo>();
         RouterVo children = new RouterVo();
@@ -191,6 +227,7 @@ public class SysMenuService {
         childrenList.add(children);
         router.setChildren(childrenList);
       } else if (menu.getParentId().intValue() == 0 && isInnerLink(menu)) {
+        // Top-level inner link (open external link via inner-link component)
         router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon()));
         router.setPath("/");
         List<RouterVo> childrenList = new ArrayList<RouterVo>();
@@ -208,23 +245,37 @@ public class SysMenuService {
     return routers;
   }
 
-  //  public boolean checkMenuNameUnique(SysMenu menu) {
-  //    Long menuId = StringUtils.isNull(menu.getMenuId()) ? -1L : menu.getMenuId();
-  //    SysMenu info = menuMapper.checkMenuNameUnique(menu.getMenuName(), menu.getParentId());
-  //    if (StringUtils.isNotNull(info) && info.getMenuId().longValue() != menuId.longValue()) {
-  //      return UserConstants.NOT_UNIQUE;
+  /**
+   * Check menu name uniqueness under the same parent.
+   *
+   * @param menu menu to check
+   * @return result flag (UNIQUE / NOT_UNIQUE)
+   */
+  //    public boolean checkMenuNameUnique(SysMenu menu) {
+  //      Long menuId = StringUtils.isNull(menu.getMenuId()) ? -1L : menu.getMenuId();
+  //      SysMenu info = menuMapper.checkMenuNameUnique(menu.getMenuName(), menu.getParentId());
+  //      if (StringUtils.isNotNull(info) && info.getMenuId().longValue() != menuId.longValue()) {
+  //        return UserConstants.NOT_UNIQUE;
+  //      }
+  //      return UserConstants.UNIQUE;
   //    }
-  //    return UserConstants.UNIQUE;
-  //  }
+
+  public boolean hasChildByMenuId(Long getMenuId) {
+    return sysMenuRepository.existsByParentId(getMenuId);
+  }
+
+  public boolean isMenuAssignedToAnyRole(Long menuId) {
+    return sysRoleMenuRepository.existsByMenuId(menuId);
+  }
 
   /**
-   * 获取路由名称
+   * Get route name for frontend router.
    *
-   * @param menu 菜单信息
-   * @return 路由名称
+   * @param menu menu info
+   * @return route name
    */
   public String getRouteName(SysMenu menu) {
-    // 非外链并且是一级目录（类型为目录）
+    // Non-outer-link and top-level directory (menu type = menu)
     if (isMenuFrame(menu)) {
       return StringUtils.EMPTY;
     }
@@ -232,11 +283,11 @@ public class SysMenuService {
   }
 
   /**
-   * 获取路由名称，如没有配置路由名称则取路由地址
+   * Get route name. If no explicit name provided, use path.
    *
-   * @param name 路由名称
-   * @param path 路由地址
-   * @return 路由名称（驼峰格式）
+   * @param name route name
+   * @param path route path
+   * @return route name (capitalized)
    */
   public String getRouteName(String name, String path) {
     String routerName = StringUtils.isNotEmpty(name) ? name : path;
@@ -244,24 +295,24 @@ public class SysMenuService {
   }
 
   /**
-   * 获取路由地址
+   * Get router path for frontend route.
    *
-   * @param menu 菜单信息
-   * @return 路由地址
+   * @param menu menu info
+   * @return router path
    */
   public String getRouterPath(SysMenu menu) {
     String routerPath = menu.getPath();
-    // 内链打开外网方式
+    // Inner link opened as external link
     if (menu.getParentId().intValue() != 0 && isInnerLink(menu)) {
       routerPath = innerLinkReplaceEach(routerPath);
     }
-    // 非外链并且是一级目录（类型为目录）
+    // Non-outer-link and top-level directory (type = DIR)
     if (0 == menu.getParentId().intValue()
         && UserConstants.TYPE_DIR.equals(menu.getMenuType())
         && UserConstants.NO_FRAME.equals(menu.getIsFrame())) {
       routerPath = "/" + menu.getPath();
     }
-    // 非外链并且是一级目录（类型为菜单）
+    // Non-outer-link and top-level menu (type = MENU)
     else if (isMenuFrame(menu)) {
       routerPath = "/";
     }
@@ -269,10 +320,10 @@ public class SysMenuService {
   }
 
   /**
-   * 获取组件信息
+   * Get component name for frontend router.
    *
-   * @param menu 菜单信息
-   * @return 组件信息
+   * @param menu menu info
+   * @return component name
    */
   public String getComponent(SysMenu menu) {
     String component = UserConstants.LAYOUT;
@@ -289,10 +340,12 @@ public class SysMenuService {
   }
 
   /**
-   * 是否为菜单内部跳转
+   * Check whether the menu is a “menu frame”.
    *
-   * @param menu 菜单信息
-   * @return 结果
+   * <p>Definition: top-level menu (parentId = 0), type = MENU, isFrame = NO_FRAME.
+   *
+   * @param menu menu info
+   * @return true if menu is a frame menu
    */
   public boolean isMenuFrame(SysMenu menu) {
     return menu.getParentId().intValue() == 0
@@ -301,37 +354,37 @@ public class SysMenuService {
   }
 
   /**
-   * 是否为内链组件
+   * Check whether the menu is an inner-link component.
    *
-   * @param menu 菜单信息
-   * @return 结果
+   * @param menu menu info
+   * @return true if menu is an inner-link
    */
   public boolean isInnerLink(SysMenu menu) {
     return menu.getIsFrame().equals(UserConstants.NO_FRAME) && StringUtils.isHttp(menu.getPath());
   }
 
   /**
-   * 是否为parent_view组件
+   * Check whether the menu should use parent-view component.
    *
-   * @param menu 菜单信息
-   * @return 结果
+   * @param menu menu info
+   * @return true if menu is parent-view
    */
   public boolean isParentView(SysMenu menu) {
     return menu.getParentId().intValue() != 0 && UserConstants.TYPE_DIR.equals(menu.getMenuType());
   }
 
   /**
-   * 根据父节点的ID获取所有子节点
+   * Build menu tree for authorization based on parentId (int).
    *
-   * @param list 分类表
-   * @param parentId 传入的父节点ID
-   * @return String
+   * @param list full menu list
+   * @param parentId parent menu id
+   * @return menu tree
    */
   public List<SysMenu> getChildPerms(List<SysMenu> list, int parentId) {
     List<SysMenu> returnList = new ArrayList<SysMenu>();
     for (Iterator<SysMenu> iterator = list.iterator(); iterator.hasNext(); ) {
-      SysMenu t = (SysMenu) iterator.next();
-      // 一、根据传入的某个父节点ID,遍历该父节点的所有子节点
+      SysMenu t = iterator.next();
+      // For a given parentId, find all child nodes
       if (t.getParentId() == parentId) {
         recursionFn(list, t);
         returnList.add(t);
@@ -340,12 +393,18 @@ public class SysMenuService {
     return returnList;
   }
 
-  /** 得到子节点列表 */
+  /**
+   * Get direct child menus of a given menu.
+   *
+   * @param list menu list
+   * @param t parent menu
+   * @return child menus of t
+   */
   private List<SysMenu> getChildList(List<SysMenu> list, SysMenu t) {
     List<SysMenu> tlist = new ArrayList<SysMenu>();
     Iterator<SysMenu> it = list.iterator();
     while (it.hasNext()) {
-      SysMenu n = (SysMenu) it.next();
+      SysMenu n = it.next();
       if (n.getParentId().longValue() == t.getMenuId().longValue()) {
         tlist.add(n);
       }
@@ -353,7 +412,13 @@ public class SysMenuService {
     return tlist;
   }
 
-  /** 判断是否有子节点 */
+  /**
+   * Check whether a menu has child nodes.
+   *
+   * @param list menu list
+   * @param t menu node
+   * @return true if menu has children
+   */
   private boolean hasChild(List<SysMenu> list, SysMenu t) {
     return getChildList(list, t).size() > 0;
   }
