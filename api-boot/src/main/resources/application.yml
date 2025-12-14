@@ -33,7 +33,7 @@ spring:
 
     master:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/ry-vue?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8
+      url: jdbc:mysql://localhost:3306/ry-vue?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8
       username: root
       password: 123456
       hikari:
@@ -46,7 +46,7 @@ spring:
 
     slave:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/ry-vue-slave?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8
+      url: jdbc:mysql://localhost:3306/ry-vue-slave?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8
       username: root
       password: 123456
       hikari:

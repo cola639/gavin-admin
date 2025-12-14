@@ -3,8 +3,10 @@ package com.api.boot.controller.system;
 import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
 import com.api.common.domain.SysMenu;
+import com.api.common.domain.SysMenuOrderUpdateRequest;
 import com.api.persistence.repository.system.SysRoleMenuRepository;
 import com.api.system.service.SysMenuService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -42,7 +44,7 @@ public class SysMenuController extends BaseController {
     //        && !StringUtils.ishttp(menu.getPath())) {
     //      return error("新增菜单'" + menu.getMenuName() + "'失败，地址必须以http(s)://开头");
     //    }
-    //    menu.setCreateBy(getUsername());
+    menu.setCreateBy(getUsername());
     return AjaxResult.success(sysMenuService.insertMenu(menu));
   }
 
@@ -57,6 +59,19 @@ public class SysMenuController extends BaseController {
     //    }
     //    menu.setCreateBy(getUsername());
     return AjaxResult.success(sysMenuService.insertMenu(menu));
+  }
+
+  @PutMapping("/update-orders")
+  public AjaxResult updateOrders(@RequestBody @Valid List<SysMenuOrderUpdateRequest> orders) {
+    if (orders == null || orders.isEmpty()) {
+      return AjaxResult.error("Request body can not be empty.");
+    }
+
+    int updated = sysMenuService.updateMenuOrders(orders, getUsername());
+
+    AjaxResult ajax = AjaxResult.success("Menu order updated successfully.");
+    ajax.put("updated", updated);
+    return ajax;
   }
 
   @DeleteMapping("/{menuId}")

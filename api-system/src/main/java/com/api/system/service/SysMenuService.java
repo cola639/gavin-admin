@@ -2,6 +2,7 @@ package com.api.system.service;
 
 import com.api.common.constant.Constants;
 import com.api.common.constant.UserConstants;
+import com.api.common.domain.SysMenuOrderUpdateRequest;
 import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.jpa.SpecificationBuilder;
@@ -14,12 +15,14 @@ import com.api.system.domain.vo.RouterVo;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SysMenuService {
@@ -119,6 +122,55 @@ public class SysMenuService {
   /** Insert a menu (simple wrapper around save). */
   public SysMenu insertMenu(SysMenu menu) {
     return sysMenuRepository.save(menu);
+  }
+
+  @Transactional
+  public int updateMenuOrders(List<SysMenuOrderUpdateRequest> updates, String updateBy) {
+    if (updates == null || updates.isEmpty()) {
+      log.info("Skip updating menu orders: empty request.");
+      return 0;
+    }
+
+    // Detect duplicate menuId
+    Map<Long, Long> dupCheck =
+        updates.stream()
+            .collect(
+                Collectors.groupingBy(SysMenuOrderUpdateRequest::getMenuId, Collectors.counting()));
+    List<Long> duplicated =
+        dupCheck.entrySet().stream()
+            .filter(e -> e.getKey() != null && e.getValue() != null && e.getValue() > 1)
+            .map(Map.Entry::getKey)
+            .toList();
+    if (!duplicated.isEmpty()) {
+      throw new IllegalArgumentException("Duplicate menuId in request: " + duplicated);
+    }
+
+    Map<Long, Integer> orderMap =
+        updates.stream()
+            .collect(
+                Collectors.toMap(
+                    SysMenuOrderUpdateRequest::getMenuId, SysMenuOrderUpdateRequest::getOrderNum));
+
+    List<Long> menuIds = updates.stream().map(SysMenuOrderUpdateRequest::getMenuId).toList();
+    List<SysMenu> menus = sysMenuRepository.findAllById(menuIds);
+
+    if (menus.size() != menuIds.size()) {
+      Set<Long> found = menus.stream().map(SysMenu::getMenuId).collect(Collectors.toSet());
+      List<Long> missing = menuIds.stream().filter(id -> !found.contains(id)).distinct().toList();
+      throw new EntityNotFoundException("Menu not found: " + missing);
+    }
+
+    menus.forEach(
+        m -> {
+          m.setOrderNum(orderMap.get(m.getMenuId()));
+          m.setUpdateBy(updateBy);
+        });
+
+    sysMenuRepository.saveAll(menus);
+    sysMenuRepository.flush();
+
+    log.info("Updated menu order successfully. size={}", menus.size());
+    return menus.size();
   }
 
   /** Delete a menu by id. */
