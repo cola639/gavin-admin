@@ -2,11 +2,12 @@ package com.api.system.service;
 
 import com.api.common.constant.Constants;
 import com.api.common.constant.UserConstants;
-import com.api.common.domain.SysMenuOrderUpdateRequest;
+import com.api.common.domain.SysMenuDTOs;
 import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.jpa.SpecificationBuilder;
 import com.api.common.domain.SysMenu;
+import com.api.framework.exception.ServiceException;
 import com.api.persistence.repository.system.SysMenuRepository;
 import com.api.persistence.repository.system.SysRoleMenuRepository;
 import com.api.persistence.repository.system.SysRoleRepository;
@@ -125,51 +126,45 @@ public class SysMenuService {
   }
 
   @Transactional
-  public int updateMenuOrders(List<SysMenuOrderUpdateRequest> updates, String updateBy) {
+  public int updateMenuOrders(List<SysMenuDTOs.OrderUpdateRequest> updates, String updateBy) {
     if (updates == null || updates.isEmpty()) {
       log.info("Skip updating menu orders: empty request.");
       return 0;
     }
 
-    // Detect duplicate menuId
-    Map<Long, Long> dupCheck =
-        updates.stream()
-            .collect(
-                Collectors.groupingBy(SysMenuOrderUpdateRequest::getMenuId, Collectors.counting()));
-    List<Long> duplicated =
-        dupCheck.entrySet().stream()
-            .filter(e -> e.getKey() != null && e.getValue() != null && e.getValue() > 1)
-            .map(Map.Entry::getKey)
-            .toList();
-    if (!duplicated.isEmpty()) {
-      throw new IllegalArgumentException("Duplicate menuId in request: " + duplicated);
-    }
-
+    // 1) Build order map (throws friendly error on duplicate menuId)
     Map<Long, Integer> orderMap =
         updates.stream()
             .collect(
                 Collectors.toMap(
-                    SysMenuOrderUpdateRequest::getMenuId, SysMenuOrderUpdateRequest::getOrderNum));
+                    SysMenuDTOs.OrderUpdateRequest::getMenuId,
+                    SysMenuDTOs.OrderUpdateRequest::getOrderNum,
+                    (oldVal, newVal) -> {
+                      throw new ServiceException("Duplicate menuId in request.");
+                    }));
 
-    List<Long> menuIds = updates.stream().map(SysMenuOrderUpdateRequest::getMenuId).toList();
-    List<SysMenu> menus = sysMenuRepository.findAllById(menuIds);
+    // 2) Load menus
+    List<SysMenu> menus = sysMenuRepository.findAllById(orderMap.keySet());
 
-    if (menus.size() != menuIds.size()) {
-      Set<Long> found = menus.stream().map(SysMenu::getMenuId).collect(Collectors.toSet());
-      List<Long> missing = menuIds.stream().filter(id -> !found.contains(id)).distinct().toList();
+    Set<Long> foundIds = menus.stream().map(SysMenu::getMenuId).collect(Collectors.toSet());
+    List<Long> missing = orderMap.keySet().stream().filter(id -> !foundIds.contains(id)).toList();
+
+    if (!missing.isEmpty()) {
       throw new EntityNotFoundException("Menu not found: " + missing);
     }
 
+    // 3) Apply updates
     menus.forEach(
         m -> {
           m.setOrderNum(orderMap.get(m.getMenuId()));
           m.setUpdateBy(updateBy);
         });
 
+    // 4) Persist
     sysMenuRepository.saveAll(menus);
     sysMenuRepository.flush();
 
-    log.info("Updated menu order successfully. size={}", menus.size());
+    log.info("Updated menu orders successfully. size={}", menus.size());
     return menus.size();
   }
 

@@ -3,7 +3,7 @@ package com.api.boot.controller.system;
 import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
 import com.api.common.domain.SysMenu;
-import com.api.common.domain.SysMenuOrderUpdateRequest;
+import com.api.common.domain.SysMenuDTOs;
 import com.api.persistence.repository.system.SysRoleMenuRepository;
 import com.api.system.service.SysMenuService;
 import jakarta.validation.Valid;
@@ -62,7 +62,7 @@ public class SysMenuController extends BaseController {
   }
 
   @PutMapping("/update-orders")
-  public AjaxResult updateOrders(@RequestBody @Valid List<SysMenuOrderUpdateRequest> orders) {
+  public AjaxResult updateOrders(@RequestBody @Valid List<SysMenuDTOs.OrderUpdateRequest> orders) {
     if (orders == null || orders.isEmpty()) {
       return AjaxResult.error("Request body can not be empty.");
     }
