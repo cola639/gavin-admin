@@ -64,7 +64,9 @@ public class SysUserService {
   }
 
   public SysUser selectUserByUserName(String userName) {
-    return userRepository.findByUserNameAndDelFlag(userName, "0").orElse(null);
+    return userRepository
+        .findByUserNameAndDelFlag(userName, DelFlagEnum.NORMAL.getCode())
+        .orElse(null);
   }
 
   public SysUser insertUser(SysUser user) {
