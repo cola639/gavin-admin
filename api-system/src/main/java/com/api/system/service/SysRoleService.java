@@ -167,8 +167,7 @@ public class SysRoleService {
   public Page<SysRole> selectRoleList(SysRole role, Map<String, Object> params, Pageable pageable) {
     Specification<SysRole> spec =
         SpecificationBuilder.<SysRole>builder()
-            // Equivalent to r.del_flag = '0'
-            .eq("delFlag", "0")
+            .eq("delFlag", DelFlagEnum.NORMAL.getCode())
             // r.role_id = ?
             .eq("roleId", role.getRoleId())
             // r.role_name LIKE ?

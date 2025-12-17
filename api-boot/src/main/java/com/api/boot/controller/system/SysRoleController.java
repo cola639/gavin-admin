@@ -37,12 +37,16 @@ public class SysRoleController extends BaseController {
 
   /** Get role list */
   @GetMapping("/list")
-  public TableDataInfo list(SysRole role) {
+  public TableDataInfo list(
+      @RequestParam(defaultValue = "1") int pageNum,
+      @RequestParam(defaultValue = "10") int pageSize,
+      SysRole role) {
+
     Map<String, Object> params = new HashMap<>();
     params.put("beginTime", null);
     params.put("endTime", null);
 
-    Pageable pageable = PageRequest.of(0, 10);
+    Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
     Page<SysRole> page = roleService.selectRoleList(role, params, pageable);
 
     return getDataTable(page);
@@ -154,7 +158,7 @@ public class SysRoleController extends BaseController {
       @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
       @RequestParam(value = "pageSize", required = false, defaultValue = "20") Integer pageSize) {
 
-    Pageable pageable = PageRequest.of(Math.max(pageNum - 1, 0), pageSize);
+    Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
 
     Page<SysUserDTO> page = roleService.getUnAllocatedUsersByRoleId(roleId, filter, pageable);
     return TableDataInfo.success(page);
