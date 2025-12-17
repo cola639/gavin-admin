@@ -469,4 +469,8 @@ public class SysMenuService {
   private boolean hasChild(List<SysMenu> list, SysMenu t) {
     return getChildList(list, t).size() > 0;
   }
+
+  public List<Long> selectMenuByRoleId(Long roleId) {
+    return sysMenuRepository.findMenuIdsByRoleId(roleId);
+  }
 }

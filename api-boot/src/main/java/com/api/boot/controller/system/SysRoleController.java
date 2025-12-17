@@ -1,11 +1,11 @@
 package com.api.boot.controller.system;
 
 import com.api.common.controller.BaseController;
-import com.api.common.domain.AjaxResult;
-import com.api.common.domain.SysRole;
+import com.api.common.domain.*;
 import com.api.common.utils.pagination.TableDataInfo;
 import com.api.system.service.*;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -15,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,6 +33,7 @@ public class SysRoleController extends BaseController {
   //  private final SysPermissionService permissionService;
   private final SysUserService userService;
   private final SysDeptService deptService;
+  private final SysMenuService sysMenuService;
 
   /** Get role list */
   @GetMapping("/list")
@@ -69,7 +71,7 @@ public class SysRoleController extends BaseController {
   @PostMapping
   public AjaxResult add(@Validated @RequestBody SysRole role) {
 
-    // role.setCreateBy(getUsername());
+    role.setCreateBy(getUsername());
     return AjaxResult.success(roleService.createRole(role));
   }
 
@@ -79,22 +81,20 @@ public class SysRoleController extends BaseController {
   //  @Log(title = "Role Management", businessType = BusinessType.UPDATE)
   @PutMapping
   public AjaxResult edit(@Validated @RequestBody SysRole role) {
-    //      roleService.checkRoleAllowed(role);
-    //      roleService.checkRoleDataScope(role.getRoleId());
 
-    //      if (!roleService.checkRoleNameUnique(role)) {
-    //        return error("Failed to update role '" + role.getRoleName() + "': Role name already
-    //   exists");
-    //      }
-    //      if (!roleService.checkRoleKeyUnique(role)) {
-    //        return error("Failed to update role '" + role.getRoleName() + "': Role key already
-    //   exists");
-    //      }
-
-    //    role.setUpdateBy(getUsername());
+    role.setUpdateBy(getUsername());
     roleService.updateRole(role);
 
     return AjaxResult.success("Operation successful");
+  }
+
+  @GetMapping("/roleMenuTreeselect/{roleId}")
+  public AjaxResult roleMenuTreeselect(@PathVariable("roleId") Long roleId) {
+
+    AjaxResult ajax = AjaxResult.success();
+    ajax.put("checkedKeys", sysMenuService.selectMenuByRoleId(roleId));
+    ajax.put("menus", sysMenuService.selectMenuTreeByUserId(getUserId()));
+    return ajax;
   }
 
   @DeleteMapping("/{roleIds}")
@@ -128,31 +128,37 @@ public class SysRoleController extends BaseController {
   //  @PreAuthorize("@ss.hasPermi('system:role:remove')")
   //  @Log(title = "Role Management", businessType = BusinessType.DELETE)
 
-  //
-  //  /** Get all roles for dropdown selection */
-  //  @PreAuthorize("@ss.hasPermi('system:role:query')")
-  //  @GetMapping("/optionselect")
-  //  public AjaxResult optionselect() {
-  //    return success(roleService.selectRoleAll());
-  //  }
-  //
-  //  /** List users already assigned to roles */
-  //  @PreAuthorize("@ss.hasPermi('system:role:list')")
-  //  @GetMapping("/authUser/allocatedList")
-  //  public TableDataInfo allocatedList(SysUser user) {
-  //    startPage();
-  //    List<SysUser> list = userService.selectAllocatedList(user);
-  //    return getDataTable(list);
-  //  }
-  //
-  //  /** List users not yet assigned to roles */
-  //  @PreAuthorize("@ss.hasPermi('system:role:list')")
-  //  @GetMapping("/authUser/unallocatedList")
-  //  public TableDataInfo unallocatedList(SysUser user) {
-  //    startPage();
-  //    List<SysUser> list = userService.selectUnallocatedList(user);
-  //    return getDataTable(list);
-  //  }
+  /** Get all roles for dropdown selection */
+  @GetMapping("/optionselect")
+  public AjaxResult optionselect() {
+    return success(roleService.selectRoleAll());
+  }
+
+  /** Query users already assigned to the given roleId. */
+  @GetMapping("/authUser/allocatedList")
+  public TableDataInfo<SysUserDTO> allocatedList(
+      @RequestParam("roleId") Long roleId,
+      SysUserDTO filter,
+      @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
+      @RequestParam(value = "pageSize", required = false, defaultValue = "20") Integer pageSize) {
+
+    Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
+    Page<SysUserDTO> page = roleService.getAllocatedUsersByRoleId(roleId, filter, pageable);
+    return TableDataInfo.success(page);
+  }
+
+  @GetMapping("/authUser/unallocatedList")
+  public TableDataInfo<SysUserDTO> unallocatedList(
+      @RequestParam("roleId") @NotNull(message = "roleId can not be null") Long roleId,
+      SysUserDTO filter,
+      @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
+      @RequestParam(value = "pageSize", required = false, defaultValue = "20") Integer pageSize) {
+
+    Pageable pageable = PageRequest.of(Math.max(pageNum - 1, 0), pageSize);
+
+    Page<SysUserDTO> page = roleService.getUnAllocatedUsersByRoleId(roleId, filter, pageable);
+    return TableDataInfo.success(page);
+  }
   //
   //  /** Revoke user-role assignment */
   //  @PreAuthorize("@ss.hasPermi('system:role:edit')")

@@ -61,4 +61,8 @@ public interface SysRoleRepository
         where r.delFlag = '0'
     """)
   List<SysRole> selectRolePermissionByUserId(Long userId);
+
+  boolean existsByRoleName(String roleName);
+
+  boolean existsByRoleKey(String roleKey);
 }
