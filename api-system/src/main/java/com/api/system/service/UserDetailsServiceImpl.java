@@ -2,6 +2,9 @@ package com.api.system.service;
 
 import com.api.common.domain.LoginUser;
 import com.api.common.domain.SysUser;
+import com.api.common.utils.MessageUtils;
+import com.api.common.utils.StringUtils;
+import com.api.framework.exception.ServiceException;
 import com.api.framework.service.SysPasswordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,10 +45,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     SysUser user = userService.selectUserByUserName(username);
 
-    //    if (StringUtils.isNull(user)) {
-    //      log.warn("Login attempt with non-existent user: {}", username);
-    //      throw new ServiceException(MessageUtils.message("user.not.exists"));
-    //    }
+    if (StringUtils.isNull(user)) {
+      log.warn("Login attempt with non-existent user: {}", username);
+      throw new ServiceException(MessageUtils.message("user.not.exists"));
+    }
     //
     //    if (UserStatus.DELETED.getCode().equals(user.getDelFlag())) {
     //      log.warn("Login attempt with deleted user: {}", username);
