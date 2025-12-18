@@ -50,13 +50,14 @@ public class SysUserController extends BaseController {
   public TableDataInfo<SysUserDTO> list(
       @RequestBody(required = false) SysUserDTO user,
       @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
-      @RequestParam(value = "pageSize", required = false, defaultValue = "20") Integer pageSize) {
+      @RequestParam(value = "pageSize", required = false, defaultValue = "20") Integer pageSize,
+      @RequestParam(value = "unpaged", required = false, defaultValue = "false") boolean unpaged) {
 
     Map<String, Object> params = new HashMap<>();
     params.put("beginTime", null);
     params.put("endTime", null);
 
-    Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
+    Pageable pageable = unpaged ? Pageable.unpaged() : PageRequest.of(pageNum - 1, pageSize);
 
     // if request body is null, use empty criteria
     SysUserDTO criteria = (user != null) ? user : new SysUserDTO();
