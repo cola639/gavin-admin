@@ -82,4 +82,12 @@ public interface SysUserRepository
       @Param("applyScope") boolean applyScope,
       @Param("deptIds") List<Long> deptIds,
       Pageable pageable);
+
+  @Modifying
+  @Query("delete from SysUserRole ur where ur.roleId = :roleId and ur.userId in :userIds")
+  int deleteByRoleIdAndUserIdIn(@Param("roleId") Long roleId, @Param("userIds") List<Long> userIds);
+
+  @Query("select ur.userId from SysUserRole ur where ur.roleId = :roleId and ur.userId in :userIds")
+  List<Long> findExistingUserIds(
+      @Param("roleId") Long roleId, @Param("userIds") List<Long> userIds);
 }

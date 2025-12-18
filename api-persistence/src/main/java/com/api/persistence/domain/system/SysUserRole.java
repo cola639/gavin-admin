@@ -16,7 +16,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@IdClass(SysUserRole.SysUserRoleId.class) // 指定内部类作为复合主键
+@IdClass(SysUserRole.SysUserRoleId.class) // Composite primary key
 public class SysUserRole {
   /** Composite primary key for SysUserRole. */
   @Data

@@ -8,9 +8,11 @@ import com.api.common.enums.StatusEnum;
 import com.api.common.utils.jpa.SpecificationBuilder;
 
 import com.api.persistence.domain.system.SysRoleMenu;
+import com.api.persistence.domain.system.SysUserRole;
 import com.api.persistence.repository.system.SysRoleMenuRepository;
 import com.api.persistence.repository.system.SysRoleRepository;
 import com.api.persistence.repository.system.SysUserRepository;
+import com.api.persistence.repository.system.SysUserRoleRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -34,6 +37,8 @@ public class SysRoleService {
   private final SysRoleMenuRepository sysRoleMenuRepository;
 
   private final SysUserRepository sysUserRepository;
+
+  private final SysUserRoleRepository sysUserRoleRepository;
 
   /**
    * Get users allocated to a role (paged).
@@ -279,5 +284,63 @@ public class SysRoleService {
 
   public List<SysRole> selectRoleAll() {
     return roleRepository.findAll();
+  }
+
+  /** Batch revoke: delete rows from sys_user_role(roleId, userIds). */
+  @Transactional
+  public Long revokeUsersFromRole(Long roleId, List<Long> userIds) {
+    requireRole(roleId);
+    List<Long> ids = normalizeIds(userIds);
+    if (ids.isEmpty()) return 0L;
+
+    Long affected = sysUserRoleRepository.deleteByRoleIdAndUserIdIn(roleId, ids);
+    log.info("Batch revoke users from role. roleId={}, affected={}", roleId, affected);
+    return affected;
+  }
+
+  /** Batch assign: insert missing rows into sys_user_role(roleId, userIds). */
+  @Transactional
+  public int assignUsersToRole(Long roleId, List<Long> userIds) {
+    requireRole(roleId);
+    List<Long> ids = normalizeIds(userIds);
+    if (ids.isEmpty()) return 0;
+
+    // Optional: validate users exist (avoid FK/logic issues)
+    var foundUsers = sysUserRepository.findAllById(ids);
+    Set<Long> foundIds = foundUsers.stream().map(SysUser::getUserId).collect(Collectors.toSet());
+    List<Long> missingUsers = ids.stream().filter(id -> !foundIds.contains(id)).toList();
+    if (!missingUsers.isEmpty()) {
+      throw new ServiceException("User not found: " + missingUsers);
+    }
+
+    // Avoid duplicates
+    Set<Long> existing = new HashSet<>(sysUserRoleRepository.findExistingUserIds(roleId, ids));
+    List<SysUserRole> toInsert =
+        ids.stream()
+            .filter(id -> !existing.contains(id))
+            .map(uid -> new SysUserRole(uid, roleId))
+            .toList();
+
+    if (toInsert.isEmpty()) return 0;
+
+    sysUserRoleRepository.saveAll(toInsert);
+    log.info("Batch assign users to role. roleId={}, inserted={}", roleId, toInsert.size());
+    return toInsert.size();
+  }
+
+  private void requireRole(Long roleId) {
+    if (roleId == null) throw new ServiceException("roleId can not be null");
+    SysRole role =
+        roleRepository
+            .findById(roleId)
+            .orElseThrow(() -> new ServiceException("Role not found: " + roleId));
+    if (!Objects.equals(role.getDelFlag(), DelFlagEnum.NORMAL.getCode())) {
+      throw new ServiceException("Role is deleted: " + roleId);
+    }
+  }
+
+  private List<Long> normalizeIds(List<Long> ids) {
+    if (ids == null) return List.of();
+    return ids.stream().filter(Objects::nonNull).distinct().toList();
   }
 }

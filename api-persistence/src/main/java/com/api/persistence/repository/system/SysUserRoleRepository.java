@@ -1,51 +1,48 @@
 package com.api.persistence.repository.system;
 
 import com.api.persistence.domain.system.SysUserRole;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /** Repository for SysUserRole entity. Provides data access methods for user-role associations. */
 @Repository
 public interface SysUserRoleRepository
-    extends JpaRepository<SysUserRole, Long>, JpaSpecificationExecutor<SysUserRole> {
+    extends JpaRepository<SysUserRole, SysUserRole.SysUserRoleId>,
+        JpaSpecificationExecutor<SysUserRole> {
 
-  /**
-   * Delete user-role associations by userId.
-   *
-   * @param userId user id
-   */
-  void deleteByUserId(Long userId);
+  /** Delete user-role associations by userId. Returns affected rows. */
+  @Transactional
+  long deleteByUserId(Long userId);
 
-  /**
-   * Count user-role associations by roleId.
-   *
-   * @param roleId role id
-   * @return count of associations
-   */
+  /** Count associations by roleId. */
   long countByRoleId(Long roleId);
 
-  /**
-   * Delete associations by userId list.
-   *
-   * @param userIds list of user ids
-   */
-  void deleteByUserIdIn(List<Long> userIds);
+  /** Delete associations by a list of userIds. Returns affected rows. */
+  @Transactional
+  long deleteByUserIdIn(List<Long> userIds);
 
-  /**
-   * Delete association by userId and roleId.
-   *
-   * @param userId user id
-   * @param roleId role id
-   */
-  void deleteByUserIdAndRoleId(Long userId, Long roleId);
+  /** Delete association by (userId, roleId). Returns affected rows. */
+  @Transactional
+  long deleteByUserIdAndRoleId(Long userId, Long roleId);
 
-  /**
-   * Delete associations by roleId and userIds.
-   *
-   * @param roleId role id
-   * @param userIds list of user ids
-   */
-  void deleteByRoleIdAndUserIdIn(Long roleId, List<Long> userIds);
+  /** Delete associations by roleId + userIds. Returns affected rows. */
+  @Transactional
+  long deleteByRoleIdAndUserIdIn(Long roleId, List<Long> userIds);
+
+  /** For batch-assign: find which userIds already have this role (avoid duplicate insert). */
+  @Query(
+      """
+      select ur.userId
+      from SysUserRole ur
+      where ur.roleId = :roleId
+        and ur.userId in :userIds
+  """)
+  List<Long> findExistingUserIds(
+      @Param("roleId") Long roleId, @Param("userIds") List<Long> userIds);
 }
