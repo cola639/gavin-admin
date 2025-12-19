@@ -80,6 +80,11 @@ public class SysDeptService {
     deptRepository.deleteById(deptId);
   }
 
+  @Transactional
+  public void deleteDeptByIds(List<Long> deptIds) {
+    deptRepository.deleteAllByIdInBatch(deptIds);
+  }
+
   public boolean checkDeptNameUnique(String deptName, Long parentId) {
     return !deptRepository.existsByDeptNameAndParentId(deptName, parentId);
   }

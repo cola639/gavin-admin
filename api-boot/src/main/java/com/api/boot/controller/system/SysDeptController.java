@@ -18,7 +18,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * REST Controller for managing Department entities (sys_dept).
@@ -177,27 +179,25 @@ public class SysDeptController extends BaseController {
     return success("Department updated successfully.");
   }
 
-  /**
-   * Deletes a department by ID.
-   *
-   * @param deptId the department ID
-   * @return success or warning message
-   */
-  @DeleteMapping("/{deptId}")
-  public AjaxResult remove(@PathVariable Long deptId) {
-    log.warn("Attempting to delete department with id={}", deptId);
-
-    long childCount = deptService.countActiveChildren(deptId);
-    if (childCount > 0) {
-      log.warn(
-          "Cannot delete department id={}: {} active child departments exist", deptId, childCount);
-      return warn("Cannot delete department: active child departments exist.");
+  @DeleteMapping("/{deptIds}")
+  public AjaxResult remove(@PathVariable("deptIds") Long[] deptIds) {
+    if (deptIds == null || deptIds.length == 0) {
+      return AjaxResult.error("deptIds can not be empty");
     }
 
-    // TODO: Add user validation when UserService is integrated
-    deptService.deleteDept(deptId);
+    // de-dup + null-safe
+    List<Long> ids = Arrays.stream(deptIds).filter(Objects::nonNull).distinct().toList();
 
-    log.info("Department with id={} deleted successfully", deptId);
-    return success("Department deleted successfully.");
+    // same rule as your single delete: block if any has active children
+    for (Long deptId : ids) {
+      long childCount = deptService.countActiveChildren(deptId);
+      if (childCount > 0) {
+        return warn("Cannot delete department id=" + deptId + ": active child departments exist.");
+      }
+    }
+
+    deptService.deleteDeptByIds(ids);
+
+    return success("Departments deleted successfully.");
   }
 }
