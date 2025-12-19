@@ -2,7 +2,9 @@ package com.api.system.service;
 
 import com.api.common.domain.SysDept;
 import com.api.common.domain.TreeSelect;
+import com.api.common.enums.StatusEnum;
 import com.api.common.utils.StringUtils;
+import com.api.framework.exception.ServiceException;
 import com.api.persistence.repository.system.SysDeptRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -11,9 +13,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,6 +38,40 @@ public class SysDeptService {
 
   @Transactional
   public SysDept saveDept(SysDept dept) {
+
+    Long parentId = dept.getParentId();
+    if (parentId == null || parentId == 0L) {
+      // root node
+      dept.setParentId(0L);
+      dept.setAncestors("0");
+      return deptRepository.save(dept);
+    }
+
+    // load parent (Optional -> entity)
+    SysDept parent =
+        deptRepository
+            .findById(parentId)
+            .orElseThrow(() -> new ServiceException("Parent dept not found: " + parentId));
+
+    if (StatusEnum.DISABLED.getCode().equals(parent.getStatus())) {
+      throw new ServiceException("Department is disabled; cannot create a sub-department.");
+    }
+
+    // build ancestors: parent.ancestors + "," + parentId
+    String parentAncestors = parent.getAncestors();
+    String ancestors =
+        (parentAncestors == null || parentAncestors.isBlank())
+            ? String.valueOf(parentId)
+            : parentAncestors + "," + parentId;
+
+    dept.setAncestors(ancestors);
+
+    return deptRepository.save(dept);
+  }
+
+  @Transactional
+  public SysDept updateDept(SysDept dept) {
+
     return deptRepository.save(dept);
   }
 

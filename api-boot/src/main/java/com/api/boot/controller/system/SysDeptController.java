@@ -6,6 +6,7 @@ import com.api.common.domain.AjaxResult;
 import com.api.common.domain.SysDept;
 import com.api.common.domain.TreeSelect;
 import com.api.common.enums.LogBusinessType;
+import com.api.common.enums.StatusEnum;
 import com.api.common.utils.pagination.TableDataInfo;
 import com.api.framework.annotation.TrackEndpointStats;
 import com.api.system.service.SysDeptService;
@@ -130,6 +131,7 @@ public class SysDeptController extends BaseController {
     }
 
     dept.setCreateBy(getUsername());
+    dept.setDeptId(null);
     deptService.saveDept(dept);
 
     log.info(
@@ -147,6 +149,7 @@ public class SysDeptController extends BaseController {
   public AjaxResult edit(@Validated @RequestBody SysDept dept) {
     log.info("Updating department: {}", dept.getDeptName());
     Long deptId = dept.getDeptId();
+    if (deptId == null) return error("Dept ID can't be null");
 
     // Validation rules
     if (!deptService.checkDeptNameUnique(dept.getDeptName(), dept.getParentId())) {
@@ -160,14 +163,15 @@ public class SysDeptController extends BaseController {
       return error("Failed to update department: a department cannot be its own parent.");
     }
 
-    if ("1".equals(dept.getStatus()) && deptService.countActiveChildren(deptId) > 0) {
+    if (dept.getStatus().equals(StatusEnum.DISABLED.getCode())
+        && deptService.countActiveChildren(deptId) > 0) {
       log.warn(
           "Failed to disable department '{}': active child departments exist", dept.getDeptName());
       return error("Failed to disable department: it contains active child departments.");
     }
 
     dept.setUpdateBy(getUsername());
-    deptService.saveDept(dept);
+    deptService.updateDept(dept);
 
     log.info("Department '{}' updated successfully by '{}'", dept.getDeptName(), getUsername());
     return success("Department updated successfully.");

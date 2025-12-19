@@ -1,7 +1,7 @@
 package com.api.common.enums;
 
 public enum StatusEnum implements DictEnum<String> {
-  NORMAL("Enabled", "Enabled"),
+  ENABLED("Enabled", "Enabled"),
   DISABLED("Disabled", "Disabled");
 
   private final String code;
