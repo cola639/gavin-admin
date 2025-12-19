@@ -1,9 +1,11 @@
 package com.api.system.service;
 
 import com.api.common.domain.SysDept;
+import com.api.common.domain.SysDeptMapper;
 import com.api.common.domain.TreeSelect;
 import com.api.common.enums.StatusEnum;
 import com.api.common.utils.StringUtils;
+import com.api.common.utils.jpa.SpecificationBuilder;
 import com.api.framework.exception.ServiceException;
 import com.api.persistence.repository.system.SysDeptRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +24,28 @@ import java.util.stream.Collectors;
 public class SysDeptService {
 
   private final SysDeptRepository deptRepository;
+  private final SysDeptMapper deptMapper;
 
   public List<TreeSelect> selectDeptList(SysDept filter) {
-    List<SysDept> depts = deptRepository.findAll();
-    return buildDeptTreeSelect(depts);
+    SysDept criteria = (filter != null) ? filter : new SysDept();
+
+    // Build dynamic spec + sort using your builder
+    SpecificationBuilder<SysDept> b =
+        SpecificationBuilder.<SysDept>builder()
+            .eq("delFlag", criteria.getDelFlag()) // or DelFlagEnum.NORMAL.getCode()
+            .like("deptName", criteria.getDeptName())
+            .eq("parentId", criteria.getParentId())
+            .eq("status", criteria.getStatus())
+            .orderByAsc("parentId")
+            .orderByAsc("orderNum")
+            .orderByAsc("deptId");
+
+    // Apply spec + sort
+    List<SysDept> depts = deptRepository.findAll(b, b.buildSort());
+
+    // Build tree + map to TreeSelect
+    List<SysDept> tree = buildDeptTreeFast(depts);
+    return tree.stream().map(TreeSelect::new).toList();
   }
 
   public Page<SysDept> getAllDept(Pageable pageable) {
@@ -70,9 +90,55 @@ public class SysDeptService {
   }
 
   @Transactional
-  public SysDept updateDept(SysDept dept) {
+  public SysDept updateDept(SysDept req) {
+    if (req == null || req.getDeptId() == null) {
+      throw new ServiceException("deptId cannot be null");
+    }
 
-    return deptRepository.save(dept);
+    SysDept existing =
+        deptRepository
+            .findById(req.getDeptId())
+            .orElseThrow(() -> new ServiceException("Department not found: " + req.getDeptId()));
+
+    // parentId: if not provided, keep existing
+    Long newParentId = (req.getParentId() != null) ? req.getParentId() : existing.getParentId();
+    if (newParentId == null) newParentId = 0L;
+
+    // cannot set parent to itself
+    if (Objects.equals(existing.getDeptId(), newParentId)) {
+      throw new ServiceException("parentId cannot be the same as deptId");
+    }
+
+    // if parent changed, validate + rebuild ancestors
+    if (!Objects.equals(existing.getParentId(), newParentId)) {
+      if (newParentId == 0L) {
+        existing.setParentId(0L);
+        existing.setAncestors("0");
+      } else {
+        Long finalNewParentId = newParentId;
+        SysDept parent =
+            deptRepository
+                .findById(newParentId)
+                .orElseThrow(() -> new ServiceException("Parent dept not found: " + finalNewParentId));
+
+        if (StatusEnum.DISABLED.getCode().equals(parent.getStatus())) {
+          throw new ServiceException("Parent department is disabled; cannot move under it.");
+        }
+
+        // prevent cycle: parent cannot be a descendant of current dept
+        if (isDescendant(parent, existing.getDeptId())) {
+          throw new ServiceException("Invalid parentId: would create a cycle.");
+        }
+
+        existing.setParentId(newParentId);
+        existing.setAncestors(buildAncestors(parent));
+      }
+    }
+
+    // copy allowed fields (deptName/orderNum/leader/phone/email/status/...)
+    deptMapper.updateFromReq(req, existing);
+
+    return deptRepository.save(existing);
   }
 
   @Transactional
@@ -145,5 +211,59 @@ public class SysDeptService {
 
   private boolean hasChild(List<SysDept> list, SysDept t) {
     return getChildList(list, t).size() > 0;
+  }
+
+  private List<SysDept> buildDeptTreeFast(List<SysDept> depts) {
+    if (depts == null || depts.isEmpty()) {
+      return List.of();
+    }
+
+    // parentId -> children list
+    Map<Long, List<SysDept>> childrenMap =
+        depts.stream()
+            .collect(Collectors.groupingBy(d -> Optional.ofNullable(d.getParentId()).orElse(0L)));
+
+    // attach children
+    depts.forEach(
+        d -> d.setChildren(new ArrayList<>(childrenMap.getOrDefault(d.getDeptId(), List.of()))));
+
+    // root detection: parentId == 0 OR parent not included (important when filtering)
+    Set<Long> ids = depts.stream().map(SysDept::getDeptId).collect(Collectors.toSet());
+
+    List<SysDept> roots =
+        depts.stream()
+            .filter(
+                d -> {
+                  Long pid = d.getParentId();
+                  return pid == null || pid == 0L || !ids.contains(pid);
+                })
+            .toList();
+
+    return roots.isEmpty() ? depts : roots;
+  }
+
+  private String buildAncestors(SysDept parent) {
+    String parentAnc = parent.getAncestors();
+    Long parentId = parent.getDeptId();
+
+    if (parentAnc == null || parentAnc.isBlank()) {
+      return String.valueOf(parentId);
+    }
+    return parentAnc + "," + parentId;
+  }
+
+  /** true if parent is under current dept (cycle) */
+  private boolean isDescendant(SysDept parent, Long currentDeptId) {
+    if (parent == null || currentDeptId == null) return false;
+    String anc = parent.getAncestors();
+    if (anc == null || anc.isBlank()) return false;
+
+    // ancestors like "0,100,101"
+    for (String part : anc.split(",")) {
+      if (part.trim().equals(String.valueOf(currentDeptId))) {
+        return true;
+      }
+    }
+    return false;
   }
 }
