@@ -1,4 +1,4 @@
-package com.api.boot.controller.qurtz;
+package com.api.boot.controller.quartz;
 
 import com.api.common.constant.Constants;
 import com.api.common.controller.BaseController;
