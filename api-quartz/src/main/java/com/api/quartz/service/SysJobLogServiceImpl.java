@@ -29,6 +29,7 @@ public class SysJobLogServiceImpl implements ISysJobLogService {
 
     Specification<SysJobLog> spec =
         SpecificationBuilder.<SysJobLog>builder()
+            .eq("jobLogId", criteria.getJobLogId())
             .like("jobName", criteria.getJobName())
             .eq("jobGroup", criteria.getJobGroup())
             .like("invokeTarget", criteria.getInvokeTarget())
