@@ -62,7 +62,7 @@ public class SysJobController extends BaseController {
       log.warn("Job validation failed: {}", validationError);
       return error(validationError);
     }
-
+    job.setJobId(null);
     job.setCreateBy(getUsername());
     return toAjax(jobService.insertJob(job));
   }
@@ -72,6 +72,7 @@ public class SysJobController extends BaseController {
   @PutMapping
   public AjaxResult edit(@RequestBody SysJob job) throws SchedulerException, TaskException {
     log.info("Updating scheduled job: {}", job.getJobName());
+    if (job.getJobId() == null) return error("Job ID cannot be null.");
 
     String validationError = validateJob(job);
     if (validationError != null) {
