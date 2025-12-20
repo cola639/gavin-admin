@@ -1,55 +1,25 @@
 package com.api.quartz.service;
 
 import com.api.quartz.domain.SysJobLog;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
-/**
- * Service interface for managing Quartz job execution logs.
- *
- * @author Gavin
- */
 public interface ISysJobLogService {
 
-  /**
-   * Retrieves execution logs matching the given criteria.
-   *
-   * @param jobLog filter conditions
-   * @return list of job execution logs
-   */
+  Page<SysJobLog> selectJobLogPage(SysJobLog filter, Map<String, Object> params, Pageable pageable);
+
   List<SysJobLog> selectJobLogList(SysJobLog jobLog);
 
-  /**
-   * Retrieves a job log by ID.
-   *
-   * @param jobLogId log ID
-   * @return log details, or {@code null} if not found
-   */
   SysJobLog selectJobLogById(Long jobLogId);
 
-  /**
-   * Adds a new job execution log.
-   *
-   * @param jobLog log entry to add
-   */
   void addJobLog(SysJobLog jobLog);
 
-  /**
-   * Deletes multiple logs by ID array.
-   *
-   * @param logIds IDs of logs to delete
-   * @return number of deleted records
-   */
   int deleteJobLogByIds(Long[] logIds);
 
-  /**
-   * Deletes a single log by ID.
-   *
-   * @param jobId log ID
-   * @return delete result (1 = success)
-   */
   int deleteJobLogById(Long jobId);
 
-  /** Clears all job logs from the system. */
   void cleanJobLog();
 }

@@ -33,7 +33,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "sys_job_log")
-public class SysJobLog extends BaseEntity implements Serializable {
+public class SysJobLog extends BaseEntity {
 
   @Serial private static final long serialVersionUID = 1L;
 

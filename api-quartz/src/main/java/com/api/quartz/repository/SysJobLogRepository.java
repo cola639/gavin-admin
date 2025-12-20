@@ -2,7 +2,9 @@ package com.api.quartz.repository;
 
 import com.api.quartz.domain.SysJobLog;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SysJobLogRepository extends JpaRepository<SysJobLog, Long> {}
+public interface SysJobLogRepository
+    extends JpaRepository<SysJobLog, Long>, JpaSpecificationExecutor<SysJobLog> {}

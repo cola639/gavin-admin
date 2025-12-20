@@ -2,23 +2,21 @@ package com.api.boot.controller.quartz;
 
 import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
+import com.api.common.utils.pagination.TableDataInfo;
 import com.api.quartz.domain.SysJobLog;
+import com.api.quartz.service.ISysJobLogService;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import com.api.quartz.service.ISysJobLogService;
 
-/**
- * REST Controller for handling Quartz job execution logs.
- *
- * <p>Responsibilities: - Retrieve and export job logs. - View detailed log entries. - Delete or
- * clean job log history.
- *
- * <p>Design principles: - Uses @Slf4j for structured logging. - Uses constructor-based dependency
- * injection (@Autowired). - Returns standardized AjaxResult and TableDataInfo responses. - Fully
- * compatible with Java 17 and Spring Boot 3.5.
- */
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -27,52 +25,50 @@ public class SysJobLogController extends BaseController {
 
   private final ISysJobLogService jobLogService;
 
-  /**
-   * Retrieves a paginated list of scheduled job execution logs.
-   *
-   * @param sysJobLog filtering criteria for job logs
-   * @return paginated list of job logs
-   */
-  //  @PreAuthorize("@ss.hasPermi('monitor:job:list')")
-  //  @GetMapping("/list")
-  //  public TableDataInfo list(SysJobLog sysJobLog) {}
+  @PreAuthorize("@ss.hasPermi('monitor:job:list')")
+  @GetMapping("/list")
+  public TableDataInfo<SysJobLog> list(
+      SysJobLog filter,
+      @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+      @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize,
+      @RequestParam(value = "unpaged", defaultValue = "false") boolean unpaged,
+      @RequestParam(value = "beginTime", required = false)
+          @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+          Date beginTime,
+      @RequestParam(value = "endTime", required = false)
+          @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+          Date endTime) {
 
-  /**
-   * Retrieves details for a specific job log by ID.
-   *
-   * @param jobLogId the ID of the job log to retrieve
-   * @return job log details wrapped in AjaxResult
-   */
+    Map<String, Object> params = new HashMap<>();
+    params.put("beginTime", beginTime);
+    params.put("endTime", endTime);
+
+    Pageable pageable =
+        unpaged
+            ? Pageable.unpaged()
+            : PageRequest.of(pageNum - 1, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
+
+    Page<SysJobLog> page = jobLogService.selectJobLogPage(filter, params, pageable);
+    return TableDataInfo.success(page);
+  }
+
   @PreAuthorize("@ss.hasPermi('monitor:job:query')")
   @GetMapping("/{jobLogId}")
-  public AjaxResult getInfo(@PathVariable Long jobLogId) {
-    log.debug("Fetching details for job log ID: {}", jobLogId);
+  public AjaxResult getInfo(@PathVariable @NotNull Long jobLogId) {
     SysJobLog jobLog = jobLogService.selectJobLogById(jobLogId);
     return success(jobLog);
   }
 
-  /**
-   * Deletes one or more scheduled job logs by their IDs.
-   *
-   * @param jobLogIds array of job log IDs to delete
-   * @return result of deletion operation
-   */
   @PreAuthorize("@ss.hasPermi('monitor:job:remove')")
   @DeleteMapping("/{jobLogIds}")
   public AjaxResult remove(@PathVariable Long[] jobLogIds) {
-    log.warn("Deleting job logs with IDs: {}", (Object) jobLogIds);
     int deleted = jobLogService.deleteJobLogByIds(jobLogIds);
     return toAjax(deleted);
   }
 
-  /**
-   * Clears all scheduled job logs from the system.
-   *
-   * @return AjaxResult indicating success
-   */
+  @PreAuthorize("@ss.hasPermi('monitor:job:remove')")
   @DeleteMapping("/clean")
   public AjaxResult clean() {
-    log.warn("Cleaning all scheduled job logs...");
     jobLogService.cleanJobLog();
     return success("All job logs have been successfully cleaned.");
   }
