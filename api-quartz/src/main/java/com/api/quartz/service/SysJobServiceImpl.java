@@ -4,6 +4,7 @@ import com.api.common.exceptions.TaskException;
 import com.api.common.utils.jpa.SpecificationBuilder;
 import com.api.quartz.constant.ScheduleConstants;
 import com.api.quartz.domain.SysJob;
+import com.api.quartz.domain.SysJobMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ public class SysJobServiceImpl implements ISysJobService {
 
   private final Scheduler scheduler;
   private final SysJobRepository jobRepository;
+  private final SysJobMapper jobMapper;
 
   // Initialize the scheduler on application startup
   @PostConstruct
@@ -138,11 +140,28 @@ public class SysJobServiceImpl implements ISysJobService {
   @Override
   @Transactional
   public int updateJob(SysJob job) throws SchedulerException, TaskException {
-    SysJob existing = jobRepository.findById(job.getJobId()).orElse(null);
-    jobRepository.save(job);
-    if (existing != null) {
-      updateSchedulerJob(job, existing.getJobGroup());
+    if (job == null || job.getJobId() == null) {
+      throw new IllegalArgumentException("jobId can not be null");
     }
+
+    SysJob existing =
+        jobRepository
+            .findById(job.getJobId())
+            .orElseThrow(() -> new IllegalArgumentException("Job not found: " + job.getJobId()));
+
+    // Keep old group for deleting the old Quartz key if group changed
+    String oldGroup = existing.getJobGroup();
+
+    // ✅ merge only non-null fields from request -> existing
+    jobMapper.updateNonNull(job, existing);
+
+    // ✅ save merged entity (so nulls won't wipe DB fields)
+    SysJob saved = jobRepository.save(existing);
+
+    // ✅ update quartz schedule (delete old key, create new)
+    updateSchedulerJob(saved, oldGroup);
+
+    log.info("Updated job: id={}, name={}", saved.getJobId(), saved.getJobName());
     return 1;
   }
 
