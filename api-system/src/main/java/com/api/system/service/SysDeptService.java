@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class SysDeptService {
 
   private final SysDeptRepository deptRepository;
@@ -119,7 +118,8 @@ public class SysDeptService {
         SysDept parent =
             deptRepository
                 .findById(newParentId)
-                .orElseThrow(() -> new ServiceException("Parent dept not found: " + finalNewParentId));
+                .orElseThrow(
+                    () -> new ServiceException("Parent dept not found: " + finalNewParentId));
 
         if (StatusEnum.DISABLED.getCode().equals(parent.getStatus())) {
           throw new ServiceException("Parent department is disabled; cannot move under it.");
@@ -155,9 +155,20 @@ public class SysDeptService {
     return !deptRepository.existsByDeptNameAndParentId(deptName, parentId);
   }
 
-  public List<SysDept> findChildren(Long parentId) {
-    Specification<SysDept> spec = (root, query, cb) -> cb.equal(root.get("parentId"), parentId);
-    return deptRepository.findAll(spec);
+  /** Direct children dept IDs (only one level). */
+  public List<Long> selectChildDeptIds(Long parentId) {
+    if (parentId == null) {
+      return List.of();
+    }
+    return deptRepository.findChildDeptIds(parentId);
+  }
+
+  /** Self + all descendants dept IDs (tree scope). */
+  public List<Long> findDeptAndChildrenIds(Long parentId) {
+    if (parentId == null) {
+      return List.of();
+    }
+    return deptRepository.findDeptAndChildrenIds(parentId);
   }
 
   public long countActiveChildren(Long deptId) {
