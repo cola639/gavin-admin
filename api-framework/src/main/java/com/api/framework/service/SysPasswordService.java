@@ -9,6 +9,7 @@ import com.api.common.utils.SecurityUtils;
 import com.api.framework.exception.user.UserPasswordNotMatchException;
 import com.api.framework.exception.user.UserPasswordRetryLimitExceedException;
 import com.api.framework.security.context.AuthenticationContextHolder;
+import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -44,8 +45,6 @@ public class SysPasswordService {
     String username = usernamePasswordAuthenticationToken.getName();
     String password = usernamePasswordAuthenticationToken.getCredentials().toString();
 
-    matches(user, password);
-
     //        Integer retryCount = redisCache.getCacheObject(getCacheKey(username));
     //
     //        if (retryCount == null) {
@@ -64,6 +63,10 @@ public class SysPasswordService {
     //        } else {
     //          clearLoginRecordCache(username);
     //        }
+
+    if (!matches(user, password)) {
+      throw new ServiceException("Password is not match ");
+    }
   }
 
   public boolean matches(SysUser user, String rawPassword) {
