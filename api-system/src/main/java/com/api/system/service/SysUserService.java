@@ -7,7 +7,7 @@ import com.api.common.enums.DelFlagEnum;
 import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.jpa.SpecificationBuilder;
-import com.api.persistence.repository.system.SysUserRepository;
+import com.api.system.repository.SysUserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

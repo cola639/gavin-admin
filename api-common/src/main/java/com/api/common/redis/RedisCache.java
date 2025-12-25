@@ -1,28 +1,16 @@
 package com.api.common.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.BoundSetOperations;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.stereotype.Component;
-
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.stereotype.Component;
 
-/**
- * Utility class for common Redis operations.
- *
- * <p>Supports caching and retrieving: - Basic objects (String, Integer, custom objects, etc.) -
- * Lists, Sets, Maps, and Hash structures - Expiration and key management
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -30,56 +18,81 @@ import java.util.stream.Collectors;
 public class RedisCache {
 
   private final RedisTemplate<Object, Object> redisTemplate;
-  private final ObjectMapper objectMapper; // ✅ Inject Jackson mapper
+  private final ObjectMapper objectMapper;
 
-  /** Store any object as JSON */
+  /** Store any object. String will be stored as raw string; others stored as JSON. */
   public <T> void setCacheObject(final String key, final T value) {
+    if (key == null || key.isBlank()) {
+      return;
+    }
+    if (value == null) {
+      deleteObject(key);
+      return;
+    }
     try {
+      if (value instanceof String str) {
+        redisTemplate.opsForValue().set(key, str);
+        return;
+      }
       String json = objectMapper.writeValueAsString(value);
       redisTemplate.opsForValue().set(key, json);
     } catch (Exception e) {
-      log.error("❌ Failed to serialize object for Redis key: {}", key, e);
+      log.error("Failed to write Redis key={}", key, e);
     }
   }
 
-  /** Store any object as JSON with expiration */
+  /**
+   * Store any object with expiration. String will be stored as raw string; others stored as JSON.
+   */
   public <T> void setCacheObject(
       final String key, final T value, final Integer timeout, final TimeUnit unit) {
+    if (key == null || key.isBlank()) {
+      return;
+    }
+    if (value == null) {
+      deleteObject(key);
+      return;
+    }
     try {
+      if (value instanceof String str) {
+        redisTemplate.opsForValue().set(key, str, timeout, unit);
+        return;
+      }
       String json = objectMapper.writeValueAsString(value);
       redisTemplate.opsForValue().set(key, json, timeout, unit);
     } catch (Exception e) {
-      log.error("❌ Failed to serialize object for Redis key: {}", key, e);
+      log.error("Failed to write Redis key={} with TTL", key, e);
     }
   }
 
-  /** Set expiration time (in seconds by default). */
   public boolean expire(final String key, final long timeout) {
     return expire(key, timeout, TimeUnit.SECONDS);
   }
 
-  /** Set expiration time with a custom unit. */
   public boolean expire(final String key, final long timeout, final TimeUnit unit) {
-    return redisTemplate.expire(key, timeout, unit);
+    Boolean ok = redisTemplate.expire(key, timeout, unit);
+    return Boolean.TRUE.equals(ok);
   }
 
-  /** Get remaining expiration time of a key. */
   public long getExpire(final String key) {
-    return redisTemplate.getExpire(key);
+    Long ttl = redisTemplate.getExpire(key);
+    return ttl == null ? -1L : ttl;
   }
 
-  /** Check if a key exists. */
   public Boolean hasKey(final String key) {
     return redisTemplate.hasKey(key);
   }
 
-  /** Retrieve a cached basic object. */
+  /**
+   * Raw get: returns the stored value as-is. - For JSON stored entries: returns JSON string - For
+   * String entries: returns raw string
+   */
   public <T> T getCacheObject(final String key) {
     ValueOperations<String, T> operation = (ValueOperations) redisTemplate.opsForValue();
     return operation.get(key);
   }
 
-  /** Read JSON string from Redis and deserialize into an object */
+  /** Typed get: reads raw String or JSON String and converts to clazz. */
   public <T> T getCacheObject(final String key, Class<T> clazz) {
     try {
       ValueOperations<Object, Object> ops = redisTemplate.opsForValue();
@@ -88,67 +101,46 @@ public class RedisCache {
         return null;
       }
 
-      // If it's already stored as an object, just cast
       if (clazz.isInstance(value)) {
         return clazz.cast(value);
       }
 
-      // Otherwise, treat it as JSON and deserialize
-      String json = value.toString();
-      return objectMapper.readValue(json, clazz);
+      // If it was stored as raw string and caller expects String
+      if (clazz == String.class) {
+        return clazz.cast(value.toString());
+      }
+
+      // Otherwise treat it as JSON
+      return objectMapper.readValue(value.toString(), clazz);
     } catch (Exception e) {
-      log.error("❌ Failed to deserialize Redis key: {}", key, e);
+      log.error("Failed to deserialize Redis key={} to {}", key, clazz.getSimpleName(), e);
       return null;
     }
   }
 
-  /** Delete a single key. */
   public boolean deleteObject(final String key) {
     return Boolean.TRUE.equals(redisTemplate.delete(key));
   }
 
-  /** Delete multiple keys safely (Spring Data Redis 3.x). */
+  /** Delete multiple keys. Returns true if at least one key was deleted. */
   public boolean deleteObject(Collection<String> keys) {
-    if (keys == null || keys.isEmpty()) return false;
-    boolean result = Boolean.TRUE.equals(redisTemplate.delete(new ArrayList<>(keys)));
-    log.debug("🧹 Deleted {} keys from Redis", keys.size());
-    return result;
-  }
-
-  /** Cache a list of objects. */
-  public <T> long setCacheList(final String key, final List<T> dataList) {
-    Long count = redisTemplate.opsForList().rightPushAll(key, dataList);
-    return count == null ? 0 : count;
-  }
-
-  /** Retrieve a cached list. */
-  public <T> List<T> getCacheList(final String key) {
-    return (List<T>) redisTemplate.opsForList().range(key, 0, -1);
-  }
-
-  /** Cache a set of objects. */
-  public <T> BoundSetOperations<String, T> setCacheSet(final String key, final Set<T> dataSet) {
-    BoundSetOperations<String, T> setOperation =
-        (BoundSetOperations) redisTemplate.boundSetOps(key);
-    if (dataSet != null) {
-      dataSet.forEach(setOperation::add);
+    if (keys == null || keys.isEmpty()) {
+      return false;
     }
-    return setOperation;
+    Long deleted =
+        redisTemplate.delete(
+            new ArrayList<>(keys)); // returns count :contentReference[oaicite:2]{index=2}
+    long count = deleted == null ? 0L : deleted;
+    log.debug("Deleted {} keys from Redis", count);
+    return count > 0;
   }
 
-  /** Retrieve a cached set. */
-  public <T> Set<T> getCacheSet(final String key) {
-    return (Set<T>) redisTemplate.opsForSet().members(key);
-  }
-
-  /** Cache a map. */
   public <T> void setCacheMap(final String key, final Map<String, T> dataMap) {
     if (dataMap != null) {
       redisTemplate.opsForHash().putAll(key, dataMap);
     }
   }
 
-  /** Retrieve a cached map with type safety. */
   public <T> Map<String, T> getCacheMap(final String key) {
     Map<Object, Object> rawMap = redisTemplate.opsForHash().entries(key);
     Map<String, T> result = new HashMap<>();
@@ -156,28 +148,19 @@ public class RedisCache {
     return result;
   }
 
-  /** Put a value into a hash. */
   public <T> void setCacheMapValue(final String key, final String hKey, final T value) {
     redisTemplate.opsForHash().put(key, hKey, value);
   }
 
-  /** Retrieve a value from a hash. */
   public <T> T getCacheMapValue(final String key, final String hKey) {
     HashOperations<String, String, T> opsForHash = (HashOperations) redisTemplate.opsForHash();
     return opsForHash.get(key, hKey);
   }
 
-  /** Retrieve multiple values from a hash. */
-  public <T> List<T> getMultiCacheMapValue(final String key, final Collection<Object> hKeys) {
-    return (List<T>) redisTemplate.opsForHash().multiGet(key, hKeys);
-  }
-
-  /** Delete a value from a hash. */
   public boolean deleteCacheMapValue(final String key, final String hKey) {
     return redisTemplate.opsForHash().delete(key, hKey) > 0;
   }
 
-  /** Get all keys matching a pattern. */
   public Set<String> keys(final String pattern) {
     Set<Object> rawKeys = redisTemplate.keys(pattern);
     if (rawKeys == null) {

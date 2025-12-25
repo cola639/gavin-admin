@@ -1,26 +1,25 @@
 package com.api.common.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serial;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-/**
- * Represents an authenticated user within the system. Implements Spring Security's {@link
- * UserDetails} interface to integrate with the authentication framework.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class LoginUser implements UserDetails {
 
-  private static final long serialVersionUID = 1L;
+  @Serial private static final long serialVersionUID = 1L;
 
   /** Unique user ID */
   private Long userId;
@@ -55,6 +54,11 @@ public class LoginUser implements UserDetails {
   /** Associated system user details */
   private SysUser user;
 
+  private String loginType; // PASSWORD / GITHUB / GOOGLE / FACEBOOK
+
+  private String oauth2Provider; // github / google / facebook
+  private String oauth2UserId; // GitHub user id / Google user id / Facebook user id
+
   @Override
   @JsonIgnore
   public String getPassword() {
@@ -66,10 +70,6 @@ public class LoginUser implements UserDetails {
     return user != null ? user.getUserName() : null;
   }
 
-  /**
-   * Account validity checks. By default, these always return true. They can be customized for
-   * advanced security.
-   */
   @Override
   @JsonIgnore
   public boolean isAccountNonExpired() {
@@ -95,12 +95,18 @@ public class LoginUser implements UserDetails {
   }
 
   /**
-   * Converts user permissions into Spring Security authorities. Can be enhanced to map Set<String>
-   * → SimpleGrantedAuthority.
+   * ✅ IMPORTANT: never return null here. Convert permission strings into Spring Security
+   * authorities.
    */
   @Override
   @JsonIgnore
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return null; // TODO: Map permissions to authorities if needed
+    if (permissions == null || permissions.isEmpty()) {
+      return List.of();
+    }
+    return permissions.stream()
+        .filter(p -> p != null && !p.isBlank())
+        .map(SimpleGrantedAuthority::new)
+        .toList();
   }
 }

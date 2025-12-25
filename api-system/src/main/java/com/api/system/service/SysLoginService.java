@@ -5,7 +5,7 @@ import com.api.common.domain.SysUser;
 import com.api.common.redis.RedisCache;
 import com.api.framework.security.context.AuthenticationContextHolder;
 import com.api.framework.service.TokenService;
-import com.api.persistence.repository.system.SysUserRepository;
+import com.api.system.repository.SysUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,8 +13,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 /**
  * Service for handling login authentication and validation.
