@@ -3,10 +3,9 @@ package com.api.config;
 import com.api.framework.security.filter.JwtAuthenticationTokenFilter;
 import com.api.framework.security.handle.AuthenticationEntryPointImpl;
 import com.api.framework.security.handle.LogoutSuccessHandlerImpl;
+import com.api.system.security.OAuth2LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,10 +16,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.filter.CorsFilter;
@@ -35,13 +31,13 @@ public class SecurityConfig {
   private static final String[] PUBLIC_ENDPOINTS = {"/auth/**", "/error"};
 
   private static final String[] SWAGGER_ENDPOINTS = {
-          "/swagger-ui.html",
-          "/swagger-ui/**",
-          "/swagger-resources/**",
-          "/webjars/**",
-          "/*/api-docs",
-          "/v3/api-docs/**",
-          "/druid/**"
+    "/swagger-ui.html",
+    "/swagger-ui/**",
+    "/swagger-resources/**",
+    "/webjars/**",
+    "/*/api-docs",
+    "/v3/api-docs/**",
+    "/druid/**"
   };
 
   private final AuthenticationEntryPointImpl unauthorizedHandler;
@@ -49,89 +45,78 @@ public class SecurityConfig {
   private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
   private final CorsFilter corsFilter;
 
-  /**
-   * Use ObjectProvider to avoid circular dependency:
-   * SecurityConfig -> oauth2LoginSuccessHandler -> PasswordEncoder -> SecurityConfig
-   */
-  @Qualifier("oauth2LoginSuccessHandler")
-  private final ObjectProvider<AuthenticationSuccessHandler> oauth2LoginSuccessHandlerProvider;
+  // ✅ Inject by concrete type to avoid ambiguity if you have other handlers
+  private final OAuth2LoginSuccessHandler oauth2LoginSuccessHandler;
 
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+      throws Exception {
     return configuration.getAuthenticationManager();
   }
 
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
-
   /**
-   * (1) OAuth2 filter chain:
-   * - MUST allow session (OAuth2 "state" uses it)
-   * - Only matches OAuth2 endpoints
+   * (1) OAuth2 filter chain: - MUST allow session (OAuth2 "state" uses it) - Only matches OAuth2
+   * endpoints
    */
   @Bean
   @Order(1)
   public SecurityFilterChain oauth2SecurityFilterChain(HttpSecurity http) throws Exception {
-    AuthenticationSuccessHandler successHandler = oauth2LoginSuccessHandlerProvider.getIfAvailable();
-    if (successHandler == null) {
-      throw new IllegalStateException(
-              "Bean 'oauth2LoginSuccessHandler' not found. Ensure @Component(\"oauth2LoginSuccessHandler\") is present."
-      );
-    }
-
-    return http
-            .securityMatcher("/oauth2/**", "/login/oauth2/**")
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-            .addFilterBefore(corsFilter, LogoutFilter.class)
-            .oauth2Login(oauth2 -> oauth2
+    return http.securityMatcher("/oauth2/**", "/login/oauth2/**")
+        .csrf(csrf -> csrf.disable())
+        .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+        .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+        .addFilterBefore(corsFilter, LogoutFilter.class)
+        .oauth2Login(
+            oauth2 ->
+                oauth2
                     .authorizationEndpoint(a -> a.baseUri("/oauth2/authorization"))
                     .redirectionEndpoint(r -> r.baseUri("/login/oauth2/code/*"))
-                    .successHandler(successHandler)
-            )
-            .build();
+                    .successHandler(oauth2LoginSuccessHandler))
+        .build();
   }
 
-  /**
-   * (2) API filter chain:
-   * - Stateless JWT for everything else
-   */
+  /** (2) API filter chain: - Stateless JWT for everything else */
   @Bean
   @Order(2)
   public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
-    return http
-            .csrf(csrf -> csrf.disable())
-            .headers(headers -> headers
+    return http.csrf(csrf -> csrf.disable())
+        .headers(
+            headers ->
+                headers
                     .frameOptions(frame -> frame.sameOrigin())
                     .cacheControl(cache -> cache.disable()))
-            .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
+        .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
+        .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(
+            auth ->
+                auth
                     // preflight
-                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    .requestMatchers(HttpMethod.OPTIONS, "/**")
+                    .permitAll()
 
-                    // static resources (Boot common locations) - avoids invalid /**.js patterns
-                    .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                    // static resources
+                    .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+                    .permitAll()
 
                     // public endpoints
-                    .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS).permitAll()
-                    .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                    .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS)
+                    .permitAll()
+                    .requestMatchers(PUBLIC_ENDPOINTS)
+                    .permitAll()
 
                     // swagger
-                    .requestMatchers(SWAGGER_ENDPOINTS).permitAll()
+                    .requestMatchers(SWAGGER_ENDPOINTS)
+                    .permitAll()
 
                     // everything else => JWT
-                    .anyRequest().authenticated()
-            )
-            .logout(logout -> logout.logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler))
-            .addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(corsFilter, JwtAuthenticationTokenFilter.class)
-            .addFilterBefore(corsFilter, LogoutFilter.class)
-            .formLogin(form -> form.disable())
-            .httpBasic(basic -> basic.disable())
-            .build();
+                    .anyRequest()
+                    .authenticated())
+        .logout(logout -> logout.logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler))
+        .addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(corsFilter, JwtAuthenticationTokenFilter.class)
+        .addFilterBefore(corsFilter, LogoutFilter.class)
+        .formLogin(form -> form.disable())
+        .httpBasic(basic -> basic.disable())
+        .build();
   }
 }

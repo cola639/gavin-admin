@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
-@Component("oauth2LoginSuccessHandler")
+@Component // ✅ no explicit bean name
 @RequiredArgsConstructor
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
@@ -185,7 +185,6 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     // Random password so DB constraints pass; user won't use it.
     u.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
 
-    // If these fields exist & are NOT NULL in DB, set them here:
     u.setDelFlag(DelFlagEnum.NORMAL.getCode());
     u.setStatus(StatusEnum.ENABLED.getCode());
     u.setAvatar("");
