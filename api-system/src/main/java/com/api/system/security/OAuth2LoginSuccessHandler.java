@@ -53,7 +53,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
   private final LoginTicketService loginTicketService;
   private final ObjectMapper objectMapper;
 
-  @Value("${app.oauth2.frontend-redirect}")
+  @Value("${spring.security.oauth2.client.registration.github.frontend-redirect}")
   private String frontendRedirect;
 
   @Override

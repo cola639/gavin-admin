@@ -14,9 +14,6 @@ app:
   profile: ./uploads
   addressEnabled: false
   captchaType: math
-  oauth2:
-    frontend-redirect: "http://127.0.0.1:5500/github.html"
-
 
 token:
   header: Authorization
@@ -104,6 +101,7 @@ spring:
             client-secret: 31503edcef8ca5861ecc44583b66889c025ff6f9
             scope: user:email
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            frontend-redirect: "http://localhost:5173/oauth/callback"
         provider:
           github:
             authorization-uri: https://github.com/login/oauth/authorize
