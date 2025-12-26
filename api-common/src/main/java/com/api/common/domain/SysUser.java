@@ -92,6 +92,12 @@ public class SysUser extends BaseEntity {
   @Column(name = "pwd_update_date")
   private Date pwdUpdateDate;
 
+  @Column(name = "user_type", length = 64)
+  private String userType;
+
+  @Column(name = "oauth_id", length = 64)
+  private String oauthId;
+
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "dept_id", insertable = false, updatable = false)
   private SysDept dept;

@@ -4,6 +4,7 @@ import com.api.common.constant.CacheConstants;
 import com.api.common.constant.UserConstants;
 import com.api.common.domain.RegisterBody;
 import com.api.common.domain.SysUser;
+import com.api.common.enums.DelFlagEnum;
 import com.api.common.redis.RedisCache;
 import com.api.common.utils.DateEnhancedUtil;
 import com.api.common.utils.SecurityUtils;
@@ -29,7 +30,6 @@ public class SysRegisterService {
 
   private final SysUserRepository userRepository;
   private final RedisCache redisCache;
-  private final String DEL_FLAG = "0";
 
   /**
    * Handles user registration.
@@ -54,7 +54,7 @@ public class SysRegisterService {
     }
 
     // Set user details
-    sysUser.setDelFlag(DEL_FLAG);
+    sysUser.setDelFlag(DelFlagEnum.NORMAL.getCode());
     sysUser.setNickName(email);
     sysUser.setPwdUpdateDate(DateEnhancedUtil.getNowDate());
     sysUser.setPassword(SecurityUtils.encryptPassword(password));
