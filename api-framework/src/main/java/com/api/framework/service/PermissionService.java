@@ -1,138 +1,192 @@
 package com.api.framework.service;
 
-import java.util.Set;
-
 import com.api.common.constant.Constants;
 import com.api.common.domain.LoginUser;
 import com.api.common.domain.SysRole;
 import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.framework.security.context.PermissionContextHolder;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 /**
- * RuoYi首创 自定义权限实现，ss取自SpringSecurity首字母
+ * Custom permission evaluation service.
  *
- * @author ruoyi
+ * <p>This bean is usually referenced in SpEL like: {@code @ss.hasPermi('system:user:list')}.
  */
 @Service("ss")
 public class PermissionService {
+
   /**
-   * 验证用户是否具备某权限
+   * Check whether the current user has a specific permission.
    *
-   * @param permission 权限字符串
-   * @return 用户是否具备某权限
+   * @param permission permission string (e.g. "system:user:list")
+   * @return true if the user has the permission, otherwise false
    */
   public boolean hasPermi(String permission) {
     if (StringUtils.isEmpty(permission)) {
       return false;
     }
+
     LoginUser loginUser = SecurityUtils.getLoginUser();
-    if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getPermissions())) {
+    if (loginUser == null || CollectionUtils.isEmpty(loginUser.getPermissions())) {
       return false;
     }
+
     PermissionContextHolder.setContext(permission);
-    return hasPermissions(loginUser.getPermissions(), permission);
+    return hasPermission(loginUser.getPermissions(), permission);
   }
 
   /**
-   * 验证用户是否不具备某权限，与 hasPermi逻辑相反
+   * Check whether the current user does NOT have a specific permission.
    *
-   * @param permission 权限字符串
-   * @return 用户是否不具备某权限
+   * @param permission permission string
+   * @return true if the user lacks the permission, otherwise false
    */
   public boolean lacksPermi(String permission) {
-    return hasPermi(permission) != true;
+    return !hasPermi(permission);
   }
 
   /**
-   * 验证用户是否具有以下任意一个权限
+   * Check whether the current user has ANY permission in the provided list.
    *
-   * @param permissions 以 PERMISSION_DELIMETER 为分隔符的权限列表
-   * @return 用户是否具有以下任意一个权限
+   * <p>The input supports multiple permissions separated by {@link Constants#PERMISSION_DELIMITER}.
+   *
+   * @param permissions permission list string (e.g. "a:b:c,a:b:d")
+   * @return true if the user has any of them, otherwise false
    */
   public boolean hasAnyPermi(String permissions) {
     if (StringUtils.isEmpty(permissions)) {
       return false;
     }
+
     LoginUser loginUser = SecurityUtils.getLoginUser();
-    if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getPermissions())) {
+    if (loginUser == null || CollectionUtils.isEmpty(loginUser.getPermissions())) {
       return false;
     }
+
     PermissionContextHolder.setContext(permissions);
-    Set<String> authorities = loginUser.getPermissions();
-    for (String permission : permissions.split(Constants.PERMISSION_DELIMITER)) {
-      if (permission != null && hasPermissions(authorities, permission)) {
+
+    Set<String> userPermissions = loginUser.getPermissions();
+    String[] items = permissions.split(Constants.PERMISSION_DELIMITER);
+
+    for (String item : items) {
+      if (item == null) {
+        continue;
+      }
+      String perm = StringUtils.trim(item);
+      if (StringUtils.isEmpty(perm)) {
+        continue;
+      }
+      if (hasPermission(userPermissions, perm)) {
         return true;
       }
     }
+
     return false;
   }
 
   /**
-   * 判断用户是否拥有某个角色
+   * Check whether the current user has a specific role.
    *
-   * @param role 角色字符串
-   * @return 用户是否具备某角色
+   * <p>SUPER_ADMIN always passes.
+   *
+   * @param role role key (e.g. "admin")
+   * @return true if the user has the role, otherwise false
    */
   public boolean hasRole(String role) {
     if (StringUtils.isEmpty(role)) {
       return false;
     }
+
     LoginUser loginUser = SecurityUtils.getLoginUser();
-    if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getUser().getRoles())) {
+    if (loginUser == null
+        || loginUser.getUser() == null
+        || CollectionUtils.isEmpty(loginUser.getUser().getRoles())) {
       return false;
     }
+
+    String expectedRole = StringUtils.trim(role);
+
     for (SysRole sysRole : loginUser.getUser().getRoles()) {
+      if (sysRole == null) {
+        continue;
+      }
       String roleKey = sysRole.getRoleKey();
-      if (Constants.SUPER_ADMIN.equals(roleKey) || roleKey.equals(StringUtils.trim(role))) {
+      if (StringUtils.isEmpty(roleKey)) {
+        continue;
+      }
+      if (Constants.SUPER_ADMIN.equals(roleKey) || roleKey.equals(expectedRole)) {
         return true;
       }
     }
+
     return false;
   }
 
   /**
-   * 验证用户是否不具备某角色，与 isRole逻辑相反。
+   * Check whether the current user does NOT have a specific role.
    *
-   * @param role 角色名称
-   * @return 用户是否不具备某角色
+   * @param role role key
+   * @return true if the user lacks the role, otherwise false
    */
   public boolean lacksRole(String role) {
-    return hasRole(role) != true;
+    return !hasRole(role);
   }
 
   /**
-   * 验证用户是否具有以下任意一个角I
+   * Check whether the current user has ANY role in the provided list.
    *
-   * @param roles 以 ROLE_NAMES_DELIMITER 为分隔符的角色列表
-   * @return 用户是否具有以下任意一个角色
+   * <p>The input supports multiple roles separated by {@link Constants#ROLE_DELIMITER}.
+   *
+   * @param roles role list string (e.g. "admin,common")
+   * @return true if the user has any of them, otherwise false
    */
   public boolean hasAnyRoles(String roles) {
     if (StringUtils.isEmpty(roles)) {
       return false;
     }
+
     LoginUser loginUser = SecurityUtils.getLoginUser();
-    if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getUser().getRoles())) {
+    if (loginUser == null
+        || loginUser.getUser() == null
+        || CollectionUtils.isEmpty(loginUser.getUser().getRoles())) {
       return false;
     }
-    for (String role : roles.split(Constants.ROLE_DELIMITER)) {
+
+    String[] items = roles.split(Constants.ROLE_DELIMITER);
+
+    for (String item : items) {
+      if (item == null) {
+        continue;
+      }
+      String role = StringUtils.trim(item);
+      if (StringUtils.isEmpty(role)) {
+        continue;
+      }
       if (hasRole(role)) {
         return true;
       }
     }
+
     return false;
   }
 
   /**
-   * 判断是否包含权限
+   * Low-level permission match.
    *
-   * @param permissions 权限列表
-   * @param permission 权限字符串
-   * @return 用户是否具备某权限
+   * <p>Rules:
+   *
+   * <ul>
+   *   <li>If the user has {@link Constants#ALL_PERMISSION}, then allow.
+   *   <li>Otherwise, match the trimmed permission string.
+   * </ul>
    */
-  private boolean hasPermissions(Set<String> permissions, String permission) {
+  private boolean hasPermission(Set<String> permissions, String permission) {
+    if (CollectionUtils.isEmpty(permissions) || StringUtils.isEmpty(permission)) {
+      return false;
+    }
     return permissions.contains(Constants.ALL_PERMISSION)
         || permissions.contains(StringUtils.trim(permission));
   }
