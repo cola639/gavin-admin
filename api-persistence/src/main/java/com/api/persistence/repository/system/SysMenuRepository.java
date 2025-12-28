@@ -23,7 +23,7 @@ public interface SysMenuRepository
            SELECT DISTINCT m.perms
            FROM SysMenu m
            JOIN SysRoleMenu rm ON m.menuId = rm.menuId
-           WHERE m.status = '0' AND rm.roleId = :roleId
+           WHERE m.status = 'Enabled' AND rm.roleId = :roleId
            """)
   List<String> findPermsByRoleId(@Param("roleId") Long roleId);
 
@@ -34,12 +34,12 @@ public interface SysMenuRepository
   /** Get all menus visible in the system */
   @Query(
       """
-        SELECT DISTINCT m
-        FROM SysMenu m
-        WHERE m.menuType IN ('Menu', 'Module')
-          AND m.status = 'Normal'
-        ORDER BY m.parentId, m.orderNum
-    """)
+                  SELECT DISTINCT m
+                  FROM SysMenu m
+                  WHERE m.menuType IN ('Menu', 'Module')
+                    AND m.status = 'Enabled'
+                  ORDER BY m.parentId, m.orderNum
+              """)
   List<SysMenu> findAllVisibleMenus();
 
   /** Get menus accessible by a specific user */
@@ -52,7 +52,7 @@ public interface SysMenuRepository
               JOIN SysRole r ON r.roleId = ur.roleId
               WHERE ur.userId = :userId
                 AND r.status = 'Enabled'
-                AND m.status = 'Normal'
+                AND m.status = 'Enabled'
               ORDER BY m.parentId, m.orderNum
               """)
   List<SysMenu> findMenusByUserId(@Param("userId") Long userId);

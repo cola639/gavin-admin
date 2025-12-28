@@ -3,6 +3,7 @@ package com.api.system.service;
 import com.api.common.constant.UserConstants;
 import com.api.common.domain.SysRole;
 import com.api.common.domain.SysUser;
+import com.api.common.enums.StatusEnum;
 import com.api.common.utils.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,7 +68,7 @@ public class SysPermissionService {
     List<SysRole> roles = user.getRoles();
     if (!CollectionUtils.isEmpty(roles)) {
       for (SysRole role : roles) {
-        if (StringUtils.equals(role.getStatus(), UserConstants.ROLE_NORMAL) && !role.isAdmin()) {
+        if (StringUtils.equals(role.getStatus(), StatusEnum.ENABLED.getCode()) && !role.isAdmin()) {
           Set<String> rolePerms = menuService.selectMenuPermsByRoleId(role.getRoleId());
           role.setPermissions(rolePerms); // assign perms back to role for reference
           perms.addAll(rolePerms);

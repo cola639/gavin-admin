@@ -1,6 +1,7 @@
 package com.api.system.service;
 
 import com.api.common.domain.SysRole;
+import com.api.common.domain.SysRoleMapper;
 import com.api.common.domain.SysUser;
 import com.api.common.domain.SysUserDTO;
 import com.api.common.enums.DelFlagEnum;
@@ -39,6 +40,8 @@ public class SysRoleService {
   private final SysUserRepository sysUserRepository;
 
   private final SysUserRoleRepository sysUserRoleRepository;
+
+  private final SysRoleMapper sysRoleMapper;
 
   /**
    * Get users allocated to a role (paged).
@@ -107,35 +110,54 @@ public class SysRoleService {
 
   /** Update role */
   @Transactional
-  public SysRole updateRole(SysRole role) {
-    if (role.getRoleId() == null) throw new ServiceException("Role ID cannot be null");
-    if (!roleRepository.existsById(role.getRoleId()))
-      throw new ServiceException("Role does not exist");
-
-    // 1. Uniqueness checks
-    if (roleRepository.existsByRoleName(role.getRoleName())) {
-      throw new ServiceException("Role name '" + role.getRoleName() + "' already exists");
-    }
-    if (roleRepository.existsByRoleKey(role.getRoleKey())) {
-      throw new ServiceException("Role key '" + role.getRoleKey() + "' already exists");
+  public SysRole updateRole(SysRole req) {
+    if (req == null || req.getRoleId() == null) {
+      throw new ServiceException("Role ID cannot be null");
     }
 
-    // 2. Update role info
-    SysRole updatedRole = roleRepository.save(role);
+    SysRole entity =
+        roleRepository
+            .findById(req.getRoleId())
+            .orElseThrow(() -> new ServiceException("Role does not exist"));
 
-    // 3. Delete old role-menu associations
-    sysRoleMenuRepository.deleteByRoleId(role.getRoleId());
+    // 1) Update role base fields (ignore nulls, protect system fields)
+    sysRoleMapper.updateFromReq(req, entity);
 
-    // 4. Re-insert role-menu associations
-    if (role.getMenuIds() != null && role.getMenuIds().length > 0) {
-      List<SysRoleMenu> roleMenus =
-          Arrays.stream(role.getMenuIds())
-              .map(menuId -> new SysRoleMenu(role.getRoleId(), menuId))
-              .toList();
-      sysRoleMenuRepository.saveAll(roleMenus);
+    SysRole saved = roleRepository.save(entity);
+    log.info("Role updated: roleId={}, roleKey={}", saved.getRoleId(), saved.getRoleKey());
+
+    // 2) Update role-menu relations (bridge table)
+    updateRoleMenus(saved.getRoleId(), req.getMenuIds());
+
+    return saved;
+  }
+
+  private void updateRoleMenus(Long roleId, Long[] menuIds) {
+    // Always clear old relations first (simple + consistent)
+    sysRoleMenuRepository.deleteByRoleId(roleId);
+    log.info("Deleted old role-menu relations: roleId={}", roleId);
+
+    if (menuIds == null || menuIds.length == 0) {
+      log.info("No menuIds provided, role-menu relations cleared: roleId={}", roleId);
+      return;
     }
 
-    return updatedRole;
+    // Deduplicate + filter nulls
+    Set<Long> distinctMenuIds =
+        Arrays.stream(menuIds)
+            .filter(Objects::nonNull)
+            .collect(java.util.stream.Collectors.toSet());
+
+    if (distinctMenuIds.isEmpty()) {
+      log.info("menuIds were all null/empty, role-menu relations cleared: roleId={}", roleId);
+      return;
+    }
+
+    List<SysRoleMenu> roleMenus =
+        distinctMenuIds.stream().map(menuId -> new SysRoleMenu(roleId, menuId)).toList();
+
+    sysRoleMenuRepository.saveAll(roleMenus);
+    log.info("Inserted role-menu relations: roleId={}, count={}", roleId, roleMenus.size());
   }
 
   /** Soft delete role */
