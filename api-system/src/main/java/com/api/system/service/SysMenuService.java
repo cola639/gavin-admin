@@ -3,6 +3,8 @@ package com.api.system.service;
 import com.api.common.constant.Constants;
 import com.api.common.constant.UserConstants;
 import com.api.common.domain.SysMenuDTOs;
+import com.api.common.enums.BooleanEnum;
+import com.api.common.enums.StatusEnum;
 import com.api.common.utils.SecurityUtils;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.jpa.SpecificationBuilder;
@@ -239,7 +241,7 @@ public class SysMenuService {
     List<RouterVo> routers = new LinkedList<RouterVo>();
     for (SysMenu menu : menus) {
       RouterVo router = new RouterVo();
-      router.setHidden("1".equals(menu.getVisible()));
+      router.setHidden(BooleanEnum.FALSE.getValue().equals(menu.getVisible()));
       router.setName(getRouteName(menu));
       router.setPath(getRouterPath(menu));
       router.setComponent(getComponent(menu));
@@ -248,7 +250,7 @@ public class SysMenuService {
           new MetaVo(
               menu.getMenuName(),
               menu.getIcon(),
-              StringUtils.equals("1", menu.getIsCache()),
+              StringUtils.equals(BooleanEnum.TRUE.getValue(), menu.getIsCache()),
               menu.getPath()));
       List<SysMenu> cMenus = menu.getChildren();
       if (StringUtils.isNotEmpty(cMenus) && UserConstants.TYPE_DIR.equals(menu.getMenuType())) {
@@ -268,7 +270,7 @@ public class SysMenuService {
             new MetaVo(
                 menu.getMenuName(),
                 menu.getIcon(),
-                StringUtils.equals("1", menu.getIsCache()),
+                StringUtils.equals(BooleanEnum.TRUE.getValue(), menu.getIsCache()),
                 menu.getPath()));
         children.setQuery(menu.getQuery());
         childrenList.add(children);

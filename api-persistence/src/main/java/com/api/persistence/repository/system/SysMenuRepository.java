@@ -45,16 +45,16 @@ public interface SysMenuRepository
   /** Get menus accessible by a specific user */
   @Query(
       """
-    SELECT DISTINCT m
-    FROM SysUserRole ur
-    JOIN SysRoleMenu rm ON ur.roleId = rm.roleId
-    JOIN SysMenu m ON rm.menuId = m.menuId
-    JOIN SysRole r ON r.roleId = ur.roleId
-    WHERE ur.userId = :userId
-      AND r.status = 'Normal'
-      AND m.status = 'Normal'
-    ORDER BY m.parentId, m.orderNum
-    """)
+              SELECT DISTINCT m
+              FROM SysUserRole ur
+              JOIN SysRoleMenu rm ON ur.roleId = rm.roleId
+              JOIN SysMenu m ON rm.menuId = m.menuId
+              JOIN SysRole r ON r.roleId = ur.roleId
+              WHERE ur.userId = :userId
+                AND r.status = 'Enabled'
+                AND m.status = 'Normal'
+              ORDER BY m.parentId, m.orderNum
+              """)
   List<SysMenu> findMenusByUserId(@Param("userId") Long userId);
 
   @Query(

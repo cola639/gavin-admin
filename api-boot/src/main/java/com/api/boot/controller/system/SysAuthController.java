@@ -15,7 +15,6 @@ import com.api.system.service.SysPermissionService;
 import com.api.framework.service.TokenService;
 
 import com.api.system.service.SysMenuService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +34,7 @@ import java.util.Set;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
-public class SysLoginController {
+public class SysAuthController {
 
   private final SysLoginService loginService;
   private final SysMenuService menuService;
@@ -96,35 +95,7 @@ public class SysLoginController {
   public AjaxResult getRouters() {
     Long userId = SecurityUtils.getUserId();
     List<SysMenu> menus = menuService.selectMenuTreeByUserId(userId);
-    return AjaxResult.success(menuService.buildMenus(menus));
-  }
-
-  @PostMapping("/testToken")
-  public AjaxResult testLogin() {
-
-    AjaxResult ajax = AjaxResult.success();
-    return ajax;
-  }
-
-  @GetMapping("/write")
-  public AjaxResult testWrite() throws JsonProcessingException {
-    SysUser user = userRepository.findById(1L).orElseThrow();
-
-    // Serialize to JSON string
-    String json = objectMapper.writeValueAsString(user);
-    redisCache.setCacheObject("user:" + user.getUserId(), user);
-    return AjaxResult.success();
-  }
-
-  @GetMapping("/read")
-  public AjaxResult testGet() throws JsonProcessingException {
-    // Get JSON string from Redis
-    //    String json = redisCache.getCacheObject("user:1");
-
-    // Deserialize back into SysUser
-    //    SysUser user = objectMapper.readValue(json, SysUser.class);
-
-    return AjaxResult.success();
+    return AjaxResult.success(menus);
   }
 
   /**

@@ -116,7 +116,7 @@ public class SysUserController extends BaseController {
     }
 
     List<SysRole> roles = sysRoleService.selectRoleAll();
-    ajax.put("roles", roles.stream().filter(r -> !r.isAdmin()).collect(Collectors.toList()));
+    ajax.put("roles", roles);
     ajax.put("posts", sysPostService.getAllPosts());
     return ajax;
   }
