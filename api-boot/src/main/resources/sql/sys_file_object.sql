@@ -1,0 +1,23 @@
+create table sys_file_object (
+  file_id          bigint primary key auto_increment,
+  bucket           varchar(128) not null,
+  object_key       varchar(512) not null,
+  original_name    varchar(255) not null,
+  content_type     varchar(128),
+  size_bytes       bigint not null,
+  etag             varchar(128),
+  owner_user_id    bigint not null,
+  category         varchar(32) not null,
+  visibility       varchar(16) not null,
+  biz_type         varchar(64),
+  biz_id           varchar(64),
+  deleted          tinyint not null default 0,
+  created_at       datetime not null,
+  updated_at       datetime not null,
+  deleted_at       datetime,
+  deleted_by       bigint,
+  unique key uk_bucket_object (bucket, object_key),
+  index idx_owner (owner_user_id),
+  index idx_biz (biz_type, biz_id),
+  index idx_deleted (deleted)
+);
