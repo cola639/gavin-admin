@@ -1,7 +1,7 @@
 package com.api.boot.controller.common;
 
 import com.api.common.domain.AjaxResult;
-import com.api.common.domain.file.*;
+import com.api.common.domain.upload.*;
 import com.api.system.service.upload.FileAppService;
 import jakarta.validation.Valid;
 import java.net.URI;

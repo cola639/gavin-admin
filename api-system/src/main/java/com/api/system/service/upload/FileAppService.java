@@ -1,8 +1,8 @@
 package com.api.system.service.upload;
 
-import com.api.common.domain.file.*;
-import com.api.common.enums.FileCategoryEnum;
-import com.api.common.enums.FileVisibilityEnum;
+import com.api.common.domain.upload.*;
+import com.api.common.enums.upload.FileCategoryEnum;
+import com.api.common.enums.upload.FileVisibilityEnum;
 import com.api.framework.config.upload.MinioProperties;
 import com.api.system.repository.SysFileObjectRepository;
 import java.io.InputStream;

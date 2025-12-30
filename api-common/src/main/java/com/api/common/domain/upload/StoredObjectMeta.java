@@ -1,4 +1,4 @@
-package com.api.common.domain.file;
+package com.api.common.domain.upload;
 
 import lombok.Builder;
 import lombok.Value;

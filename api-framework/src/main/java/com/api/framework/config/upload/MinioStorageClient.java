@@ -7,10 +7,10 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import com.api.common.domain.file.ListedObject;
-import com.api.common.domain.file.PresignedUrl;
-import com.api.common.domain.file.StorageClient;
-import com.api.common.domain.file.StoredObjectMeta;
+import com.api.common.domain.upload.ListedObject;
+import com.api.common.domain.upload.PresignedUrl;
+import com.api.common.domain.upload.StorageClient;
+import com.api.common.domain.upload.StoredObjectMeta;
 import io.minio.*;
 import io.minio.http.Method;
 import io.minio.messages.Item;

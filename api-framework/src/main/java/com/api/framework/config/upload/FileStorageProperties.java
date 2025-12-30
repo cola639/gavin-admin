@@ -1,6 +1,6 @@
 package com.api.framework.config.upload;
 
-import com.api.common.enums.FileVisibilityEnum;
+import com.api.common.enums.upload.FileVisibilityEnum;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

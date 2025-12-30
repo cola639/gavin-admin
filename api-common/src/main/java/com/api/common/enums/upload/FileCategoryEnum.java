@@ -1,4 +1,4 @@
-package com.api.common.enums;
+package com.api.common.enums.upload;
 
 import java.util.Arrays;
 

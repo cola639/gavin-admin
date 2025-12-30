@@ -1,6 +1,6 @@
 package com.api.system.service.upload;
 
-import com.api.common.domain.file.SysFileObject;
+import com.api.common.domain.upload.SysFileObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

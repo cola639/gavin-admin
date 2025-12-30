@@ -1,4 +1,4 @@
-package com.api.common.domain.file;
+package com.api.common.domain.upload;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.api.common.domain.file;
+package com.api.common.domain.upload;
 
 import java.time.Instant;
 import lombok.Builder;

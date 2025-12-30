@@ -3,8 +3,8 @@ package com.api.system.service.upload;
 import java.util.List;
 import java.util.Locale;
 
-import com.api.common.enums.FileCategoryEnum;
-import com.api.common.enums.FileVisibilityEnum;
+import com.api.common.enums.upload.FileCategoryEnum;
+import com.api.common.enums.upload.FileVisibilityEnum;
 import com.api.framework.config.upload.FileStorageProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;

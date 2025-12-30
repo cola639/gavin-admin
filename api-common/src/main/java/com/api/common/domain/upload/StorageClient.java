@@ -1,4 +1,4 @@
-package com.api.common.domain.file;
+package com.api.common.domain.upload;
 
 import java.io.InputStream;
 import java.time.Duration;

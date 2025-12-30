@@ -1,6 +1,6 @@
-package com.api.common.domain.file;
+package com.api.common.domain.upload;
 
-import com.api.common.enums.FileVisibilityEnum;
+import com.api.common.enums.upload.FileVisibilityEnum;
 import lombok.Builder;
 import lombok.Value;
 
