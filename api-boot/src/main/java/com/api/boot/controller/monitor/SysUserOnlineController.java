@@ -7,11 +7,10 @@ import com.api.common.domain.LoginUser;
 import com.api.common.redis.RedisCache;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.pagination.TableDataInfo;
-import com.api.persistence.domain.system.SysUserOnline;
-import com.api.persistence.domain.system.SysUserOnlineService;
+import com.api.system.domain.system.SysUserOnline;
+import com.api.system.domain.system.SysUserOnlineService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;

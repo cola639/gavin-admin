@@ -1,7 +1,7 @@
 package com.api.system.service;
 
-import com.api.persistence.domain.system.SysOperLog;
-import com.api.persistence.repository.system.SysOperLogRepository;
+import com.api.system.domain.system.SysOperLog;
+import com.api.system.repository.SysOperLogRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

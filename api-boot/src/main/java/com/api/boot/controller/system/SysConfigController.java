@@ -1,7 +1,7 @@
 import com.api.common.annotation.Log;
 import com.api.common.domain.AjaxResult;
 import com.api.common.enums.LogBusinessType;
-import com.api.persistence.domain.system.SysConfig;
+import com.api.system.domain.system.SysConfig;
 import com.api.system.service.SysConfigService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -5,7 +5,46 @@ server:
       max: 50        # max concurrent requests (2–3x DB pool size)
       min-spare: 10  # keep a few threads ready
 
+minio:
+  endpoint: http://142.171.47.231:9000
+  accessKey: ipaeo0kFgGuW6dG4SIXu
+  secretKey: yrr6DmWAyhMBTDFXXEZGuDPoD74CrwNUgmAouO3N
+  bucket: admin
+  defaultPresignExpirySeconds: 3600
+  publicBaseUrl: ""
 
+file:
+  categories:
+    AVATAR:
+      prefix: avatar
+      maxSizeMb: 5
+      allowedExtensions: [ "png", "jpg", "jpeg", "gif", "bmp" ]
+      visibility: PUBLIC
+      presignExpirySeconds: 3600
+    EXCEL:
+      prefix: excel
+      maxSizeMb: 20
+      allowedExtensions: [ "xls", "xlsx" ]
+      visibility: PRIVATE
+      presignExpirySeconds: 1800
+    DOC:
+      prefix: doc
+      maxSizeMb: 20
+      allowedExtensions: [ "pdf", "doc", "docx" ]
+      visibility: PRIVATE
+      presignExpirySeconds: 1800
+    FILE:
+      prefix: file
+      maxSizeMb: 50
+      allowedExtensions: [ "png", "jpg", "jpeg", "pdf", "zip", "rar", "txt" ]
+      visibility: PRIVATE
+      presignExpirySeconds: 1800
+    ATTACHMENT:
+      prefix: attachment
+      maxSizeMb: 50
+      allowedExtensions: [ "png", "jpg", "jpeg", "pdf", "zip", "rar", "txt" ]
+      visibility: PRIVATE
+      presignExpirySeconds: 1800
 
 app:
   name: Gavin
@@ -108,3 +147,7 @@ spring:
             token-uri: https://github.com/login/oauth/access_token
             user-info-uri: https://api.github.com/user
             user-name-attribute: id
+
+
+
+

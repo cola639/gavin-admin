@@ -1,9 +1,9 @@
 package com.api.system.service;
 
 import com.api.common.domain.SysUser;
-import com.api.persistence.domain.system.SysPost;
-import com.api.persistence.domain.system.SysUserPost;
-import com.api.persistence.repository.system.SysUserPostRepository;
+import com.api.system.domain.system.SysPost;
+import com.api.system.domain.system.SysUserPost;
+import com.api.system.repository.SysUserPostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

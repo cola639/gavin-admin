@@ -24,7 +24,6 @@
         <module>api-system</module>
         <module>api-common</module>
         <module>api-quartz</module>
-        <module>api-persistence</module>
     </modules>
 
     <properties>
@@ -41,6 +40,7 @@
         <redis.version>3.5.5</redis.version>
         <mysql.version>8.3.0</mysql.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <minio.version>8.5.12</minio.version>
     </properties>
 
     <!-- Dependency management -->
@@ -144,6 +144,13 @@
                 <artifactId>mapstruct-processor</artifactId>
                 <version>${mapstruct.version}</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <!-- MinIO -->
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

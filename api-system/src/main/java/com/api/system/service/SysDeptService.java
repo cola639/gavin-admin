@@ -7,11 +7,10 @@ import com.api.common.enums.StatusEnum;
 import com.api.common.utils.StringUtils;
 import com.api.common.utils.jpa.SpecificationBuilder;
 import com.api.framework.exception.ServiceException;
-import com.api.persistence.repository.system.SysDeptRepository;
+import com.api.system.repository.SysDeptRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

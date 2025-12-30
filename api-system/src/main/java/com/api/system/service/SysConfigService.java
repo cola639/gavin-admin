@@ -5,16 +5,14 @@ import com.api.common.constant.UserConstants;
 import com.api.common.redis.RedisCache;
 import com.api.common.utils.StringUtils;
 import com.api.framework.exception.ServiceException;
-import com.api.persistence.domain.system.SysConfig;
-import com.api.persistence.repository.system.SysConfigRepository;
+import com.api.system.domain.system.SysConfig;
+import com.api.system.repository.SysConfigRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.List;
 

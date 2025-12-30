@@ -4,7 +4,7 @@ import com.api.common.controller.BaseController;
 import com.api.common.domain.AjaxResult;
 import com.api.common.domain.SysMenu;
 import com.api.common.domain.SysMenuDTOs;
-import com.api.persistence.repository.system.SysRoleMenuRepository;
+import com.api.system.repository.SysRoleMenuRepository;
 import com.api.system.service.SysMenuService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

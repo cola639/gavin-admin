@@ -1,6 +1,6 @@
 package com.api.system.manager;
 
-import com.api.persistence.domain.system.SysOperLog;
+import com.api.system.domain.system.SysOperLog;
 import com.api.system.service.SysOperLogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
