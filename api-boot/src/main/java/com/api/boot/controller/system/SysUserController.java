@@ -19,6 +19,7 @@ import com.api.system.service.*;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -44,6 +45,9 @@ public class SysUserController extends BaseController {
   private final SysRoleService sysRoleService;
 
   private final SysPostService sysPostService;
+
+  @Value("app.default.password")
+  private String defaultPassword;
 
   /** Get paginated list of users (with fixed params for now). */
   @PostMapping("/list")
@@ -124,6 +128,7 @@ public class SysUserController extends BaseController {
   @PostMapping
   @RepeatSubmit(message = "Please don’t submit twice quickly.")
   public AjaxResult add(@Validated @RequestBody SysUser user) {
+    user.setPassword(defaultPassword);
     user.setCreateBy(getUsername());
     user.setDelFlag(DelFlagEnum.NORMAL.getCode());
     userService.createUser(user);

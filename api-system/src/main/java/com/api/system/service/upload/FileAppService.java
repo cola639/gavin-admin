@@ -72,6 +72,7 @@ public class FileAppService {
                   .deleted(false)
                   .build());
 
+      //      String url = buildUrl(saved, Duration.ofSeconds(policy.getPresignExpirySeconds()));
       String url = buildUrl(saved, Duration.ofSeconds(policy.getPresignExpirySeconds()));
 
       log.info(
@@ -362,6 +363,7 @@ public class FileAppService {
 
   private String buildUrl(SysFileObject obj, Duration expiry) {
     if (obj.getVisibility() == FileVisibilityEnum.PUBLIC) {
+      // 1) Prefer a stable public base URL (reverse proxy / CDN / minio public gateway)
       String publicBase = minioProperties.getPublicBaseUrl();
       if (publicBase != null && !publicBase.isBlank()) {
         String base =
@@ -370,7 +372,17 @@ public class FileAppService {
                 : publicBase;
         return base + "/" + obj.getBucket() + "/" + obj.getObjectKey();
       }
+
+      // 2) Fallback: build a direct MinIO static URL (works only if bucket/object is public)
+      String endpoint = minioProperties.getEndpoint();
+      String base =
+          endpoint.endsWith("/") ? endpoint.substring(0, endpoint.length() - 1) : endpoint;
+
+      // MinIO path-style URL: {endpoint}/{bucket}/{objectKey}
+      return base + "/" + obj.getBucket() + "/" + obj.getObjectKey();
     }
+
+    // PRIVATE files still require presigned URL
     return storageClient.presignGet(obj.getBucket(), obj.getObjectKey(), expiry).getUrl();
   }
 

@@ -6,7 +6,7 @@ server:
       min-spare: 10  # keep a few threads ready
 
 minio:
-  endpoint: http://142.171.47.231:9000
+  endpoint: https://minio.gogogavin.uk
   accessKey: ipaeo0kFgGuW6dG4SIXu
   secretKey: yrr6DmWAyhMBTDFXXEZGuDPoD74CrwNUgmAouO3N
   bucket: admin
@@ -53,6 +53,9 @@ app:
   profile: ./uploads
   addressEnabled: false
   captchaType: math
+  default:
+    avatar: https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png
+    password: admin123
 
 token:
   header: Authorization
