@@ -1,6 +1,7 @@
 package com.api.system.service.upload;
 
 import com.api.common.domain.upload.SysFileObject;
+import com.api.common.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class FilePermissionService {
 
   private boolean isAdmin(Long userId) {
     try {
-      return com.api.common.utils.SecurityUtils.isAdmin(userId);
+      return SecurityUtils.isAdmin(userId);
     } catch (Throwable ignore) {
       return false;
     }
