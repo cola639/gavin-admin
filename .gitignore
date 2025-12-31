@@ -36,3 +36,4 @@ build/
 
 ### Temp
 /uploads
+.env.example
