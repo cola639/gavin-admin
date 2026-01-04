@@ -37,4 +37,6 @@ build/
 ### Temp
 /uploads
 .env.example
+# git rm --cached api-boot/src/main/resources/application.yml
+# git commit -m "chore: stop tracking application.yml"
 **/application*.yml
