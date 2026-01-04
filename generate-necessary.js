@@ -32,21 +32,16 @@ const path = require("path");
  *   [".java", ".yml"]        -> matches Java + YAML
  *   ["application.yml"]      -> matches only files ending with "application.yml"
  */
-const necessaryTypeArr = [
-    "pom.xml",
-    // ".java",
+const necessaryTypeArr = ["pom.xml", // ".java",
 ];
 
 /** =======================
  * REQUIRED INPUTS (edit me)
  * ======================= */
-const necessaryFolderArr = [
-    "api-common/",
-    // "api-framework/src/main/java/com/api/framework/config/email",
+const necessaryFolderArr = ["api-common/", // "api-framework/src/main/java/com/api/framework/config/email",
 ];
 
-const necessaryFilesArr = [
-    // "pom.xml",
+const necessaryFilesArr = [// "pom.xml",
     // "api-boot/pom.xml",
 ];
 
@@ -55,25 +50,9 @@ const necessaryFilesArr = [
  * OPTIONAL SKIPS (by NAME)
  * Skips apply INSIDE the scanned subtrees
  * ======================= */
-const skipFolderArr = [
-    ".idea",
-    ".mvn",
-    "doc",
-    "httpRequests",
-    "node_modules",
-    ".git",
-    "dist",
-    "target",
-];
+const skipFolderArr = [".idea", ".mvn", "doc", "httpRequests", "node_modules", ".git", "dist", "target",];
 
-const skipFilesArr = [
-    "project-core.md",
-    "generate-necessary.js",
-    "generate.js",
-    "project-tree.md",
-    "project-content.md",
-    ".DS_Store",
-];
+const skipFilesArr = ["project-core.md", "generate-necessary.js", "generate.js", "project-tree.md", "project-content.md", ".DS_Store", ".env.example",];
 
 // Output file name (only one file)
 const OUT_FILE = "project-core.md";
@@ -89,11 +68,7 @@ async function main() {
     const hasNecessaryTypes = Array.isArray(necessaryTypeArr) && necessaryTypeArr.length > 0;
 
     if (!hasNecessaryFolders && !hasNecessaryFiles && !hasNecessaryTypes) {
-        const lines = [
-            `${rootName}/`,
-            "",
-            "  [necessaryFolderArr, necessaryFilesArr, and necessaryTypeArr are empty. Please add paths/types in generate-necessary.js]",
-        ];
+        const lines = [`${rootName}/`, "", "  [necessaryFolderArr, necessaryFilesArr, and necessaryTypeArr are empty. Please add paths/types in generate-necessary.js]",];
         await writeOutput(path.join(root, OUT_FILE), lines.join("\n") + "\n");
         console.log("Generated:");
         console.log("  " + path.join(root, OUT_FILE));

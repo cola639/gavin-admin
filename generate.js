@@ -15,33 +15,16 @@ const path = require("path");
  * - .idea
  * - generate.js
  */
-const skipFolderArr = [
-    ".idea",
-    ".mvn",
-    "doc",
-    "httpRequests", // (already inside .idea, but keep it in case you move it elsewhere)
-    "node_modules",
-    ".git",
-    "dist",
-    "target",
-];
+const skipFolderArr = [".idea", ".mvn", "doc", "httpRequests", // (already inside .idea, but keep it in case you move it elsewhere)
+    "node_modules", ".git", "dist", "target",];
 
-const skipFilesArr = [
-    ".DS_Store",
-    "generate.js",
-    "project-tree.md",
-    "project-content.md",
-];
-
+const skipFilesArr = ["project-core.md", "generate-necessary.js", "generate.js", "project-tree.md", "project-content.md", ".DS_Store", ".env.example",];
 // Content safety limits
 const MAX_BYTES = 200_000; // skip content if file > 200KB
 const MAX_LINES = 2000;    // truncate after N lines
 
 // Simple text extensions heuristic
-const TEXT_EXT = new Set([
-    ".txt", ".md", ".yml", ".yaml", ".properties", ".json", ".xml", ".html", ".htm",
-    ".css", ".js", ".ts", ".java", ".kt", ".go", ".py", ".sh", ".conf", ".ini", ".sql",
-]);
+const TEXT_EXT = new Set([".txt", ".md", ".yml", ".yaml", ".properties", ".json", ".xml", ".html", ".htm", ".css", ".js", ".ts", ".java", ".kt", ".go", ".py", ".sh", ".conf", ".ini", ".sql",]);
 
 async function main() {
     // Always generate for the CURRENT directory
