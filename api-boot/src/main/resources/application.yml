@@ -6,10 +6,10 @@ server:
       min-spare: 10  # keep a few threads ready
 
 minio:
-  endpoint: https://minio.gogogavin.uk
-  accessKey: ipaeo0kFgGuW6dG4SIXu
-  secretKey: yrr6DmWAyhMBTDFXXEZGuDPoD74CrwNUgmAouO3N
-  bucket: admin
+  endpoint:
+  accessKey:
+  secretKey:
+  bucket:
   defaultPresignExpirySeconds: 3600
   publicBaseUrl: ""
 
@@ -56,6 +56,22 @@ app:
   default:
     avatar: https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png
     password: admin123
+
+  email:
+    provider: ses
+    from: "no-reply@gogogavin.uk"
+    maxBatchSize: 100
+    maxRetries: 4
+    snapshotEnabled: false
+    templateRoot: "templates/email"
+
+    ses:
+      region: ""
+      accessKey: ""
+      secretKey: ""
+      configurationSet: ""
+
+
 
 token:
   header: Authorization

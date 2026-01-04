@@ -37,3 +37,7 @@ build/
 ### Temp
 /uploads
 .env.example
+/project-content.md
+/project-tree.md
+/project-core.md
+/project-*.md

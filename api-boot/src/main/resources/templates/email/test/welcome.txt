@@ -1,0 +1,9 @@
+Welcome, [[${userName}]]!
+
+This is a test email template used to validate layout and behavior (TEXT).
+
+Open: [[${actionUrl}]]
+
+Support: [[${supportEmail}]]
+
+© [[${copyrightYear}]] [[${appName}]]

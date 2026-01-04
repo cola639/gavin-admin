@@ -41,6 +41,10 @@
         <mysql.version>8.3.0</mysql.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <minio.version>8.5.12</minio.version>
+        <!-- AWS SDK v2 (SESv2/auth/regions etc.) -->
+        <aws.sdk.version>2.39.6</aws.sdk.version>
+
+
     </properties>
 
     <!-- Dependency management -->
@@ -152,6 +156,17 @@
                 <artifactId>minio</artifactId>
                 <version>${minio.version}</version>
             </dependency>
+
+            <!-- ✅ Import AWS SDK v2 BOM (manages sesv2/auth/regions versions) -->
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${aws.sdk.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+
         </dependencies>
     </dependencyManagement>
 

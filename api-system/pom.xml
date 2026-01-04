@@ -13,12 +13,6 @@
 
 
     <dependencies>
-        <dependency>
-            <groupId>com.gavin</groupId>
-            <artifactId>api-persistence</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
 
         <dependency>
             <groupId>com.gavin</groupId>
@@ -38,6 +32,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.gavin</groupId>
+            <artifactId>api-framework</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
 
 

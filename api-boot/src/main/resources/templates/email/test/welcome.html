@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome</title>
+</head>
+<body style="margin:0;padding:0;background:#f6f7fb;font-family:Arial,Helvetica,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f7fb;padding:24px 0;">
+  <tr>
+    <td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;">
+        <tr>
+          <td style="padding:20px 24px;background:#111827;color:#fff;">
+            <div style="font-size:16px;font-weight:700;" th:text="${appName}">App</div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px;">
+            <h2 style="margin:0 0 12px 0;color:#111827;">Welcome, <span th:text="${userName}">User</span>!</h2>
+            <p style="margin:0 0 16px 0;color:#374151;line-height:1.6;">
+              This is a test email template used to validate layout and behavior (HTML).
+            </p>
+
+            <a th:href="${actionUrl}"
+               style="display:inline-block;padding:12px 16px;border-radius:8px;background:#2563eb;color:#fff;text-decoration:none;">
+              Open Welcome Page
+            </a>
+
+            <p style="margin:20px 0 0 0;color:#6b7280;font-size:12px;">
+              If you have questions, contact <span th:text="${supportEmail}">support@example.com</span>.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:16px 24px;background:#f9fafb;color:#6b7280;font-size:12px;">
+            © <span th:text="${copyrightYear}">2025</span> <span th:text="${appName}">App</span>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>
