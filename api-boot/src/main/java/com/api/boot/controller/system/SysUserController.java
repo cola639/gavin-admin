@@ -46,7 +46,7 @@ public class SysUserController extends BaseController {
 
   private final SysPostService sysPostService;
 
-  @Value("app.default.password")
+  @Value("${app.default.password:admin123}")
   private String defaultPassword;
 
   /** Get paginated list of users (with fixed params for now). */
