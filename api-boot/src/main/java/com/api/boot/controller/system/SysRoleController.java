@@ -73,7 +73,7 @@ public class SysRoleController extends BaseController {
 
     AjaxResult ajax = AjaxResult.success();
     ajax.put("checkedKeys", sysMenuService.selectMenuByRoleId(roleId));
-    ajax.put("menus", sysMenuService.selectMenuTreeByUserId(getUserId()));
+    ajax.put("menus", sysMenuService.selectMenuTreeByRoleId(roleId));
     return ajax;
   }
 

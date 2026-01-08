@@ -207,11 +207,19 @@ public class SysMenuService {
    * @param userId user id
    * @return menu tree for the user
    */
-  public List<SysMenu> selectMenuTreeByUserId(Long userId) {
+  public List<SysMenu> selectMenuTreeByUserId(Long roleId) {
+    Long userId = SecurityUtils.getUserId();
+
     List<SysMenu> menus =
         SecurityUtils.isAdmin(userId)
             ? sysMenuRepository.findAllVisibleMenus()
-            : sysMenuRepository.findMenusByUserId(userId);
+            : sysMenuRepository.findMenusByRoleId(roleId);
+
+    return getChildPerms(menus, 0L);
+  }
+
+  public List<SysMenu> selectMenuTreeByRoleId(Long roleId) {
+    List<SysMenu> menus = sysMenuRepository.findMenusByRoleId(roleId);
 
     return getChildPerms(menus, 0L);
   }
