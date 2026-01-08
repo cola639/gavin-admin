@@ -93,8 +93,7 @@ public class SysAuthController {
   /** Get routers endpoint. */
   @GetMapping("getRouters")
   public AjaxResult getRouters() {
-    Long userId = SecurityUtils.getUserId();
-    List<SysMenu> menus = menuService.selectMenuTreeByUserId(userId);
+    List<SysMenu> menus = menuService.selectMenuTreeByUserId();
     return AjaxResult.success(menus);
   }
 
