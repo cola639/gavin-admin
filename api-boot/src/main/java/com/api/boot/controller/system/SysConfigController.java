@@ -1,3 +1,5 @@
+package com.api.boot.controller.system;
+
 import com.api.common.annotation.Log;
 import com.api.common.domain.AjaxResult;
 import com.api.common.enums.LogBusinessType;

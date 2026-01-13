@@ -1,5 +1,5 @@
-# Use openjdk:8-jre-alpine as the base image
-FROM openjdk:8-jre-alpine
+# Use Java 17 runtime (matches pom.xml java.version=17)
+FROM eclipse-temurin:17-jre-alpine
 
 # Build arguments (provided by Jenkinsfile when building the image)
 ARG PROFILE
