@@ -26,8 +26,8 @@ pipeline {
         // Spring profile / build arg (used by Dockerfile + app config)
         PROFILE = 'prod'
 
-        // Mvn version
-        NODE_IMAGE   = "maven:3-alpine"
+        // Mvn version (>= 3.6.3 required by maven-clean-plugin 3.4.1)
+        NODE_IMAGE   = "maven:3.9.9-eclipse-temurin-17"
 
         // Http port: the port your Spring Boot app listens on (matches application-prod.yml)
         HOST_HTTP_PORT = '8989'
