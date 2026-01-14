@@ -2,9 +2,9 @@
 FROM eclipse-temurin:17-jre-alpine
 
 # Build arguments (provided by Jenkinsfile when building the image)
-ARG PROFILE
-# Build argument for the JAR file name
-ARG JAR_FILE
+ARG PROFILE=prod
+# Build argument for the JAR file path (relative to build context)
+ARG JAR_FILE=api-boot/target/api-server.jar
 
 # Convert ARG to ENV so they are available at container runtime
 ENV PROFILE=${PROFILE}
@@ -35,7 +35,7 @@ RUN mkdir -p /logs && chown -R spring:spring /logs
 USER spring:spring
 
 # Copy the built JAR into the container
-COPY ${JAR_FILE} /app.jar
+COPY ${JAR_FILE} /admin-server.jar
 
 # Expose container ports (documentation only; actual publishing is done via `docker run -p ...`)
 EXPOSE 80 443
@@ -45,4 +45,4 @@ EXPOSE 80 443
 # - Limit JVM memory usage with MaxRAMPercentage
 # - Improve entropy source for faster startup
 # - Run the Spring Boot JAR and set the active profile
-ENTRYPOINT ["sh", "-c", "java -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom -jar /app.jar --spring.profiles.active=${PROFILE}"]
+ENTRYPOINT ["sh", "-c", "java -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom -jar /admin-server.jar --spring.profiles.active=${PROFILE}"]

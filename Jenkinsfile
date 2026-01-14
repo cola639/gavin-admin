@@ -10,8 +10,15 @@ pipeline {
         // Docker image + container name
         IMAGE_NAME = 'admin-server'
 
+        // Module that produces the runnable JAR
+        MODULE_DIR = 'api-boot'
+
         // Built JAR file name (in target/)
-        JAR_FILE = 'admin-server.jar'
+        JAR_FILE = 'api-server.jar'
+
+        // Host config (mounted into build container)
+        CONFIG_SRC = '/host-yml/application-prod.yml'
+        CONFIG_DEST = 'api-boot/src/main/resources/application-prod.yml'
 
         // Jenkins workspace directory
         WS = "${WORKSPACE}"
@@ -46,14 +53,17 @@ pipeline {
             agent {
                 docker {
                     image "${NODE_IMAGE}"    // Use Maven Docker image for build
-                    args  '-v maven-repository:/root/.m2'   // Cache Maven dependencies
+                    args  "-v maven-repository:/root/.m2 -v /www/yml/admin:/host-yml:ro"
                 }
             }
             steps {
                 sh 'pwd && ls -alh'
                 sh 'mvn -v'
+                sh 'test -f ${CONFIG_SRC}'
+                sh 'cp ${CONFIG_SRC} ${WS}/${CONFIG_DEST}'
+                sh 'ls -lah ${WS}/${CONFIG_DEST}'
                 // Build and package (skip tests)
-                sh 'cd ${WS} && mvn clean package -Dmaven.test.skip=true'
+                sh 'cd ${WS} && mvn -DskipTests clean package'
             }
         }
 
@@ -62,18 +72,19 @@ pipeline {
                 sh 'pwd && ls -alh'
                 sh 'echo ${WS}'
                 sh 'ls -alh ${WS}/'
-                sh 'ls -lah ${WS}/${IMAGE_NAME}/target/'
+                sh 'ls -lah ${WS}/${MODULE_DIR}/target/'
+                sh 'ls -lah ${WS}/${MODULE_DIR}/target/${JAR_FILE}'
 
                 // Build Docker image:
-                // - Docker build context points to the target/ folder (where the JAR is)
-                // - Dockerfile must be able to COPY the JAR from that context
+                // - Docker build context points to the repo root
+                // - Dockerfile can COPY the JAR via its relative path
                 sh '''
                     docker build \
                       --build-arg PROFILE=${PROFILE} \
-                      --build-arg JAR_FILE=${JAR_FILE} \
+                      --build-arg JAR_FILE=${MODULE_DIR}/target/${JAR_FILE} \
                       -t ${IMAGE_NAME} \
                       -f Dockerfile \
-                      ${WS}/${IMAGE_NAME}/target/
+                      ${WS}
                 '''
 
                 // Remove old container if it exists (ignore error if not found)
