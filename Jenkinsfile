@@ -54,6 +54,7 @@ pipeline {
                 docker {
                     image "${NODE_IMAGE}"    // Use Maven Docker image for build
                     args  "-v maven-repository:/root/.m2 -v /www/yml/admin:/host-yml:ro"
+                    alwaysPull true
                 }
             }
             steps {
