@@ -11,7 +11,7 @@ ENV PROFILE=${PROFILE}
 ENV JAR_FILE=${JAR_FILE}
 
 # Create a non-root user/group named "spring" to run the process for better security
-RUN addgroup -S spring && adduser -S spring -G spring
+RUN groupadd -r spring && useradd -r -g spring -s /usr/sbin/nologin -d /nonexistent spring
 
 # Install fonts and libudev for native libraries (e.g., OSHI)
 RUN apt-get update && \

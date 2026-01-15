@@ -73,6 +73,7 @@ pipeline {
                 sh 'pwd && ls -alh'
                 sh 'echo ${WS}'
                 sh 'ls -alh ${WS}/'
+                sh 'sed -n "1,40p" ${WS}/Dockerfile'
                 sh 'ls -lah ${WS}/${MODULE_DIR}/target/'
                 sh 'ls -lah ${WS}/${MODULE_DIR}/target/${JAR_FILE}'
 
@@ -84,7 +85,7 @@ pipeline {
                       --build-arg PROFILE=${PROFILE} \
                       --build-arg JAR_FILE=${MODULE_DIR}/target/${JAR_FILE} \
                       -t ${IMAGE_NAME} \
-                      -f Dockerfile \
+                      -f ${WS}/Dockerfile \
                       ${WS}
                 '''
 
