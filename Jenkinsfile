@@ -108,7 +108,8 @@ pipeline {
                 docker run -d --net ${NETWORK} \
                   -p ${HOST_HTTP_PORT}:${CONTAINER_HTTP_PORT} \
                   -p ${HOST_JVM_PORT}:${CONTAINER_JVM_PORT} \
-                  --name ${IMAGE_NAME} --restart always \
+                  --name ${IMAGE_NAME}  \
+                 // --name ${IMAGE_NAME} --restart always \
                   ${IMAGE_NAME}
                 """
 
