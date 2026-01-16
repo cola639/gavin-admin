@@ -18,7 +18,7 @@ const path = require("path");
 const skipFolderArr = [".idea", ".mvn", "doc", "httpRequests", // (already inside .idea, but keep it in case you move it elsewhere)
     "node_modules", ".git", "dist", "target",];
 
-const skipFilesArr = ["project-core.md", "generate-necessary.js", "generate.js", "project-tree.md", "project-content.md", ".DS_Store", "create-env.sh.example",];
+const skipFilesArr = ["project-core.md", "generate-necessary.js", "generate.js", "project-tree.md", "project-content.md", ".DS_Store", "docker-env.sh.example",];
 // Content safety limits
 const MAX_BYTES = 200_000; // skip content if file > 200KB
 const MAX_LINES = 2000;    // truncate after N lines

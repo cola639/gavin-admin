@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# chmod +x create-env.sh
-# ./create-env.sh
+# chmod +x docker-env.sh
+# ./docker-env.sh
 
 
 cat > .env <<'EOF'

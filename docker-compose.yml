@@ -1,6 +1,6 @@
 # !!Remember copy env file together
-# chmod +x create-env.sh
-# ./create-env.sh
+# chmod +x docker-env.sh
+# ./docker-env.sh
 version: "3.8"
 
 services:
