@@ -52,7 +52,7 @@ const necessaryFilesArr = [// "pom.xml",
  * ======================= */
 const skipFolderArr = [".idea", ".mvn", "doc", "httpRequests", "node_modules", ".git", "dist", "target",];
 
-const skipFilesArr = ["project-core.md", "generate-necessary.js", "generate.js", "project-tree.md", "project-content.md", ".DS_Store", ".env.example",];
+const skipFilesArr = ["project-core.md", "generate-necessary.js", "generate.js", "project-tree.md", "project-content.md", ".DS_Store", "create-env.sh.example",];
 
 // Output file name (only one file)
 const OUT_FILE = "project-core.md";

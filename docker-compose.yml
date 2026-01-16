@@ -1,0 +1,42 @@
+# !!Remember copy env file together
+# chmod +x create-env.sh
+# ./create-env.sh
+version: "3.8"
+
+services:
+  mysql:
+    image: ${MYSQL_IMAGE}
+    container_name: ${MYSQL_CONTAINER}
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      TZ: Asia/Shanghai
+    ports:
+      - "${MYSQL_PORT}:${MYSQL_INNER_PORT}"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app_net
+    restart: unless-stopped
+
+  redis:
+    image: ${REDIS_IMAGE}
+    container_name: ${REDIS_CONTAINER}
+    ports:
+      - "${REDIS_PORT}:${REDIS_INNER_PORT}"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app_net
+    restart: unless-stopped
+
+networks:
+  app_net:
+    external: true
+    name: ${NETWORK_NAME}
+
+volumes:
+  mysql_data:
+    name: ${NETWORK_NAME}_mysql_data
+  redis_data:
+    name: ${NETWORK_NAME}_redis_data
