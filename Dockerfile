@@ -13,6 +13,9 @@ ENV JAR_FILE=${JAR_FILE}
 # Create a non-root user/group named "spring" to run the process for better security
 RUN groupadd -r spring && useradd -r -m -d /home/spring -g spring -s /usr/sbin/nologin spring
 
+# Ensure the runtime home directory is set for logback's ${user.home}
+ENV HOME=/home/spring
+
 # Install fonts and libudev for native libraries (e.g., OSHI)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends fonts-dejavu-core fontconfig libudev1 && \
@@ -37,4 +40,4 @@ EXPOSE 80 443
 # - Limit JVM memory usage with MaxRAMPercentage
 # - Improve entropy source for faster startup
 # - Run the Spring Boot JAR and set the active profile
-ENTRYPOINT ["sh", "-c", "java -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom -jar /admin-server.jar --spring.profiles.active=${PROFILE}"]
+ENTRYPOINT ["sh", "-c", "java -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom -Duser.home=/home/spring -jar /admin-server.jar --spring.profiles.active=${PROFILE}"]
