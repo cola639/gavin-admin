@@ -1,4 +1,4 @@
-# !!Remember copy env file together
+# !!Copy docker-compose.yml + docker-env.sh to /www/docker-compose
 # chmod +x docker-env.sh
 # ./docker-env.sh
 version: "3.8"

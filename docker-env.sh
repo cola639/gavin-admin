@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# !!Copy docker-compose.yml + docker-env.sh to /www/docker-compose
 # chmod +x docker-env.sh
 # ./docker-env.sh
 
