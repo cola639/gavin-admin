@@ -11,7 +11,7 @@ ENV PROFILE=${PROFILE}
 ENV JAR_FILE=${JAR_FILE}
 
 # Create a non-root user/group named "spring" to run the process for better security
-RUN groupadd -r spring && useradd -r -g spring -s /usr/sbin/nologin -d /nonexistent spring
+RUN groupadd -r spring && useradd -r -m -d /home/spring -g spring -s /usr/sbin/nologin spring
 
 # Install fonts and libudev for native libraries (e.g., OSHI)
 RUN apt-get update && \
@@ -19,9 +19,9 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Create the logs directory required by the application.
-# This should match logback.xml, e.g. <property name="log.path" value="./logs"/>
+# This should match logback.xml, e.g. <property name="log.path" value="${user.home}/logs"/>
 # Set ownership to the "spring" user and group.
-RUN mkdir -p /logs && chown -R spring:spring /logs
+RUN mkdir -p /home/spring/logs && chown -R spring:spring /home/spring/logs
 
 # Switch to the non-root user
 USER spring:spring
