@@ -31,7 +31,7 @@ pipeline {
 
         // Http port: the port your Spring Boot app listens on (matches application-prod.yml)
         HOST_HTTP_PORT = '8989'
-        CONTAINER_HTTP_PORT = '80'
+        CONTAINER_HTTP_PORT = '8989'
 
         // JVM port: the port your JVM is running on
         HOST_JVM_PORT = '8887'
