@@ -31,7 +31,7 @@ public class SysLoginWithPlatformController {
   @GetMapping("/github/start")
   public void startGithub(HttpServletResponse response) throws IOException {
     log.info("Redirecting to GitHub OAuth2 authorization endpoint.");
-    response.sendRedirect("/oauth2/authorization/github");
+    response.sendRedirect("/prod-api/oauth2/authorization/github");
   }
 
   /**
