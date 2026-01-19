@@ -31,7 +31,7 @@ public class SysAuthWithOosController {
   @GetMapping("/github/start")
   public void startGithub(HttpServletResponse response) throws IOException {
     log.info("Redirecting to GitHub OAuth2 authorization endpoint.");
-    response.sendRedirect("http://142.171.47.231:8989/auth2/authorization/github");
+    response.sendRedirect("/oauth2/authorization/github");
   }
 
   /**
