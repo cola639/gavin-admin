@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
-public class SysLoginWithPlatformController {
+public class SysAuthWithOosController {
 
   private final LoginTicketService loginTicketService;
 
