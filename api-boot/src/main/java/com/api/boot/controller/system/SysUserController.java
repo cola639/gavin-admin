@@ -15,6 +15,8 @@ import com.api.common.utils.pagination.TableDataInfo;
 import com.api.common.utils.uuid.IdUtils;
 import com.api.framework.annotation.RepeatSubmit;
 import com.api.framework.exception.ServiceException;
+import com.api.system.imports.user.UserImportResult;
+import com.api.system.imports.user.UserImportService;
 import com.api.system.service.*;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +27,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,6 +50,8 @@ public class SysUserController extends BaseController {
   private final SysRoleService sysRoleService;
 
   private final SysPostService sysPostService;
+
+  private final UserImportService userImportService;
 
   @Value("${app.default.password:admin123}")
   private String defaultPassword;
@@ -104,6 +111,32 @@ public class SysUserController extends BaseController {
   //    }
   //
 
+  @PostMapping("/import")
+  public AjaxResult importUsers(
+      @RequestPart MultipartFile file,
+      @RequestParam(value = "updateSupport", defaultValue = "false") boolean updateSupport) {
+    validateImportFile(file);
+    try (java.io.InputStream inputStream = file.getInputStream()) {
+      UserImportResult result = userImportService.importUsers(inputStream, updateSupport, false);
+      return AjaxResult.success("Import completed", result);
+    } catch (IOException e) {
+      throw new ServiceException("Failed to read uploaded file: " + e.getMessage());
+    }
+  }
+
+  @PostMapping("/import/preview")
+  public AjaxResult previewImport(
+      @RequestPart MultipartFile file,
+      @RequestParam(value = "updateSupport", defaultValue = "false") boolean updateSupport) {
+    validateImportFile(file);
+    try (java.io.InputStream inputStream = file.getInputStream()) {
+      UserImportResult result = userImportService.importUsers(inputStream, updateSupport, true);
+      return AjaxResult.success("Import preview completed", result);
+    } catch (IOException e) {
+      throw new ServiceException("Failed to read uploaded file: " + e.getMessage());
+    }
+  }
+
   @GetMapping("/info")
   public AjaxResult getInfo(@RequestParam(value = "userId", required = false) Long userId) {
     AjaxResult ajax = AjaxResult.success();
@@ -155,6 +188,16 @@ public class SysUserController extends BaseController {
     }
     userService.deleteUserByIds(userIds);
     return AjaxResult.success("Deleted Successful");
+  }
+
+  private void validateImportFile(MultipartFile file) {
+    if (file == null || file.isEmpty()) {
+      throw new ServiceException("Excel file is required");
+    }
+    String filename = file.getOriginalFilename();
+    if (filename == null || !filename.toLowerCase(Locale.ROOT).endsWith(".xlsx")) {
+      throw new ServiceException("Only .xlsx files are supported");
+    }
   }
 
   //    @PutMapping("/resetPwd")
