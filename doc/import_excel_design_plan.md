@@ -1,48 +1,21 @@
-# Excel Import Design Plan (Project Standard + Template)
+# Excel Import Design Plan (Project Standard)
 
-This document captures the current Excel import design in this repo and a reusable template for adding new imports.
+This document captures the current Excel import design used in this repo and serves as a reusable template for new import types.
 
----
+## 1) Scope and goals
 
-## 1) Goals and constraints
+- Provide a consistent, testable pipeline for Excel imports.
+- Separate responsibilities: read, map, validate, generate, persist.
+- Support update vs create, dry-run, and row-level error reporting.
 
-### Functional goals
+## 2) High-level data flow
 
-- User uploads an Excel (.xlsx) file.
-- System parses rows, validates data, generates derived fields, and persists valid records.
-- Provide import result with counts and row-level errors.
-- Support update vs create and dry-run mode.
-
-### Non-functional goals
-
-- Clear, deterministic rules for validation and normalization.
-- Row-level errors that are easy to fix and re-upload.
-- Reasonable performance for typical file sizes.
-
-Note: The current `ExcelReader` uses Apache POI `WorkbookFactory` (in-memory). For very large files, consider a streaming reader.
-
----
-
-## 2) Current implementation overview (code-based)
-
-Pipeline in `api-system`:
-
-1. Read Excel with `ExcelReader` using an `ExcelReadSpec`.
-2. Map each `ExcelRow` to a typed row DTO via `ImportRowMapper`.
-3. Validate row data via `ImportRowValidator` and return `ImportValidationResult` with context.
-4. Normalize and apply defaults in `ImportRowGenerator`.
-5. Persist via `ImportRowWriter`.
-6. Aggregate results in the import service.
-
-Key behaviors in the current user import:
-
-- `updateSupport` controls update vs create.
-- `dryRun` skips persistence but still validates.
-- Duplicate detection within the file uses `ImportBatchContext.getSeenKeys()`.
-- DB-level checks are done in the validator.
-- Aliases and normalization live in the contract to keep validator and generator aligned.
-
----
+1. `ExcelReader` loads an `ExcelSheet` using `ExcelReadSpec`.
+2. `ImportRowMapper` converts each `ExcelRow` to a typed row DTO.
+3. `ImportRowValidator` validates and returns `ImportValidationResult` with row context.
+4. `ImportRowGenerator` normalizes values and creates a persistent entity.
+5. `ImportRowWriter` persists the entity.
+6. `ImportService` aggregates results and errors.
 
 ## 3) Base contracts (shared across import types)
 
@@ -55,8 +28,6 @@ Located in `api-system/src/main/java/com/api/system/imports/base`:
 - `ImportBatchContext`: per-import state (updateSupport, duplicate detection).
 - `ImportValidationResult<C>`: validation errors + context; `isValid()` helper.
 
----
-
 ## 4) Excel read rules (current behavior)
 
 Using `api-common` Excel utilities:
@@ -67,8 +38,6 @@ Using `api-common` Excel utilities:
 - `ExcelRow.rowIndex` is 1-based and matches user-facing row numbers.
 - Header mismatches throw `ExcelHeaderMismatchException` with expected vs actual.
 
----
-
 ## 5) Import contract (per import type)
 
 Example: `UserImportContract`
@@ -77,24 +46,22 @@ Responsibilities:
 
 - Define sheet name, column headers, required headers, allowed values, defaults.
 - Provide `readSpec()` for `ExcelReader`.
-- Normalize user-provided strings into canonical values with alias maps.
+- Normalize user-provided strings into canonical values:
+  - `normalizeStatus`, `normalizeSex`, `normalizeUserType`.
+  - Map aliases to stored codes via constant maps.
 
 Guideline:
 
 - Keep column definitions and header lists in one place to avoid drift.
 - Use constants for shared strings across mapper/validator/generator.
 
----
-
 ## 6) Row DTO and mapping
 
-Example: `UserImportRow` and `UserImportRowMapper`
+Example: `UserImportRow`
 
-- DTO fields mirror Excel columns.
-- Mapper trims values from `ExcelRow.getValues()`.
-- Mapping is deterministic and side-effect free.
-
----
+- Plain DTO with fields matching columns.
+- `UserImportRowMapper` trims values from `ExcelRow.getValues()`.
+- Mapping should be deterministic and side-effect free.
 
 ## 7) Validation layer
 
@@ -113,8 +80,6 @@ Validation output:
   - `errors`: list of messages.
   - `context`: resolved data for generation (e.g., existing entity, foreign keys).
 
----
-
 ## 8) Generation layer
 
 Example: `UserImportGenerator`
@@ -125,10 +90,8 @@ Responsibilities:
 - Respect update vs create:
   - On update, only set optional fields when provided.
   - On create, set defaults for missing optional fields.
-- Use validation context for resolved references.
+- Use `ImportValidationResult.context` for resolved references.
 - Set audit fields (`createBy`, `updateBy`) and default flags.
-
----
 
 ## 9) Persistence layer
 
@@ -137,15 +100,13 @@ Example: `UserImportWriter`
 - Single responsibility: save entity via repository.
 - No validation or transformation here.
 
----
-
 ## 10) Orchestration (service layer)
 
 Example: `UserImportService`
 
 Workflow:
 
-- Read Excel with `[Entity]ImportContract.readSpec()`.
+- Read Excel with `UserImportContract.readSpec()`.
 - Loop rows and apply: map -> validate -> generate -> save.
 - Support:
   - `updateSupport` for upsert behavior.
@@ -154,16 +115,12 @@ Workflow:
   - total rows, created, updated, errors.
   - per-row errors with row index + identifier.
 
----
-
 ## 11) Result + error reporting
 
 Example: `UserImportResult` and `UserImportRowError`
 
 - `UserImportRowError` includes row index, row identifier, and messages.
 - `UserImportResult` captures totals and error list for UI display.
-
----
 
 ## 12) Checklist for adding a new import
 
@@ -191,78 +148,9 @@ Use this as a repeatable template:
 8. Add a sample Excel file in `doc/import-test/`.
 9. Add tests for validator and generator (at minimum).
 
----
-
-## 13) Optional UX/API design (future)
-
-If you need async imports or job tracking, add:
-
-- `POST /api/imports` (upload file -> returns `importJobId`)
-- `GET /api/imports/{jobId}` (status + progress + summary)
-- `GET /api/imports/{jobId}/errors` (download error report)
-- optional `POST /api/imports/{jobId}/confirm` for preview-first flow
-
----
-
-## 14) Idempotency and duplicate control
-
-Current design:
-
-- File-level duplicate detection via `ImportBatchContext`.
-- DB-level uniqueness checks in the validator.
-
-Optional extensions:
-
-- File checksum + import type to block or mark re-imports.
-- Database unique constraints on business keys.
-- Upsert policy in the service or repository.
-
----
-
-## 15) Performance and scalability
-
-Current design loads the workbook in memory. For large files:
-
-- Switch to a streaming Excel reader.
-- Use chunked persistence to reduce transaction size.
-- Prefetch reference data to avoid per-row DB lookups.
-
----
-
-## 16) Security and compliance
-
-- Restrict import endpoints to authorized roles.
-- Avoid logging raw sensitive values.
-- Consider retention policy for uploaded files.
-
----
-
-## 17) Observability
-
-Recommended logs/metrics:
-
-- job identifier, import type, user, total rows.
-- success/failure counts and elapsed time.
-- row error count by type.
-
----
-
-## 18) Testing plan
-
-- Unit tests:
-  - header validation rules.
-  - row validation constraints.
-  - generator normalization and defaults.
-- Integration tests:
-  - import a small Excel and verify DB state.
-  - update vs create behavior.
-  - dry-run behavior.
-
----
-
-## 19) Practical notes
+## 13) Practical notes (from current design)
 
 - Keep validation and generation separate to make dry-run meaningful.
-- Keep normalization functions in the contract so validator and generator stay in sync.
 - Use consistent error message strings for predictable UI display.
+- Make normalization functions in the contract so validator and generator stay in sync.
 
