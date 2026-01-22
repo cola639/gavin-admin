@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserImportService {
 
+  private static final int IMPORT_BATCH_SIZE = 200;
+
   private final ExcelReader excelReader;
   private final ImportRowMapper<UserImportRow> rowMapper;
   private final ImportRowValidator<UserImportRow, UserImportContext> validator;
@@ -52,6 +54,7 @@ public class UserImportService {
     String operator = SecurityUtils.getUsername();
     ImportBatchContext batchContext = new ImportBatchContext(updateSupport);
     List<UserImportRowError> rowErrors = new ArrayList<>();
+    List<SysUser> pendingSaves = new ArrayList<>(IMPORT_BATCH_SIZE);
 
     int createdCount = 0;
     int updatedCount = 0;
@@ -70,7 +73,11 @@ public class UserImportService {
       boolean isUpdate = context != null && context.getExistingUser() != null;
       SysUser entity = generator.generate(row, context, operator);
       if (!dryRun) {
-        writer.save(entity);
+        pendingSaves.add(entity);
+        if (pendingSaves.size() >= IMPORT_BATCH_SIZE) {
+          writer.saveAll(pendingSaves);
+          pendingSaves.clear();
+        }
       }
 
       if (isUpdate) {
@@ -78,6 +85,11 @@ public class UserImportService {
       } else {
         createdCount++;
       }
+    }
+
+    if (!dryRun && !pendingSaves.isEmpty()) {
+      writer.saveAll(pendingSaves);
+      pendingSaves.clear();
     }
 
     int totalRows = sheet.getRows().size();

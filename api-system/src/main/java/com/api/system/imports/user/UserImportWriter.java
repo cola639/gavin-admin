@@ -17,4 +17,9 @@ public class UserImportWriter implements ImportRowWriter<SysUser> {
   public SysUser save(SysUser user) {
     return userRepository.save(user);
   }
+
+  @Override
+  public void saveAll(Iterable<SysUser> users) {
+    userRepository.saveAll(users);
+  }
 }
