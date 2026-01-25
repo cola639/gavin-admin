@@ -2,6 +2,11 @@ server:
   port: 8989
 
 spring:
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
   datasource:
     url: jdbc:mysql://localhost:3306/ry-vue?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8
     username: root
