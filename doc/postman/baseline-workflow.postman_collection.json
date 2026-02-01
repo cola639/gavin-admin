@@ -1,0 +1,592 @@
+{
+  "info": {
+    "name": "Baseline Workflow API",
+    "_postman_id": "9f1c0d5b-9f10-4b1a-a56e-7d3a0c7d8b1f",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8989"
+    },
+    {
+      "key": "baselineId",
+      "value": "1"
+    },
+    {
+      "key": "taskId",
+      "value": "1001"
+    },
+    {
+      "key": "assigneeId",
+      "value": "sme01"
+    }
+  ],
+  "item": [
+    {
+      "name": "Workflow Runner",
+      "item": [
+        {
+          "name": "1 - Create baseline draft (runner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Draft baseline - API created\",\n  \"ownerId\": \"owner01\",\n  \"ownerName\": \"Platform Owner A\",\n  \"reviewerId\": \"sme01\",\n  \"reviewerName\": \"Cyber SME A\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/baselines",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baselines"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.data && jsonData.data.id) {",
+                  "  pm.collectionVariables.set('baselineId', jsonData.data.id.toString());",
+                  "}",
+                  "pm.setNextRequest('2 - Submit baseline (runner)');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2 - Submit baseline (runner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reviewerId\": \"sme01\",\n  \"reviewerName\": \"Cyber SME A\",\n  \"actorId\": \"owner01\",\n  \"actorName\": \"Platform Owner A\",\n  \"actorRole\": \"OWNER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/baselines/{{baselineId}}/submit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baselines",
+                "{{baselineId}}",
+                "submit"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.setNextRequest('3 - My tasks (runner)');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3 - My tasks (runner)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/my?assigneeId={{assigneeId}}&assigneeRole=CYBER_SME&status=PENDING&page=1&size=20&sort=createdAt,desc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "my"
+              ],
+              "query": [
+                {
+                  "key": "assigneeId",
+                  "value": "{{assigneeId}}"
+                },
+                {
+                  "key": "assigneeRole",
+                  "value": "CYBER_SME"
+                },
+                {
+                  "key": "status",
+                  "value": "PENDING"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "sort",
+                  "value": "createdAt,desc"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "var rows = jsonData && jsonData.rows ? jsonData.rows : [];",
+                  "var baselineId = pm.collectionVariables.get('baselineId');",
+                  "var match = rows.find(function(r) { return r.requestId && r.requestId.toString() === String(baselineId); });",
+                  "var picked = match || (rows.length > 0 ? rows[0] : null);",
+                  "if (picked && picked.taskId) {",
+                  "  pm.collectionVariables.set('taskId', picked.taskId.toString());",
+                  "}",
+                  "pm.setNextRequest('4 - Decide task (approve) (runner)');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4 - Decide task (approve) (runner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"APPROVE\",\n  \"comment\": \"Looks good\",\n  \"actorId\": \"sme01\",\n  \"actorName\": \"Cyber SME A\",\n  \"actorRole\": \"CYBER_SME\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{taskId}}/decision",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{taskId}}",
+                "decision"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.setNextRequest('5 - Get baseline by id (runner)');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5 - Get baseline by id (runner)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/baselines/{{baselineId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baselines",
+                "{{baselineId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.setNextRequest('6 - Get baseline timeline (runner)');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "6 - Get baseline timeline (runner)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/baselines/{{baselineId}}/timeline",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baselines",
+                "{{baselineId}}",
+                "timeline"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.setNextRequest(null);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Baselines",
+      "item": [
+        {
+          "name": "List baselines",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/baselines?page=1&size=20&sort=updatedAt,desc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baselines"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "PUBLISHED",
+                  "disabled": true
+                },
+                {
+                  "key": "approvalStatus",
+                  "value": "APPROVED",
+                  "disabled": true
+                },
+                {
+                  "key": "ownerId",
+                  "value": "owner01",
+                  "disabled": true
+                },
+                {
+                  "key": "reviewerId",
+                  "value": "sme01",
+                  "disabled": true
+                },
+                {
+                  "key": "pendingActionType",
+                  "value": "RETIRE",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "sort",
+                  "value": "updatedAt,desc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get baseline by id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/baselines/{{baselineId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baselines",
+                "{{baselineId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get baseline timeline",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/baselines/{{baselineId}}/timeline",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baselines",
+                "{{baselineId}}",
+                "timeline"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create baseline draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Draft baseline - API created\",\n  \"ownerId\": \"owner01\",\n  \"ownerName\": \"Platform Owner A\",\n  \"reviewerId\": \"sme01\",\n  \"reviewerName\": \"Cyber SME A\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/baselines",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baselines"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Submit baseline",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reviewerId\": \"sme01\",\n  \"reviewerName\": \"Cyber SME A\",\n  \"actorId\": \"owner01\",\n  \"actorName\": \"Platform Owner A\",\n  \"actorRole\": \"OWNER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/baselines/{{baselineId}}/submit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baselines",
+                "{{baselineId}}",
+                "submit"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Request post-action",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"actionType\": \"RETIRE\",\n  \"reason\": \"No longer needed\",\n  \"reviewerId\": \"sme01\",\n  \"reviewerName\": \"Cyber SME A\",\n  \"actorId\": \"owner01\",\n  \"actorName\": \"Platform Owner A\",\n  \"actorRole\": \"OWNER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/baselines/{{baselineId}}/post-action/request",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baselines",
+                "{{baselineId}}",
+                "post-action",
+                "request"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "My tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/my?assigneeId={{assigneeId}}&assigneeRole=CYBER_SME&status=PENDING&page=1&size=20&sort=createdAt,desc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "my"
+              ],
+              "query": [
+                {
+                  "key": "assigneeId",
+                  "value": "{{assigneeId}}"
+                },
+                {
+                  "key": "assigneeRole",
+                  "value": "CYBER_SME"
+                },
+                {
+                  "key": "status",
+                  "value": "PENDING"
+                },
+                {
+                  "key": "stepCode",
+                  "value": "SME_REVIEW",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "sort",
+                  "value": "createdAt,desc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Decide task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"APPROVE\",\n  \"comment\": \"Looks good\",\n  \"actorId\": \"sme01\",\n  \"actorName\": \"Cyber SME A\",\n  \"actorRole\": \"CYBER_SME\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{taskId}}/decision",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{taskId}}",
+                "decision"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

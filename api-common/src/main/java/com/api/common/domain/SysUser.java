@@ -5,6 +5,7 @@ import com.api.common.validation.DictValidator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -53,8 +54,10 @@ public class SysUser extends BaseEntity {
   private String nickName;
 
   /** Email address */
+  @NotBlank(message = "Email cannot be blank")
+  @Email(message = "Email format is invalid")
   @Size(max = 50, message = "Email length cannot exceed 50 characters")
-  @Column(name = "email")
+  @Column(name = "email", length = 50, nullable = false)
   private String email;
 
   /** Phone number */
