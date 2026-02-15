@@ -16,6 +16,7 @@ public class BaselineSummary {
   private Long id;
   private String requestNo;
   private String title;
+  private String remark;
   private String status;
   private String approvalStatus;
   private String currentStep;
@@ -36,6 +37,7 @@ public class BaselineSummary {
         .id(entity.getId())
         .requestNo(entity.getRequestNo())
         .title(entity.getTitle())
+        .remark(entity.getRemark())
         .status(entity.getStatus())
         .approvalStatus(entity.getApprovalStatus())
         .currentStep(entity.getCurrentStep())

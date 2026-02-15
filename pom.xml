@@ -43,6 +43,7 @@
         <minio.version>8.5.12</minio.version>
         <!-- AWS SDK v2 (SESv2/auth/regions etc.) -->
         <aws.sdk.version>2.39.6</aws.sdk.version>
+        <flyway.version>11.7.2</flyway.version>
 
 
     </properties>
@@ -59,6 +60,37 @@
                 <scope>import</scope>
             </dependency>
 
+            <dependency>
+                <groupId>com.gavin</groupId>
+                <artifactId>api-framework</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.gavin</groupId>
+                <artifactId>api-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.gavin</groupId>
+                <artifactId>api-system</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.gavin</groupId>
+                <artifactId>api-quartz</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>${flyway.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-mysql</artifactId>
+                <version>${flyway.version}</version>
+            </dependency>
 
             <!-- MySQL Driver -->
             <dependency>

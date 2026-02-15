@@ -38,6 +38,9 @@ public class BaselineRequest {
   @Column(name = "title", nullable = false, length = 255)
   private String title;
 
+  @Column(name = "remark", length = 500)
+  private String remark;
+
   @Column(name = "owner_id", nullable = false, length = 64)
   private String ownerId;
 

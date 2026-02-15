@@ -17,12 +17,10 @@
         <dependency>
             <groupId>com.gavin</groupId>
             <artifactId>api-framework</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.gavin</groupId>
             <artifactId>api-common</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -32,20 +30,24 @@
         <dependency>
             <groupId>com.gavin</groupId>
             <artifactId>api-system</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.gavin</groupId>
             <artifactId>api-quartz</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
         </dependency>
 
     </dependencies>
